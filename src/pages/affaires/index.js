@@ -21,7 +21,7 @@ const Page = () => {
 
   const proceedToForm = () => {
     router.push('/affaires/createAffaire');
-};
+  };
 
   return (
     <>
