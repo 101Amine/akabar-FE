@@ -9,18 +9,24 @@ import {
   Typography
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-
+import { fetchWithHeaders } from '../../utils/api';
 const CreateClient = () => {
   const [clientDetails, setClientDetails] = useState({
-    userName: '',
+    nameClient: '',
     password: '',
-    email: '',
+    firstName: '',
+    lastName: '',
+    mobilePhoneNumber: '',
     phone: '',
     fax: '',
     ice: '',
     bankAccount: '',
     address: ''
   });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = useCallback(
     (event) => {
@@ -33,27 +39,48 @@ const CreateClient = () => {
   );
 
   const handleSubmit = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
-      // Logic for form submission
+      setSubmitting(true);
+      setError(null);
+
+      console.log("clientDetails",clientDetails)
+      try {
+        const response = await fetchWithHeaders(`/users/client/add`, {
+          method: 'POST',
+          body: JSON.stringify(clientDetails),
+        });
+
+        setSubmitting(false);
+
+        if (response.status === 200) {
+          setSuccess(true);
+        } else {
+          setError('Failed to add client. Please try again.');
+        }
+      } catch (error) {
+        setSubmitting(false);
+        setError('Failed to add client. Please try again.');
+      }
     },
-    []
+    [clientDetails]
   );
 
   return (
     <Container maxWidth="xl">
+      <Box marginTop={8}>
       <Typography variant="h4" gutterBottom>
         Create Client
       </Typography>
       <Divider />
-      <Box ustifyContent="center" mt={4}>
+      <Box justifyContent="center" mt={4}>
         <form autoComplete="off" noValidate onSubmit={handleSubmit}>
           <Grid container spacing={3} padding={2} display='flex' flexDirection='column'>
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Nom d'utilisateur"
-                name="userName"
+                label="Nom du client"
+                name="nameClient"
                 onChange={handleChange}
                 required
                 value={clientDetails.userName}
@@ -73,18 +100,37 @@ const CreateClient = () => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Email"
-                name="email"
+                label="Nom"
+                name="firstName"
                 onChange={handleChange}
                 required
-                type="email"
-                value={clientDetails.email}
+                value={clientDetails.firstName}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Prenom"
+                name="lastName"
+                onChange={handleChange}
+                required
+                value={clientDetails.lastName}
               />
             </Grid>
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
                 label="Téléphone"
+                name="mobilePhoneNumber"
+                onChange={handleChange}
+                value={clientDetails.mobilePhoneNumber}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Téléphone Fix"
                 name="phone"
                 onChange={handleChange}
                 value={clientDetails.phone}
@@ -134,6 +180,12 @@ const CreateClient = () => {
             </Button>
           </Box>
         </form>
+        <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
+          {submitting && <Typography variant="body2">Submitting...</Typography>}
+          {error && <Typography variant="body2" color="error">{error}</Typography>}
+          {success && <Typography variant="body2" color="success">Client added successfully!</Typography>}
+        </Box>
+      </Box>
       </Box>
     </Container>
   );

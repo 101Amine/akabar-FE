@@ -37,6 +37,7 @@ import {
 
     return (
       <Container maxWidth="xl">
+        <Box marginTop={8}>
         <Typography variant="h4" gutterBottom>
           Create Affaire
         </Typography>
@@ -279,6 +280,7 @@ import {
         <Button variant="contained" color="primary" sx={{marginBlock: 3, float: 'right'}}>
           Soumettre
         </Button>
+        </Box>
       </Container>
     );
   };

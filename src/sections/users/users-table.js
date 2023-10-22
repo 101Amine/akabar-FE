@@ -13,10 +13,18 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
+import { useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { getInitials } from 'src/utils/get-initials';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import BlockIcon from '@mui/icons-material/Block';
+import { Snackbar, Alert } from '@mui/material';
+import { router } from 'next/client';
+import { fetchWithHeaders } from '../../utils/api';
 
-export const CustomersTable = (props) => {
+
+export const UsersTable = (props) => {
   const {
     count = 0,
     items = [],
@@ -30,6 +38,45 @@ export const CustomersTable = (props) => {
     rowsPerPage = 0,
     selected = []
   } = props;
+
+  const handleEdit = (user) => {
+
+    console.log("user",user)
+    router.push({
+      pathname: '/users/updateUser',
+      query: { user: JSON.stringify(user) }
+    });
+  };
+
+  const handleBlock = async (id) => {
+    console.log("Blocking user with ID:", id);
+
+    const payload = {
+      active: false
+    };
+
+    try {
+      const response = await fetchWithHeaders('/users/profile', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      console.log("User blocked successfully", response);
+      setSnackbarMessage('User blocked successfully!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+
+    } catch (error) {
+      console.error("Error blocking user:", error.message);
+      setSnackbarMessage('Error blocking user.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const selectedSome = (selected.length > 0) && (selected.length < items.length);
   const selectedAll = (items.length > 0) && (selected.length === items.length);
@@ -50,6 +97,7 @@ export const CustomersTable = (props) => {
                 <TableCell>
                   Phone
                 </TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -83,6 +131,20 @@ export const CustomersTable = (props) => {
                     <TableCell>
                       {customer.mobilePhoneNumber}
                     </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} sx={{ float: 'right' }}>
+                        <IconButton color="primary" aria-label="edit customer" onClick={() =>
+                        {
+                          handleEdit(customer)
+                          console.log("curstomer :",customer)
+                        }}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton color="secondary" aria-label="block customer" onClick={() => handleBlock(customer.id)}>
+                          <BlockIcon />
+                        </IconButton>
+                      </Stack>
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -99,11 +161,22 @@ export const CustomersTable = (props) => {
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
       />
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} variant="filled">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Card>
   );
 };
 
-CustomersTable.propTypes = {
+UsersTable.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
   onDeselectAll: PropTypes.func,

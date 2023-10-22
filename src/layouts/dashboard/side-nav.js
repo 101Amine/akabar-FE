@@ -1,27 +1,43 @@
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import PropTypes from 'prop-types';
-import ArrowTopRightOnSquareIcon from '@heroicons/react/24/solid/ArrowTopRightOnSquareIcon';
-import ChevronUpDownIcon from '@heroicons/react/24/solid/ChevronUpDownIcon';
 import {
   Box,
-  Button,
   Divider,
   Drawer,
   Stack,
-  SvgIcon,
   Typography,
-  useMediaQuery
+  useMediaQuery,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
-import { items } from './config';
-import { SideNavItem } from './side-nav-item';
+import { styled } from '@mui/material/styles';
+
+const StyledListItem = styled(ListItem)(({ theme, active }) => ({
+  '&:hover': {
+    backgroundColor: theme.palette.primary.main,
+    cursor: 'pointer'
+  },
+  backgroundColor: active ? theme.palette.primary.main : 'transparent',
+  color: active ? theme.palette.primary.contrastText : 'inherit',
+  '&.Mui-selected, &.Mui-selected:hover': {
+    backgroundColor: 'red',
+    color: theme.palette.primary.contrastText,
+  },
+  transition: 'background-color 0.1s',
+  borderRadius: '10px'
+}));
+
 
 export const SideNav = (props) => {
-  const { open, onClose } = props;
+  const { open, onClose, submenuItems  } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+
 
   const content = (
     <Scrollbar
@@ -86,21 +102,19 @@ export const SideNav = (props) => {
               m: 0
             }}
           >
-            {items.map((item) => {
-              const active = item.path ? (pathname === item.path) : false;
-
-              return (
-                <SideNavItem
-                  active={active}
-                  disabled={item.disabled}
-                  external={item.external}
-                  icon={item.icon}
-                  key={item.title}
-                  path={item.path}
-                  title={item.title}
-                />
-              );
-            })}
+            <List component="nav" sx={{ '& > *': { marginBottom: '10px'} }}>
+              {submenuItems.map(item => {
+                const isActive = item.path === pathname;
+                return (
+                  <StyledListItem key={item.label} button component={NextLink} href={item.path} active={isActive}>
+                    <ListItemIcon>
+                      <item.icon />
+                    </ListItemIcon>
+                    <ListItemText primary={item.label} />
+                  </StyledListItem>
+                );
+              })}
+            </List>
           </Stack>
         </Box>
         <Divider sx={{ borderColor: 'neutral.700' }} />
@@ -149,5 +163,12 @@ export const SideNav = (props) => {
 
 SideNav.propTypes = {
   onClose: PropTypes.func,
-  open: PropTypes.bool
+  open: PropTypes.bool.isRequired,
+  submenuItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      path: PropTypes.string.isRequired,
+      icon: PropTypes.elementType.isRequired
+    })
+  ).isRequired
 };

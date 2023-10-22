@@ -10,6 +10,7 @@ export function createPalette() {
       disabledBackground: alpha(neutral[900], 0.12),
       focus: alpha(neutral[900], 0.16),
       hover: alpha(neutral[900], 0.04),
+      hoverMenu: alpha(neutral[1000], 0.04),
       selected: alpha(neutral[900], 0.12)
     },
     background: {

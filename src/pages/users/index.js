@@ -1,46 +1,40 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Container, Divider, Stack, SvgIcon, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { CustomersTable } from 'src/sections/users/customers-table';
-import { CustomersSearch } from 'src/sections/users/customers-search';
-import { applyPagination } from 'src/utils/apply-pagination';
+import { UsersTable } from 'src/sections/users/users-table';
+import { UsersSearch } from 'src/sections/users/users-search';
 import { useRouter } from 'next/router';
-
-
-const data = [
-  {
-    id: '5e887ac47eed253091be10cb',
-    firstName: 'Becha',
-    lastName: 'Mohamed Amine',
-    email: 'aminebecha8@gmail.com',
-    mobilePhoneNumber: '0699494516'
-  },
-  {
-    id: '5e887b209c28ac3dd97f6db5',
-    firstName: 'Ayoub',
-    lastName: 'Alouani',
-    email: 'Ayoubalouani@gmail.com',
-    mobilePhoneNumber: '0699541265'
-  },
-  {
-    id: '5e887b7602bdbc4dbb234b27',
-    firstName: 'XXXXX',
-    lastName: 'YYYYY',
-    email: 'test@test.com',
-    mobilePhoneNumber: '0600225545'
-  },
-];
+import { fetchWithHeaders } from '../../utils/api';
 
 const useCustomers = (page, rowsPerPage) => {
-  return useMemo(
-    () => {
-      return applyPagination(data, page, rowsPerPage);
-    },
-    [page, rowsPerPage]
-  );
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetchWithHeaders(`/users/staff/list?offset=0&limit=10`, {
+          method: 'POST',
+          body: JSON.stringify({
+            searchFilter: {},
+            offset: 0,
+            limit: 10
+          }),
+        });
+
+        setData(response.content.currentPageData || []);  // Add a fallback to an empty array
+
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, [page, rowsPerPage]);
+
+  return data;
 };
 
 const useCustomerIds = (customers) => {
@@ -102,7 +96,7 @@ const Page = () => {
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                Clients
+                  Users
                 </Typography>
                 <Stack
                   alignItems="center"
@@ -111,6 +105,7 @@ const Page = () => {
                 >
                 </Stack>
               </Stack>
+              <Divider />
               <div>
                 <Button
                   onClick={proceedToForm}
@@ -123,11 +118,12 @@ const Page = () => {
                 >
                   Add
                 </Button>
+
               </div>
             </Stack>
-            <CustomersSearch />
-            <CustomersTable
-              count={data.length}
+            <UsersSearch />
+            <UsersTable
+              count={customers.length}
               items={customers}
               onDeselectAll={customersSelection.handleDeselectAll}
               onDeselectOne={customersSelection.handleDeselectOne}

@@ -1,11 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Button,
-  Card,
   CardActions,
-  CardContent,
-  CardHeader,
   Divider,
   TextField,
   Grid,
@@ -15,17 +13,37 @@ import {
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { fetchWithHeaders } from '../../utils/api';
 
-const CreateUser = () => {
-  const [userDetails, setUserDetails] = useState({
-    userName: '',
-    password: '',
-    phoneNumber: ''
-  });
+const UpdateUser = () => {
+  const router = useRouter();
+
+  const { user: userJSON } = router.query;
+
+  const initialUserDetails = userJSON
+    ? JSON.parse(userJSON)
+    : {
+      userName: '',
+      password: '',
+      phoneNumber: ''
+    };
+
+  const [userDetails, setUserDetails] = useState(initialUserDetails);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    if (userJSON) {
+      setUserDetails(JSON.parse(userJSON));
+    }
+  }, [userJSON]);
+
+  useEffect(() => {
+    console.log("userDetails",userDetails)
+  }, [userDetails]);
+
+
+  // Handle changes to the form's input fields
   const handleChange = useCallback(
     (event) => {
       setUserDetails((prevState) => ({
@@ -43,11 +61,10 @@ const CreateUser = () => {
       setError(null);
 
       try {
-        const responseData = await fetchWithHeaders('/users/staff/add', {
+        await fetchWithHeaders(`/users/profile`, {
           method: 'POST',
           body: JSON.stringify(userDetails)
         });
-
         setSubmitting(false);
         setSuccess(true);
       } catch (error) {
@@ -59,9 +76,9 @@ const CreateUser = () => {
   );
 
   return (
-    <Container maxWidth="xl" >
+    <Container maxWidth="xl">
       <Typography variant="h4" marginTop='40px' gutterBottom>
-        Create User
+        Update User
       </Typography>
       <Divider />
       <Box marginInline='50px' justifyContent="center" mt={4}>
@@ -70,11 +87,22 @@ const CreateUser = () => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Nom d'utilisateur"
-                name="userName"
+                label="Nom"
+                name="firstName"
                 onChange={handleChange}
                 required
-                value={userDetails.userName}
+                value={userDetails.firstName}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Prenom"
+                name="lastName"
+                onChange={handleChange}
+                required
+                value={userDetails.lastName}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -107,31 +135,31 @@ const CreateUser = () => {
                 onChange={handleChange}
                 required
                 type="tel"
-                value={userDetails.phoneNumber}
+                value={userDetails.mobilePhoneNumber}
               />
             </Grid>
           </Grid>
           <Divider />
           <CardActions sx={{ justifyContent: 'flex-end' }}>
             <Button variant="contained" color="primary" type="submit" disabled={submitting}>
-              Soumettre
+              Update
             </Button>
           </CardActions>
         </form>
         <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
-          {submitting && <Typography variant="body2">Submitting...</Typography>}
+          {submitting && <Typography variant="body2">Updating...</Typography>}
           {error && <Typography variant="body2" color="error">{error}</Typography>}
-          {success && <Typography variant="body2" color="success">User added successfully!</Typography>}
+          {success && <Typography variant="body2" color="success">User updated successfully!</Typography>}
         </Box>
       </Box>
     </Container>
   );
 };
 
-CreateUser.getLayout = (page) => (
+UpdateUser.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
 );
 
-export default CreateUser;
+export default UpdateUser;

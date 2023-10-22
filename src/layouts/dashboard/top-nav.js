@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import BellIcon from '@heroicons/react/24/solid/BellIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import Bars3Icon from '@heroicons/react/24/solid/Bars3Icon';
-import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import {
   Avatar,
   Badge,
@@ -16,14 +15,23 @@ import {
 import { alpha } from '@mui/material/styles';
 import { usePopover } from 'src/hooks/use-popover';
 import { AccountPopover } from './account-popover';
+import { items } from './config';
+import { usePathname } from 'next/navigation';
+import { SideNavItem } from './side-nav-item';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
 
 export const TopNav = (props) => {
-  const { onNavOpen } = props;
+  const { onNavOpen, setActiveTopNavItem } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+  const pathname = usePathname();
   const accountPopover = usePopover();
+
+  const handleTopNavClick = (menuItemKey) => {
+    setActiveTopNavItem(menuItemKey);
+  };
+
 
   return (
     <>
@@ -45,6 +53,7 @@ export const TopNav = (props) => {
           direction="row"
           justifyContent="space-between"
           spacing={2}
+          boxShadow="0 1px 5px rgba(18,44,43,.3019607843)"
           sx={{
             minHeight: TOP_NAV_HEIGHT,
             px: 2
@@ -62,6 +71,28 @@ export const TopNav = (props) => {
                 </SvgIcon>
               </IconButton>
             )}
+            <div style={{display:'flex',paddingLeft:'275px', listStyle:'none',}}>
+              {items.map((item) => {
+                let active = false;
+                if (item.path === '/') {
+                  active = pathname === item.path;
+                } else {
+                  active = item.path && pathname !== '/' && pathname.includes(item.path);
+                }
+                return (
+                  <SideNavItem
+                    active={active}
+                    disabled={item.disabled}
+                    external={item.external}
+                    icon={item.icon}
+                    key={item.title}
+                    path={item.path}
+                    title={item.title}
+                    onItemClicked={handleTopNavClick}
+                  />
+                );
+              })}
+            </div>
           </Stack>
           <Stack
             alignItems="center"

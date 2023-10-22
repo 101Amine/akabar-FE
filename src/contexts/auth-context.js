@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { fetchWithHeaders, fetchWithHeadersLogin } from '../utils/api';
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -65,109 +66,53 @@ export const AuthProvider = (props) => {
   const initialized = useRef(false);
 
   const initialize = async () => {
-    // Prevent from calling twice in development mode with React.StrictMode enabled
     if (initialized.current) {
       return;
     }
 
     initialized.current = true;
 
-    let isAuthenticated = false;
-
     try {
-      isAuthenticated = window.sessionStorage.getItem('authenticated') === 'true';
-    } catch (err) {
-      console.error(err);
-    }
-
-    if (isAuthenticated) {
-      const user = {
-        id: '5e86809283e28b96d2d38537',
-        avatar: '/assets/avatars/avatar-anika-visser.png',
-        name: 'Anika Visser',
-        email: 'anika.visser@devias.io'
-      };
-
-      dispatch({
-        type: HANDLERS.INITIALIZE,
-        payload: user
-      });
-    } else {
-      dispatch({
-        type: HANDLERS.INITIALIZE
-      });
+      const user = await fetchWithHeaders('/user/info');
+      dispatch({ type: HANDLERS.INITIALIZE, payload: user });
+    } catch (error) {
+      console.error(error);
+      window.localStorage.removeItem('token');
+      dispatch({ type: HANDLERS.INITIALIZE });
     }
   };
 
-  useEffect(
-    () => {
-      initialize();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  useEffect(() => {
+    initialize();
+  }, []);
 
-  const skip = () => {
-    try {
-      window.sessionStorage.setItem('authenticated', 'true');
-    } catch (err) {
-      console.error(err);
-    }
-
-    const user = {
-      id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Anika Visser',
-      email: 'anika.visser@devias.io'
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    });
-  };
 
   const signIn = async (email, password) => {
-    if (email !== 'demo@devias.io' || password !== 'Password123!') {
-      throw new Error('Please check your email and password');
-    }
-
+    console.log("logging in")
     try {
-      window.sessionStorage.setItem('authenticated', 'true');
-    } catch (err) {
-      console.error(err);
+      const data = await fetchWithHeadersLogin('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username: email, password }),
+      });
+
+      console.log("data",data);
+      dispatch({ type: HANDLERS.SIGN_IN, payload: data.user });
+    } catch (error) {
+      console.error('error singnIn',error);
+      throw new Error(`Failed to authenticate: ${error.message}`);
     }
-
-    const user = {
-      id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Anika Visser',
-      email: 'anika.visser@devias.io'
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    });
   };
 
-  const signUp = async (email, name, password) => {
-    throw new Error('Sign up is not implemented');
-  };
 
   const signOut = () => {
-    dispatch({
-      type: HANDLERS.SIGN_OUT
-    });
+    dispatch({ type: HANDLERS.SIGN_OUT });
   };
 
   return (
     <AuthContext.Provider
       value={{
         ...state,
-        skip,
         signIn,
-        signUp,
         signOut
       }}
     >
