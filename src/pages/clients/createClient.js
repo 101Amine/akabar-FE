@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -9,67 +9,65 @@ import {
   Typography
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { fetchWithHeaders } from '../../utils/api';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import { useDispatch, useSelector } from 'react-redux';
+import { setClientDetails, addClient } from '../../redux/clientSlice';
+import { useRouter } from 'next/router';
+
 const CreateClient = () => {
-  const [clientDetails, setClientDetails] = useState({
-    nameClient: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    mobilePhoneNumber: '',
-    phone: '',
-    fax: '',
-    ice: '',
-    bankAccount: '',
-    address: ''
-  });
 
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-  const handleChange = useCallback(
-    (event) => {
-      setClientDetails((prevState) => ({
-        ...prevState,
-        [event.target.name]: event.target.value
-      }));
-    },
-    []
-  );
+  // State
+  const { clientDetails, submitting, error, success } = useSelector(state => state.client);
 
-  const handleSubmit = useCallback(
-    async (event) => {
-      event.preventDefault();
-      setSubmitting(true);
-      setError(null);
+  console.log("clientDetails",clientDetails)
 
-      console.log("clientDetails",clientDetails)
-      try {
-        const response = await fetchWithHeaders(`/users/client/add`, {
-          method: 'POST',
-          body: JSON.stringify(clientDetails),
-        });
+  // Local State for Snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-        setSubmitting(false);
+  // Handlers
+  const handleChange = useCallback((event) => {
+    dispatch(setClientDetails({ ...clientDetails, [event.target.name]: event.target.value }));
+  }, [clientDetails, dispatch]);
 
-        if (response.status === 200) {
-          setSuccess(true);
-        } else {
-          setError('Failed to add client. Please try again.');
-        }
-      } catch (error) {
-        setSubmitting(false);
-        setError('Failed to add client. Please try again.');
-      }
-    },
-    [clientDetails]
-  );
+  const handleSubmit = useCallback((event) => {
+    event.preventDefault();
+    dispatch(addClient(clientDetails));
+
+    if (success && submitting) {
+      router.push('/clients');
+    }
+  }, [clientDetails, dispatch, router, success]);
+
+
+  useEffect(() => {
+    console.log("sucess",success)
+    console.log("error",error)
+    console.log("submitting",submitting)
+    if (success && submitting) {
+      handleSnackbarOpen('Client added successfully!', 'success');
+    } else if (error && submitting) {
+      handleSnackbarOpen('Failed to add client. Please try again.', 'error');
+    }
+  }, [success, error,submitting]);
+
+
+  const handleSnackbarOpen = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
 
   return (
     <Container maxWidth="xl">
       <Box marginTop={8}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" marginTop='40px' gutterBottom>
         Create Client
       </Typography>
       <Divider />
@@ -81,6 +79,16 @@ const CreateClient = () => {
                 fullWidth
                 label="Nom du client"
                 name="nameClient"
+                onChange={handleChange}
+                required
+                value={clientDetails.nameClient}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="userName"
+                name="userName"
                 onChange={handleChange}
                 required
                 value={clientDetails.userName}
@@ -180,11 +188,20 @@ const CreateClient = () => {
             </Button>
           </Box>
         </form>
-        <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
-          {submitting && <Typography variant="body2">Submitting...</Typography>}
-          {error && <Typography variant="body2" color="error">{error}</Typography>}
-          {success && <Typography variant="body2" color="success">Client added successfully!</Typography>}
-        </Box>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            severity={snackbarSeverity} // Use the snackbarSeverity state variable
+            onClose={() => setSnackbarOpen(false)}
+          >
+            {snackbarMessage}
+          </MuiAlert>
+        </Snackbar>
       </Box>
       </Box>
     </Container>

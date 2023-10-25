@@ -1,76 +1,53 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import { Box, Button, Container, Divider, Stack, SvgIcon, Typography } from '@mui/material';
-import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { UsersTable } from 'src/sections/users/users-table';
 import { UsersSearch } from 'src/sections/users/users-search';
 import { useRouter } from 'next/router';
-import { fetchWithHeaders } from '../../utils/api';
+import { DataTable } from '../../sections/DataTable/data-table';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers, setPage, setRowsPerPage } from '../../redux/userSlice';
 
-const useCustomers = (page, rowsPerPage) => {
-  const [data, setData] = useState([]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetchWithHeaders(`/users/staff/list?offset=0&limit=10`, {
-          method: 'POST',
-          body: JSON.stringify({
-            searchFilter: {},
-            offset: 0,
-            limit: 10
-          }),
-        });
+const userColumns = [
+  { key: 'name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'role', label: 'Role' },
+  { key: 'active', label: 'Status' }
+];
 
-        setData(response.content.currentPageData || []);  // Add a fallback to an empty array
+  const Page = () => {
 
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
+    const dispatch = useDispatch();
 
-    fetchUsers();
-  }, [page, rowsPerPage]);
+    const page = useSelector(state => state.user.page);
+    const rowsPerPage = useSelector(state => state.user.rowsPerPage);
+    const users = useSelector(state => state.user.users);
+    const router = useRouter();
 
-  return data;
-};
+    useEffect(() => {
+      dispatch(fetchUsers());
+    }, [dispatch]);
 
-const useCustomerIds = (customers) => {
-  return useMemo(
-    () => {
-      return customers.map((customer) => customer.id);
-    },
-    [customers]
-  );
-};
+    const handlePageChange = useCallback(
+      (event, value) => {
+        dispatch(setPage(value));
+      },
+      [dispatch]
+    );
 
-const Page = () => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const customers = useCustomers(page, rowsPerPage);
-  const customersIds = useCustomerIds(customers);
-  const customersSelection = useSelection(customersIds);
+    console.log("users",users)
 
-  const router = useRouter();
-
-  const handlePageChange = useCallback(
-    (event, value) => {
-      setPage(value);
-    },
-    []
-  );
-
-  const handleRowsPerPageChange = useCallback(
-    (event) => {
-      setRowsPerPage(event.target.value);
-    },
-    []
-  );
+    const handleRowsPerPageChange = useCallback(
+      (event) => {
+        dispatch(setRowsPerPage(event.target.value));
+      },
+      [dispatch]
+    );
 
   const proceedToForm = () => {
-    router.push('/users/createUser');
+    router.push('/users/createUser').then(r => console.log(r) );
   };
 
   return (
@@ -122,18 +99,11 @@ const Page = () => {
               </div>
             </Stack>
             <UsersSearch />
-            <UsersTable
-              count={customers.length}
-              items={customers}
-              onDeselectAll={customersSelection.handleDeselectAll}
-              onDeselectOne={customersSelection.handleDeselectOne}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={customersSelection.handleSelectAll}
-              onSelectOne={customersSelection.handleSelectOne}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              selected={customersSelection.selected}
+            <DataTable
+              count={users?.length}
+              items={users}
+              columns={userColumns}
+              entity="user"
             />
           </Stack>
         </Container>

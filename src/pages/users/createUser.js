@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect} from 'react';
 import {
   Box,
   Button,
@@ -13,50 +13,51 @@ import {
   Typography
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { fetchWithHeaders } from '../../utils/api';
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import { useDispatch, useSelector } from 'react-redux';
+import { addUser, setUserDetails } from '../../redux/userSlice';
+import { useRouter } from 'next/router';
 
-const CreateUser = () => {
-  const [userDetails, setUserDetails] = useState({
-    userName: '',
-    password: '',
-    phoneNumber: ''
-  });
+const CreateUser = () =>
 
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+{
+  const dispatch = useDispatch();
+  const { userDetails, submitting, error, success } = useSelector(state => state.user);
 
-  const handleChange = useCallback(
-    (event) => {
-      setUserDetails((prevState) => ({
-        ...prevState,
-        [event.target.name]: event.target.value
-      }));
-    },
-    []
-  );
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const router = useRouter();
 
-  const handleSubmit = useCallback(
-    async (event) => {
-      event.preventDefault();
-      setSubmitting(true);
-      setError(null);
+  console.log("error",error)
 
-      try {
-        const responseData = await fetchWithHeaders('/users/staff/add', {
-          method: 'POST',
-          body: JSON.stringify(userDetails)
-        });
+  const handleChange = useCallback((event) => {
+    dispatch(setUserDetails({ ...userDetails, [event.target.name]: event.target.value }));
+  }, [userDetails, dispatch]);
 
-        setSubmitting(false);
-        setSuccess(true);
-      } catch (error) {
-        setSubmitting(false);
-        setError(error.message);
-      }
-    },
-    [userDetails]
-  );
+  const handleSubmit = useCallback( (event) => {
+    event.preventDefault();
+    dispatch(addUser(userDetails));
+    if (success) {
+      router.push('/users');
+    }
+  }, [userDetails, dispatch, router, success]);
+
+  const handleSnackbarOpen = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  useEffect(() => {
+    if (success) {
+      handleSnackbarOpen('User added successfully!', 'success');
+    } else if (error) {
+      handleSnackbarOpen('Failed to add user. Please try again.', 'error');
+    }
+  }, [success, error]);
+
 
   return (
     <Container maxWidth="xl" >
@@ -70,11 +71,22 @@ const CreateUser = () => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Nom d'utilisateur"
-                name="userName"
+                label="Nom"
+                name="firstName"
                 onChange={handleChange}
                 required
-                value={userDetails.userName}
+                value={userDetails.firstName}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Prenom"
+                name="lastName"
+                onChange={handleChange}
+                required
+                value={userDetails.lastName}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -107,7 +119,7 @@ const CreateUser = () => {
                 onChange={handleChange}
                 required
                 type="tel"
-                value={userDetails.phoneNumber}
+                value={userDetails.mobilePhoneNumber}
               />
             </Grid>
           </Grid>
@@ -118,11 +130,20 @@ const CreateUser = () => {
             </Button>
           </CardActions>
         </form>
-        <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
-          {submitting && <Typography variant="body2">Submitting...</Typography>}
-          {error && <Typography variant="body2" color="error">{error}</Typography>}
-          {success && <Typography variant="body2" color="success">User added successfully!</Typography>}
-        </Box>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            severity={snackbarSeverity}
+            onClose={() => setSnackbarOpen(false)}
+          >
+            {snackbarMessage}
+          </MuiAlert>
+        </Snackbar>
       </Box>
     </Container>
   );

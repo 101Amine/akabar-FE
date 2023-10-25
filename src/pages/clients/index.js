@@ -1,92 +1,56 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import { Box, Button, Container, Divider, Stack, SvgIcon, Typography } from '@mui/material';
-import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { applyPagination } from 'src/utils/apply-pagination';
-import { ClientTable } from 'src/sections/clients/client-table';
 import { useRouter } from 'next/router';
 import { ClientsSearch } from 'src/sections/clients/client-search';
-import { fetchWithHeaders } from '../../utils/api';
+import { DataTable } from '../../sections/DataTable/data-table';
+import { fetchClients, setPage, setRowsPerPage } from '../../redux/clientSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 
-// const useCustomers = (page, rowsPerPage) => {
-//   return useMemo(
-//     () => {
-//       return applyPagination(data, page, rowsPerPage);
-//     },
-//     [page, rowsPerPage]
-//   );
-// };
-//
-// const useCustomerIds = (customers) => {
-//   return useMemo(
-//     () => {
-//       return customers.map((customer) => customer.id);
-//     },
-//     [customers]
-//   );
-// };
-
+const clientColumns = [
+  { key: 'companyName', label: 'Company Name' },
+  { key: 'contactPerson', label: 'Contact Person' },
+  { key: 'contactEmail', label: 'Contact Email' },
+  { key: 'active', label: 'Status' },
+  { key: 'type', label: 'Type' }
+];
 
 
 const Page = () => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // const customers = useCustomers(page, rowsPerPage);
-  // const customersIds = useCustomerIds(customers);
-  // const customersSelection = useSelection(customersIds);
+  // const page = useSelector(state => state.client.page);
+  // const rowsPerPage = useSelector(state => state.client.rowsPerPage);
+  const clients = useSelector(state => state);
+  // const totalCustomers = useSelector(state => state.client.totalClients);
 
+  console.log("clients",clients)
   const router = useRouter();
-
-  const [clients, setClients] = useState([]);
-  const [totalCustomers, setTotalCustomers] = useState(0);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetchWithHeaders('/users/client/list?offset=0&limit=10', {
-          method: 'POST',
-          body: JSON.stringify({
-            searchFilter: {},
-            offset: page * rowsPerPage,
-            limit: rowsPerPage
-          }),
-        });
-
-
-        console.log("response",response?.content)
-
-        setClients(response.content.currentPageData || []);  // Add a fallback to an empty array
-        setTotalCustomers(response.content.totalPages);
-      } catch (error) {
-        console.error('Failed to fetch users:', error);
-      }
-    };
-
-    fetchUsers().then((res) => {
-      console.log(res)
-    });
-  }, []);
+    console.log("fetch clients")
+    dispatch(fetchClients());
+  }, [dispatch]);
 
   const handlePageChange = useCallback(
     (event, value) => {
-      setPage(value);
+      dispatch(setPage(value));
     },
-    []
+    [dispatch]
   );
 
   const handleRowsPerPageChange = useCallback(
     (event) => {
-      setRowsPerPage(event.target.value);
+      dispatch(setRowsPerPage(event.target.value));
     },
-    []
+    [dispatch]
   );
 
   const proceedToForm = () => {
-    router.push('/clients/createClient');
+    router.push('/clients/createClient').then(r => console.info(r));
   };
 
   return (
@@ -139,14 +103,12 @@ const Page = () => {
               </div>
             </Stack>
             <ClientsSearch />
-            <ClientTable
-              count={clients?.length || 0} // Adjusting this line
-              items={clients || []}  // Adjusting this line
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              page={page}
-              rowsPerPage={rowsPerPage}
-            />
+            {/*<DataTable*/}
+            {/*  count={clients?.length}*/}
+            {/*  items={clients}*/}
+            {/*  entity="client"*/}
+            {/*  columns={clientColumns}*/}
+            {/*/>*/}
 
           </Stack>
         </Container>

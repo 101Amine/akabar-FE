@@ -12,7 +12,7 @@ export const AccountPopover = (props) => {
   const handleSignOut = useCallback(
     () => {
       onClose?.();
-      auth.signOut();
+      auth.handleSignOut();
       router.push('/auth/login');
     },
     [onClose, auth, router]
@@ -42,7 +42,8 @@ export const AccountPopover = (props) => {
           color="text.secondary"
           variant="body2"
         >
-          Anika Visser
+          {/*Todo set the user connected name here*/}
+          Becha Mohamed Amine
         </Typography>
       </Box>
       <Divider />

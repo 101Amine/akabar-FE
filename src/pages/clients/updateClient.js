@@ -11,6 +11,9 @@ import {
 } from '@mui/material';
 import { fetchWithHeaders } from '../../utils/api';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+
 const UpdateClient = () => {
   const router = useRouter();
 
@@ -22,6 +25,9 @@ const UpdateClient = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   // Update clientDetails state when the router's query changes
   useEffect(() => {
@@ -37,6 +43,13 @@ const UpdateClient = () => {
     }));
   }, []);
 
+  const handleSnackbarOpen = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
     setSubmitting(true);
@@ -51,9 +64,12 @@ const UpdateClient = () => {
       setSubmitting(false);
 
       if (response.status === 200) {
+        handleSnackbarOpen('Client added successfully!', 'success');
         setSuccess(true);
       } else {
         setError('Failed to update client. Please try again.');
+        handleSnackbarOpen('Failed to update client. Please try again!', 'error');
+
       }
     } catch (error) {
       setSubmitting(false);
@@ -176,11 +192,20 @@ const UpdateClient = () => {
               </Button>
             </Box>
           </form>
-          <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
-            {submitting && <Typography variant="body2">Updating...</Typography>}
-            {error && <Typography variant="body2" color="error">{error}</Typography>}
-            {success && <Typography variant="body2" color="success">Client updated successfully!</Typography>}
-          </Box>
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+          >
+            <MuiAlert
+              elevation={6}
+              variant="filled"
+              severity={snackbarSeverity}
+              onClose={() => setSnackbarOpen(false)}
+            >
+              {snackbarMessage}
+            </MuiAlert>
+          </Snackbar>
         </Box>
       </Box>
     </Container>

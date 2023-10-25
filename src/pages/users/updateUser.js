@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { fetchWithHeaders } from '../../utils/api';
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
 const UpdateUser = () => {
   const router = useRouter();
@@ -31,6 +33,9 @@ const UpdateUser = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   useEffect(() => {
     if (userJSON) {
@@ -54,6 +59,13 @@ const UpdateUser = () => {
     []
   );
 
+  const handleSnackbarOpen = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
@@ -67,9 +79,14 @@ const UpdateUser = () => {
         });
         setSubmitting(false);
         setSuccess(true);
+        handleSnackbarOpen('User updated successfully!', 'success');
+
+
       } catch (error) {
         setSubmitting(false);
         setError(error.message);
+        handleSnackbarOpen('Failed to add client. Please try again.', 'error');
+
       }
     },
     [userDetails]
@@ -146,11 +163,20 @@ const UpdateUser = () => {
             </Button>
           </CardActions>
         </form>
-        <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
-          {submitting && <Typography variant="body2">Updating...</Typography>}
-          {error && <Typography variant="body2" color="error">{error}</Typography>}
-          {success && <Typography variant="body2" color="success">User updated successfully!</Typography>}
-        </Box>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            severity={snackbarSeverity}
+            onClose={() => setSnackbarOpen(false)}
+          >
+            {snackbarMessage}
+          </MuiAlert>
+        </Snackbar>
       </Box>
     </Container>
   );

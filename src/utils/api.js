@@ -34,11 +34,11 @@ export const fetchWithHeadersLogin = async (endpoint, options = {}) => {
   });
 
   if (!response.ok) {
-    const errorMsg = await response.text();
+    const errorMsg = await response.json();
     throw new Error(errorMsg);
   }
 
-  return response.text();
+  return response.json();
 };
 
 export const getUserInfo = async () => {
