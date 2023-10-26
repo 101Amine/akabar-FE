@@ -5,7 +5,15 @@ import { forwardRef } from 'react';
 import styles from '../../styles/global.module.scss';
 
 export const SideNavItem = (props) => {
-  const { active = false, disabled, external, icon, path, title, onItemClicked } = props;
+  const {
+    active = false,
+    disabled,
+    external,
+    icon,
+    path,
+    title,
+    onItemClicked,
+  } = props;
 
   const handleItemClick = () => {
     if (onItemClicked && title) {
@@ -18,7 +26,11 @@ export const SideNavItem = (props) => {
   ));
 
   const LinkComponent = forwardRef((props, ref) => (
-    <ButtonBaseWithRef {...props} ref={ref} sx={{ textDecoration: 'none', ...props.sx }} />
+    <ButtonBaseWithRef
+      {...props}
+      ref={ref}
+      sx={{ textDecoration: 'none', ...props.sx }}
+    />
   ));
 
   return (
@@ -38,12 +50,15 @@ export const SideNavItem = (props) => {
               textAlign: 'left',
               width: '100%',
               textDecoration: 'none',
-              ...(active && {
-                backgroundColor: 'rgba(255, 255, 255, 0.04)'
-              }),
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.04)'
-              }
+                backgroundColor: 'white',
+                '& > span': {
+                  color: '#164cc8',
+                },
+              },
+              ...(active && {
+                backgroundColor: 'white',
+              }),
             }}
           >
             {icon && (
@@ -56,8 +71,8 @@ export const SideNavItem = (props) => {
                   justifyContent: 'center',
                   mr: 2,
                   ...(active && {
-                    color: 'primary.main'
-                  })
+                    color: '#164cc8',
+                  }),
                 }}
               >
                 {icon}
@@ -65,8 +80,9 @@ export const SideNavItem = (props) => {
             )}
             <Box
               component="span"
+              className="childBox"
               sx={{
-                color: 'neutral.400',
+                color: 'white',
                 flexGrow: 1,
                 fontFamily: (theme) => theme.typography.fontFamily,
                 fontSize: 14,
@@ -74,11 +90,11 @@ export const SideNavItem = (props) => {
                 lineHeight: '24px',
                 whiteSpace: 'nowrap',
                 ...(active && {
-                  color: 'primary.main'
+                  color: '#164cc8',
                 }),
                 ...(disabled && {
-                  color: 'neutral.500'
-                })
+                  color: '#000',
+                }),
               }}
             >
               {title}
@@ -102,11 +118,11 @@ export const SideNavItem = (props) => {
             textAlign: 'left',
             width: '100%',
             ...(active && {
-              backgroundColor: 'rgba(255, 255, 255, 0.04)'
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
             }),
             '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.04)'
-            }
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            },
           }}
         >
           {icon && (
@@ -119,8 +135,8 @@ export const SideNavItem = (props) => {
                 justifyContent: 'center',
                 mr: 2,
                 ...(active && {
-                  color: 'primary.main'
-                })
+                  color: 'primary.main',
+                }),
               }}
             >
               {icon}
@@ -137,11 +153,11 @@ export const SideNavItem = (props) => {
               lineHeight: '24px',
               whiteSpace: 'nowrap',
               ...(active && {
-                color: 'primary.main'
+                color: 'primary.main',
               }),
               ...(disabled && {
-                color: 'neutral.500'
-              })
+                color: 'neutral.500',
+              }),
             }}
           >
             {title}
@@ -159,7 +175,7 @@ SideNavItem.propTypes = {
   icon: PropTypes.node,
   path: PropTypes.string,
   title: PropTypes.string.isRequired,
-  onItemClicked: PropTypes.func
+  onItemClicked: PropTypes.func,
 };
 
 export default SideNavItem;

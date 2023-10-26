@@ -3,13 +3,10 @@ import * as authAPI from '../utils/authAPI';
 
 export const initializeAuth = createAsyncThunk(
   'auth/initialize',
-  authAPI.validateToken
+  authAPI.validateToken,
 );
 
-export const signIn = createAsyncThunk(
-  'auth/signIn',
-  authAPI.loginUser
-);
+export const signIn = createAsyncThunk('auth/signIn', authAPI.loginUser);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -39,7 +36,7 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(signIn.rejected, (state) => {
-        console.log("rejecting signIn....")
+        console.log('rejecting signIn....');
         state.isAuthenticated = false;
         state.error = 'signIn rejected, please try again..';
       });

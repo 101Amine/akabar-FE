@@ -1,48 +1,59 @@
-import { useCallback, useState, useEffect} from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Button,
-  Card,
   CardActions,
-  CardContent,
-  CardHeader,
   Divider,
   TextField,
   Grid,
   Container,
-  Typography
+  Typography,
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
+import { fetchWithHeaders } from '../../../utils/api';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import { useDispatch, useSelector } from 'react-redux';
-import { addUser, setUserDetails } from '../../redux/userSlice';
-import { useRouter } from 'next/router';
+import { updateUser } from '../../../redux/userSlice';
+import { useDispatch } from 'react-redux';
 
-const CreateUser = () =>
-
-{
+const UpdateUser = () => {
+  const router = useRouter();
   const dispatch = useDispatch();
-  const { userDetails, submitting, error, success } = useSelector(state => state.user);
 
+  const { user: userJSON } = router.query;
+
+  const initialUserDetails = userJSON
+    ? JSON.parse(userJSON)
+    : {
+        userName: '',
+        password: '',
+        phoneNumber: '',
+      };
+
+  const [userDetails, setUserDetails] = useState(initialUserDetails);
+  const [submitting, setSubmitting] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const router = useRouter();
 
-  console.log("error",error)
+  useEffect(() => {
+    if (userJSON) {
+      setUserDetails(JSON.parse(userJSON));
+    }
+  }, [userJSON]);
+
+  useEffect(() => {
+    console.log('userDetails', userDetails);
+  }, [userDetails]);
 
   const handleChange = useCallback((event) => {
-    dispatch(setUserDetails({ ...userDetails, [event.target.name]: event.target.value }));
-  }, [userDetails, dispatch]);
-
-  const handleSubmit = useCallback( (event) => {
-    event.preventDefault();
-    dispatch(addUser(userDetails));
-    if (success) {
-      router.push('/users');
-    }
-  }, [userDetails, dispatch, router, success]);
+    console.log('event target value', event.target.name);
+    setUserDetails((prevState) => ({
+      ...prevState,
+      [event.target.name]: event.target.value,
+    }));
+  }, []);
 
   const handleSnackbarOpen = (message, severity) => {
     setSnackbarMessage(message);
@@ -50,24 +61,47 @@ const CreateUser = () =>
     setSnackbarOpen(true);
   };
 
-  useEffect(() => {
-    if (success) {
-      handleSnackbarOpen('User added successfully!', 'success');
-    } else if (error) {
-      handleSnackbarOpen('Failed to add user. Please try again.', 'error');
-    }
-  }, [success, error]);
+  const handleSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+      setSubmitting(true);
 
+      try {
+        const resultAction = await dispatch(updateUser(userDetails));
+
+        setSubmitting(false);
+
+        if (updateUser.fulfilled.match(resultAction)) {
+          handleSnackbarOpen('User updated successfully!', 'success');
+          router.push('/outils/users');
+        } else {
+          handleSnackbarOpen(
+            'Failed to update user. Please try again!',
+            'error',
+          );
+        }
+      } catch (error) {
+        setSubmitting(false);
+      }
+    },
+    [dispatch, userDetails],
+  );
 
   return (
-    <Container maxWidth="xl" >
-      <Typography variant="h4" marginTop='40px' gutterBottom>
-        Create User
+    <Container maxWidth="xl">
+      <Typography variant="h4" marginTop="40px" gutterBottom>
+        Mettre à jour l'utilisateur
       </Typography>
       <Divider />
-      <Box marginInline='50px' justifyContent="center" mt={4}>
+      <Box marginInline="50px" justifyContent="center" mt={4}>
         <form autoComplete="off" noValidate onSubmit={handleSubmit}>
-          <Grid container spacing={3} padding={2} display='flex' flexDirection='column'>
+          <Grid
+            container
+            spacing={3}
+            padding={2}
+            display="flex"
+            flexDirection="column"
+          >
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
@@ -92,17 +126,6 @@ const CreateUser = () =>
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Mot de passe"
-                name="password"
-                onChange={handleChange}
-                required
-                type="password"
-                value={userDetails.password}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
                 label="Email"
                 name="email"
                 onChange={handleChange}
@@ -115,7 +138,7 @@ const CreateUser = () =>
               <TextField
                 fullWidth
                 label="Numéro de téléphone"
-                name="phoneNumber"
+                name="mobilePhoneNumber"
                 onChange={handleChange}
                 required
                 type="tel"
@@ -125,8 +148,13 @@ const CreateUser = () =>
           </Grid>
           <Divider />
           <CardActions sx={{ justifyContent: 'flex-end' }}>
-            <Button variant="contained" color="primary" type="submit" disabled={submitting}>
-              Soumettre
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={submitting}
+            >
+              Mise à jour
             </Button>
           </CardActions>
         </form>
@@ -149,10 +177,6 @@ const CreateUser = () =>
   );
 };
 
-CreateUser.getLayout = (page) => (
-  <DashboardLayout>
-    {page}
-  </DashboardLayout>
-);
+UpdateUser.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default CreateUser;
+export default UpdateUser;

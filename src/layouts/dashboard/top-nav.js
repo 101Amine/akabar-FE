@@ -10,14 +10,14 @@ import {
   Stack,
   SvgIcon,
   Tooltip,
-  useMediaQuery
+  useMediaQuery,
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { usePopover } from 'src/hooks/use-popover';
 import { AccountPopover } from './account-popover';
 import { items } from './config';
 import { usePathname } from 'next/navigation';
 import { SideNavItem } from './side-nav-item';
+import PersonIcon from '@mui/icons-material/Person';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -32,20 +32,19 @@ export const TopNav = (props) => {
     setActiveTopNavItem(menuItemKey);
   };
 
-
   return (
     <>
       <Box
         component="header"
         sx={{
           backdropFilter: 'blur(6px)',
-          backgroundColor: (theme) => alpha(theme.palette.background.default, 0.8),
+          backgroundColor: '#164cc8',
           position: 'sticky',
           left: {
-            lg: `${SIDE_NAV_WIDTH}px`
+            lg: `${SIDE_NAV_WIDTH}px`,
           },
           top: 0,
-          zIndex: (theme) => theme.zIndex.appBar
+          zIndex: (theme) => theme.zIndex.appBar,
         }}
       >
         <Stack
@@ -56,14 +55,10 @@ export const TopNav = (props) => {
           boxShadow="0 1px 5px rgba(18,44,43,.3019607843)"
           sx={{
             minHeight: TOP_NAV_HEIGHT,
-            px: 2
+            px: 2,
           }}
         >
-          <Stack
-            alignItems="center"
-            direction="row"
-            spacing={2}
-          >
+          <Stack alignItems="center" direction="row" spacing={2}>
             {!lgUp && (
               <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize="small">
@@ -71,13 +66,23 @@ export const TopNav = (props) => {
                 </SvgIcon>
               </IconButton>
             )}
-            <div style={{display:'flex',paddingLeft:'275px', listStyle:'none',}}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                paddingLeft: '275px',
+                listStyle: 'none',
+              }}
+            >
               {items.map((item) => {
                 let active = false;
                 if (item.path === '/') {
                   active = pathname === item.path;
                 } else {
-                  active = item.path && pathname !== '/' && pathname.includes(item.path);
+                  active =
+                    item.path &&
+                    pathname !== '/' &&
+                    pathname.includes(item.path);
                 }
                 return (
                   <SideNavItem
@@ -94,26 +99,18 @@ export const TopNav = (props) => {
               })}
             </div>
           </Stack>
-          <Stack
-            alignItems="center"
-            direction="row"
-            spacing={2}
-          >
+          <Stack alignItems="center" direction="row" spacing={2}>
             <Tooltip title="Contacts">
               <IconButton>
-                <SvgIcon fontSize="small">
+                <SvgIcon fontSize="small" style={{ color: '#FFF' }}>
                   <UsersIcon />
                 </SvgIcon>
               </IconButton>
             </Tooltip>
             <Tooltip title="Notifications">
-              <IconButton>
-                <Badge
-                  badgeContent={4}
-                  color="success"
-                  variant="dot"
-                >
-                  <SvgIcon fontSize="small">
+              <IconButton color="primary">
+                <Badge badgeContent={4} variant="dot">
+                  <SvgIcon fontSize="small" style={{ color: '#FFF' }}>
                     <BellIcon />
                   </SvgIcon>
                 </Badge>
@@ -125,10 +122,11 @@ export const TopNav = (props) => {
               sx={{
                 cursor: 'pointer',
                 height: 40,
-                width: 40
+                width: 40,
               }}
-              src="/assets/avatars/med.jpeg"
-            />
+            >
+              <PersonIcon />
+            </Avatar>
           </Stack>
         </Stack>
       </Box>
@@ -142,5 +140,5 @@ export const TopNav = (props) => {
 };
 
 TopNav.propTypes = {
-  onNavOpen: PropTypes.func
+  onNavOpen: PropTypes.func,
 };

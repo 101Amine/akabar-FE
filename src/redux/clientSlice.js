@@ -24,46 +24,69 @@ export const addClient = createAsyncThunk(
       method: 'POST',
       body: JSON.stringify(clientDetails),
     });
-  }
+  },
+);
+
+/**
+ * @typedef {Object} ClientUpdateDetails
+ * @property {string} firstName - the client's firstName
+ * @property {string} lastName - the client's lastName
+ * @property {number} email - the client's mobilePhoneNumber
+ * @property {number} phone - the client's phone
+ */
+export const updateClient = createAsyncThunk(
+  'client/updateClient',
+  /**
+   * @param {ClientUpdateDetails} ClientUpdateDetails
+   */
+  async (ClientUpdateDetails) => {
+    const response = await fetchWithHeaders(`/users/profile`, {
+      method: 'POST',
+      body: JSON.stringify(ClientUpdateDetails),
+    });
+
+    if (response.status !== 200) {
+      throw new Error('Failed to update client. Please try again.');
+    }
+    return response.json();
+  },
 );
 
 export const fetchClients = createAsyncThunk(
   'client/fetchClients',
   async (_, { getState }) => {
-
     // const { page, rowsPerPage } = getState().client;
-    const response = await fetchWithHeaders(`/users/client/list?offset=10&limit=10`, {
-      method: 'POST',
-      body: JSON.stringify({
-        searchFilter: {},
-        offset: 10,
-        limit: 10
-      }),
-    });
+    const response = await fetchWithHeaders(
+      `/users/client/list?offset=0&limit=10`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          searchFilter: {},
+        }),
+      },
+    );
 
-    console.log("response",response)
+    console.log('response', response);
     if (response.status !== 200) {
       throw new Error('Failed to fetch clients');
     }
     return response.content;
-  }
+  },
 );
-
-
 
 // Initial state
 const initialState = {
   clientDetails: {
     nameClient: '',
-    userName: '',
+    email: '',
     password: '',
     firstName: '',
     lastName: '',
     mobilePhoneNumber: '',
     phone: '',
     fax: '',
-    ice:'',
-    bankAccount:''
+    ice: '',
+    bankAccount: '',
   },
   clients: [],
   page: 0,
@@ -89,7 +112,7 @@ const clientSlice = createSlice({
     },
     setRowsPerPage: (state, action) => {
       state.rowsPerPage = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -106,27 +129,35 @@ const clientSlice = createSlice({
         state.error = action.error;
       })
       .addCase(fetchClients.pending, (state) => {
-      state.fetching = true;
-      state.error = null;
+        state.fetching = true;
+        state.error = null;
       })
       .addCase(fetchClients.fulfilled, (state, action) => {
         state.fetching = false;
-        console.log("action.payload",action.payload)
+        console.log('action.payload', action.payload);
         state.clients = action.payload.currentPageData || [];
         state.totalClients = action.payload.totalPages;
       })
       .addCase(fetchClients.rejected, (state, action) => {
         state.fetching = false;
         state.error = 'error while fetching clients';
+      })
+      .addCase(updateClient.pending, (state) => {
+        state.submitting = true;
+        state.error = null;
+      })
+      .addCase(updateClient.fulfilled, (state, action) => {
+        state.submitting = false;
+        state.success = true;
+      })
+      .addCase(updateClient.rejected, (state, action) => {
+        state.submitting = false;
+        state.error = action.error.message;
       });
   },
 });
 
-export const {
-  setClientDetails,
-  clearClientDetails,
-  setPage,
-  setRowsPerPage
-} = clientSlice.actions;
+export const { setClientDetails, clearClientDetails, setPage, setRowsPerPage } =
+  clientSlice.actions;
 
 export default clientSlice.reducer;

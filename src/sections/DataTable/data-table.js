@@ -18,8 +18,10 @@ import { getInitials } from 'src/utils/get-initials';
 import EditIcon from '@mui/icons-material/Edit';
 import BlockIcon from '@mui/icons-material/Block';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { fetchWithHeaders } from '../../utils/api';
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { blockUser, unblockUser } from '../../redux/userSlice';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 
 export const DataTable = ({
   count = 0,
@@ -33,42 +35,46 @@ export const DataTable = ({
   entity = 'user',
 }) => {
   const router = useRouter();
+  const dispatch = useDispatch();
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const handleEdit = (item) => {
-    const route = entity === 'client' ? '/clients/updateClient' : '/users/updateUser';
+    const route =
+      entity === 'client'
+        ? '/ventes/clients/updateClient'
+        : '/ventes/users/updateUser';
     router.push({
       pathname: route,
       query: { [entity]: JSON.stringify(item) },
     });
   };
 
-  const handleBlock = async (idOrEmail) => {
-    let apiEndpoint;
-    if (entity === 'user') {
-      apiEndpoint = '/users/block'; // Adjust the endpoint as per your API setup
-    } else if (entity === 'client') {
-      apiEndpoint = '/clients/block'; // Adjust the endpoint as per your API setup
-    }
-
-    const payload = {
-      active: false,
-      ...(typeof idOrEmail === 'string' && { email: idOrEmail }),
-    };
-
+  const handleBlockOrUnblock = async (item) => {
     try {
-      const response = await fetchWithHeaders(apiEndpoint, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-
-      setSnackbarMessage(`${entity.charAt(0).toUpperCase() + entity.slice(1)} blocked successfully!`);
-      setSnackbarSeverity('success');
+      if (item.active) {
+        await dispatch(blockUser(item.id || item.email));
+        setSnackbarMessage(
+          `${
+            entity.charAt(0).toUpperCase() + entity.slice(1)
+          } a été bloqué avec succès!`,
+        );
+      } else {
+        await dispatch(unblockUser(item.id || item.email));
+        setSnackbarMessage(
+          `${
+            entity.charAt(0).toUpperCase() + entity.slice(1)
+          } a été débloqué avec succès!`,
+        );
+      }
+      setSnackbarSeverity('succès');
       setSnackbarOpen(true);
     } catch (error) {
-      setSnackbarMessage(`Error blocking ${entity}.`);
+      setSnackbarMessage(
+        `Error ${item.active ? 'bloquer' : 'débloquer'} ${entity}.`,
+      );
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
@@ -90,13 +96,22 @@ export const DataTable = ({
             {items.map((item) => {
               const fullName = `${item.firstName} ${item.lastName}`;
               return (
-                <TableRow hover key={item.id}>
+                <TableRow
+                  key={item.id}
+                  sx={{
+                    backgroundColor: item.active
+                      ? 'transparent'
+                      : 'rgba(255,0,0,0.1)',
+                  }}
+                >
                   {columns.map((col) => (
                     <TableCell key={col.key}>
                       {col.key === 'name' ? (
                         <Stack alignItems="center" direction="row" spacing={2}>
                           <Avatar>{getInitials(fullName)}</Avatar>
-                          <Typography variant="subtitle2">{fullName}</Typography>
+                          <Typography variant="subtitle2">
+                            {fullName}
+                          </Typography>
                         </Stack>
                       ) : (
                         item[col.key]
@@ -113,11 +128,13 @@ export const DataTable = ({
                         <EditIcon />
                       </IconButton>
                       <IconButton
-                        color="secondary"
-                        aria-label={`block ${entity}`}
-                        onClick={() => handleBlock(item.id || item.email)}
+                        color={item.active ? 'secondary' : 'primary'}
+                        aria-label={
+                          item.active ? `block ${entity}` : `unblock ${entity}`
+                        }
+                        onClick={() => handleBlockOrUnblock(item)}
                       >
-                        <BlockIcon />
+                        {item.active ? <BlockIcon /> : <LockOpenIcon />}
                       </IconButton>
                     </Stack>
                   </TableCell>
@@ -142,7 +159,11 @@ export const DataTable = ({
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} variant="filled">
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          variant="filled"
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

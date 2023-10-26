@@ -17,9 +17,7 @@ const now = new Date();
 const Page = () => (
   <>
     <Head>
-      <title>
-        Akabar
-      </title>
+      <title>Akabar</title>
     </Head>
     <Box
       component="main"
@@ -28,15 +26,13 @@ const Page = () => (
         width: 500,
       }}
     >
-      <ComingSoon/>
+      <ComingSoon />
     </Box>
   </>
 );
 
 Page.getLayout = (page) => (
-  <DashboardLayout isComingSoon={true}>
-    {page}
-  </DashboardLayout>
+  <DashboardLayout isComingSoon={true}>{page}</DashboardLayout>
 );
 
 export default Page;

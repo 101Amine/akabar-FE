@@ -3,7 +3,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchWithHeaders } from '../utils/api';
 
-
 /**
  * @typedef {Object} UserDetails
  * @property {string} firstName - The user's firstName.
@@ -22,38 +21,88 @@ export const addUser = createAsyncThunk(
       method: 'POST',
       body: JSON.stringify(UserDetails),
     });
-  }
+  },
 );
 
+export const blockUser = createAsyncThunk(
+  'user/blockUser',
+  async (idOrEmail) => {
+    console.log('idOrEmail', idOrEmail);
+    const payload = {
+      active: false,
+      ...(typeof idOrEmail === 'string' && { email: idOrEmail }),
+    };
+    return await fetchWithHeaders('/users/profile', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+);
+
+export const unblockUser = createAsyncThunk(
+  'user/unblockUser',
+  async (idOrEmail) => {
+    const payload = {
+      active: true,
+      ...(typeof idOrEmail === 'string' && { email: idOrEmail }),
+    };
+    return await fetchWithHeaders('/users/profile', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+);
+
+/**
+ * @typedef {Object} UserUpdateDetails
+ * @property {string} firstName - The user's firstName.
+ * @property {string} lastName - The user's lastName.
+ * @property {string} email - the user's email
+ * @property {string} mobilePhoneNumber - the user's phoneNumber
+ */
+export const updateUser = createAsyncThunk(
+  'user/updateUser',
+  /**
+   * @param {UserUpdateDetails} UserUpdateDetails
+   */
+  async (UserUpdateDetails) => {
+    return await fetchWithHeaders(`/users/profile`, {
+      method: 'POST',
+      body: JSON.stringify(UserUpdateDetails),
+    });
+  },
+);
 
 export const fetchUsers = createAsyncThunk(
   'user/fetchUsers',
   async (_, { getState }) => {
-    console.log("getState",getState)
+    console.log('getState', getState);
     const { page, rowsPerPage } = getState().user;
-    const response = await fetchWithHeaders(`/users/staff/list?offset=${page * rowsPerPage}&limit=${rowsPerPage}`, {
-      method: 'POST',
-      body: JSON.stringify({
-        searchFilter: {},
-        offset: page * rowsPerPage,
-        limit: rowsPerPage
-      }),
-    });
+    const response = await fetchWithHeaders(
+      `/users/staff/list?offset=${page * rowsPerPage}&limit=${rowsPerPage}`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          searchFilter: {},
+          offset: page * rowsPerPage,
+          limit: rowsPerPage,
+        }),
+      },
+    );
 
-    console.log(".................",response)
     if (response.status !== 200) {
       throw new Error('Failed to fetch users');
     }
     return response.content;
-  }
+  },
 );
 
 const initialState = {
   userDetails: {
     userName: '',
     password: '',
-    phoneNumber: '',
-    email: ''
+    mobilePhoneNumber: '',
+    email: '',
   },
   users: [],
   page: 0,
@@ -77,7 +126,7 @@ const userSlice = createSlice({
     },
     setRowsPerPage: (state, action) => {
       state.rowsPerPage = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -92,9 +141,10 @@ const userSlice = createSlice({
       .addCase(addUser.rejected, (state, action) => {
         state.submitting = false;
         state.error = action.error;
-      }).addCase(fetchUsers.pending, (state) => {
-      state.fetching = true;
-      state.error = null;
+      })
+      .addCase(fetchUsers.pending, (state) => {
+        state.fetching = true;
+        state.error = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.fetching = false;
@@ -104,10 +154,51 @@ const userSlice = createSlice({
       .addCase(fetchUsers.rejected, (state, action) => {
         state.fetching = false;
         state.error = action.error;
+      })
+      .addCase(blockUser.pending, (state) => {
+        state.submitting = true;
+        state.error = null;
+      })
+      .addCase(blockUser.fulfilled, (state, action) => {
+        state.submitting = false;
+        state.success = true;
+        // Update the user's active status in the state
+        const user = state.users.find(
+          (user) =>
+            user.id === action.meta.arg || user.email === action.meta.arg,
+        );
+        if (user) {
+          user.active = false;
+        }
+      })
+      .addCase(blockUser.rejected, (state, action) => {
+        state.submitting = false;
+        state.error = action.error;
+      })
+      .addCase(unblockUser.pending, (state) => {
+        state.submitting = true;
+        state.error = null;
+      })
+      .addCase(unblockUser.fulfilled, (state, action) => {
+        state.submitting = false;
+        state.success = true;
+        // Update the user's active status in the state
+        const user = state.users.find(
+          (user) =>
+            user.id === action.meta.arg || user.email === action.meta.arg,
+        );
+        if (user) {
+          user.active = true;
+        }
+      })
+      .addCase(unblockUser.rejected, (state, action) => {
+        state.submitting = false;
+        state.error = action.error;
       });
   },
 });
 
-export const { setUserDetails, clearUserDetails, setPage, setRowsPerPage } = userSlice.actions;
+export const { setUserDetails, clearUserDetails, setPage, setRowsPerPage } =
+  userSlice.actions;
 
 export default userSlice.reducer;

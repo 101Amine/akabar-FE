@@ -10,9 +10,8 @@ import { createTheme } from 'src/theme';
 import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import 'simplebar-react/dist/simplebar.min.css';
 import { Provider } from 'react-redux';
-import { store , persistor} from '../redux/store';
+import { store, persistor } from '../redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
-
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -31,30 +30,29 @@ const App = (props) => {
     <CacheProvider value={emotionCache}>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-
-        <Head>
-          <title>
-            Akabar
-          </title>
-          <meta
-            name="viewport"
-            content="initial-scale=1, width=device-width"
-          />
-        </Head>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <AuthProvider>
-            <ThemeProvider theme={theme}>
-              <CssBaseline/>
-              <AuthConsumer>
-                {
-                  (auth) => auth.isLoading
-                    ? <SplashScreen/>
-                    : getLayout(<Component {...pageProps} />)
-                }
-              </AuthConsumer>
-            </ThemeProvider>
-          </AuthProvider>
-        </LocalizationProvider>
+          <Head>
+            <title>Akabar</title>
+            <meta
+              name="viewport"
+              content="initial-scale=1, width=device-width"
+            />
+          </Head>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <AuthProvider>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <AuthConsumer>
+                  {(auth) =>
+                    auth.isLoading ? (
+                      <SplashScreen />
+                    ) : (
+                      getLayout(<Component {...pageProps} />)
+                    )
+                  }
+                </AuthConsumer>
+              </ThemeProvider>
+            </AuthProvider>
+          </LocalizationProvider>
         </PersistGate>
       </Provider>
     </CacheProvider>

@@ -1,7 +1,14 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import PropTypes from 'prop-types';
-import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
+import {
+  Box,
+  Divider,
+  MenuItem,
+  MenuList,
+  Popover,
+  Typography,
+} from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 
 export const AccountPopover = (props) => {
@@ -9,21 +16,18 @@ export const AccountPopover = (props) => {
   const router = useRouter();
   const auth = useAuth();
 
-  const handleSignOut = useCallback(
-    () => {
-      onClose?.();
-      auth.handleSignOut();
-      router.push('/auth/login');
-    },
-    [onClose, auth, router]
-  );
+  const handleSignOut = useCallback(() => {
+    onClose?.();
+    auth.handleSignOut();
+    router.push('/auth/login');
+  }, [onClose, auth, router]);
 
   return (
     <Popover
       anchorEl={anchorEl}
       anchorOrigin={{
         horizontal: 'left',
-        vertical: 'bottom'
+        vertical: 'bottom',
       }}
       onClose={onClose}
       open={open}
@@ -32,17 +36,10 @@ export const AccountPopover = (props) => {
       <Box
         sx={{
           py: 1.5,
-          px: 2
+          px: 2,
         }}
       >
-        <Typography variant="overline">
-          Account
-        </Typography>
-        <Typography
-          color="text.secondary"
-          variant="body2"
-        >
-          {/*Todo set the user connected name here*/}
+        <Typography color="text.secondary" variant="body2">
           Becha Mohamed Amine
         </Typography>
       </Box>
@@ -53,13 +50,11 @@ export const AccountPopover = (props) => {
         sx={{
           p: '8px',
           '& > *': {
-            borderRadius: 1
-          }
+            borderRadius: 1,
+          },
         }}
       >
-        <MenuItem onClick={handleSignOut}>
-          Sign out
-        </MenuItem>
+        <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
       </MenuList>
     </Popover>
   );
@@ -68,5 +63,5 @@ export const AccountPopover = (props) => {
 AccountPopover.propTypes = {
   anchorEl: PropTypes.any,
   onClose: PropTypes.func,
-  open: PropTypes.bool.isRequired
+  open: PropTypes.bool.isRequired,
 };

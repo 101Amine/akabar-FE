@@ -11,7 +11,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography
+  Typography,
 } from '@mui/material';
 import { useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -22,7 +22,6 @@ import BlockIcon from '@mui/icons-material/Block';
 import { Snackbar, Alert } from '@mui/material';
 import { router } from 'next/client';
 import { fetchWithHeaders } from '../../utils/api';
-
 
 export const UsersTable = (props) => {
   const {
@@ -36,38 +35,36 @@ export const UsersTable = (props) => {
     onSelectOne,
     page = 0,
     rowsPerPage = 0,
-    selected = []
+    selected = [],
   } = props;
 
   const handleEdit = (user) => {
-
-    console.log("user",user)
+    console.log('user', user);
     router.push({
       pathname: '/users/updateUser',
-      query: { user: JSON.stringify(user) }
+      query: { user: JSON.stringify(user) },
     });
   };
 
   const handleBlock = async (id) => {
-    console.log("Blocking user with ID:", id);
+    console.log('Blocking user with ID:', id);
 
     const payload = {
-      active: false
+      active: false,
     };
 
     try {
       const response = await fetchWithHeaders('/users/profile', {
         method: 'POST',
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
-      console.log("User blocked successfully", response);
+      console.log('User blocked successfully', response);
       setSnackbarMessage('User blocked successfully!');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
-
     } catch (error) {
-      console.error("Error blocking user:", error.message);
+      console.error('Error blocking user:', error.message);
       setSnackbarMessage('Error blocking user.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
@@ -78,8 +75,8 @@ export const UsersTable = (props) => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  const selectedSome = (selected.length > 0) && (selected.length < items.length);
-  const selectedAll = (items.length > 0) && (selected.length === items.length);
+  const selectedSome = selected.length > 0 && selected.length < items.length;
+  const selectedAll = items.length > 0 && selected.length === items.length;
 
   return (
     <Card>
@@ -88,15 +85,9 @@ export const UsersTable = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>
-                  Name
-                </TableCell>
-                <TableCell>
-                  Email
-                </TableCell>
-                <TableCell>
-                  Phone
-                </TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Phone</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
@@ -106,41 +97,36 @@ export const UsersTable = (props) => {
                 const fullName = `${customer.firstName} ${customer.lastName}`;
 
                 return (
-                  <TableRow
-                    hover
-                    key={customer.id}
-                    selected={isSelected}
-                  >
+                  <TableRow hover key={customer.id} selected={isSelected}>
                     <TableCell>
-                      <Stack
-                        alignItems="center"
-                        direction="row"
-                        spacing={2}
-                      >
-                        <Avatar>
-                          {getInitials(fullName)}
-                        </Avatar>
-                        <Typography variant="subtitle2">
-                          {fullName}
-                        </Typography>
+                      <Stack alignItems="center" direction="row" spacing={2}>
+                        <Avatar>{getInitials(fullName)}</Avatar>
+                        <Typography variant="subtitle2">{fullName}</Typography>
                       </Stack>
                     </TableCell>
+                    <TableCell>{customer.email}</TableCell>
+                    <TableCell>{customer.mobilePhoneNumber}</TableCell>
                     <TableCell>
-                      {customer.email}
-                    </TableCell>
-                    <TableCell>
-                      {customer.mobilePhoneNumber}
-                    </TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1} sx={{ float: 'right' }}>
-                        <IconButton color="primary" aria-label="edit customer" onClick={() =>
-                        {
-                          handleEdit(customer)
-                          console.log("curstomer :",customer)
-                        }}>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{ float: 'right' }}
+                      >
+                        <IconButton
+                          color="primary"
+                          aria-label="edit customer"
+                          onClick={() => {
+                            handleEdit(customer);
+                            console.log('curstomer :', customer);
+                          }}
+                        >
                           <EditIcon />
                         </IconButton>
-                        <IconButton color="secondary" aria-label="block customer" onClick={() => handleBlock(customer.id)}>
+                        <IconButton
+                          color="secondary"
+                          aria-label="block customer"
+                          onClick={() => handleBlock(customer.id)}
+                        >
                           <BlockIcon />
                         </IconButton>
                       </Stack>
@@ -168,7 +154,11 @@ export const UsersTable = (props) => {
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} variant="filled">
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          variant="filled"
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
@@ -187,5 +177,5 @@ UsersTable.propTypes = {
   onSelectOne: PropTypes.func,
   page: PropTypes.number,
   rowsPerPage: PropTypes.number,
-  selected: PropTypes.array
+  selected: PropTypes.array,
 };

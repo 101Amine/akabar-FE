@@ -11,14 +11,16 @@
     "start": "next start",
     "export": "next export",
     "lint": "next lint",
-    "lint-fix": "next lint --fix"
+    "lint-fix": "next lint --fix",
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --list-different ."
   },
   "dependencies": {
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.6",
     "@emotion/server": "11.10.0",
     "@emotion/styled": "11.10.6",
-    "@heroicons/react": "2.0.16",
+    "@heroicons/react": "^2.0.16",
     "@mui/icons-material": "^5.14.14",
     "@mui/lab": "5.0.0-alpha.120",
     "@mui/material": "5.11.10",
@@ -28,6 +30,7 @@
     "apexcharts": "3.37.0",
     "date-fns": "2.29.3",
     "formik": "2.2.9",
+    "heroicons": "^2.0.18",
     "next": "13.1.6",
     "nprogress": "0.2.0",
     "prop-types": "15.8.1",
@@ -47,6 +50,9 @@
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
     "eslint": "8.34.0",
-    "eslint-config-next": "13.1.6"
+    "eslint-config-next": "13.1.6",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.0.3"
   }
 }

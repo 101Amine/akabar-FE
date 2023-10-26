@@ -13,13 +13,10 @@ export const Layout = (props) => {
       component="main"
       sx={{
         display: 'flex',
-        flex: '1 1 auto'
+        flex: '1 1 auto',
       }}
     >
-      <Grid
-        container
-        sx={{ flex: '1 1 auto' }}
-      >
+      <Grid container sx={{ flex: '1 1 auto' }}>
         <Grid
           xs={12}
           lg={6}
@@ -27,7 +24,7 @@ export const Layout = (props) => {
             backgroundColor: 'background.paper',
             display: 'flex',
             flexDirection: 'column',
-            position: 'relative'
+            position: 'relative',
           }}
         >
           <Box
@@ -37,7 +34,7 @@ export const Layout = (props) => {
               p: 3,
               position: 'fixed',
               top: 0,
-              width: '100%'
+              width: '100%',
             }}
           >
             <Box
@@ -46,7 +43,7 @@ export const Layout = (props) => {
               sx={{
                 display: 'inline-flex',
                 height: 32,
-                width: 32
+                width: 32,
               }}
             >
               <Logo />
@@ -59,21 +56,21 @@ export const Layout = (props) => {
           lg={6}
           sx={{
             alignItems: 'center',
-            background: 'radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)',
+            background:
+              'radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)',
             color: 'white',
             display: 'flex',
             justifyContent: 'center',
             '& img': {
-              maxWidth: '100%'
-            }
+              maxWidth: '100%',
+            },
           }}
-        >
-        </Grid>
+        ></Grid>
       </Grid>
     </Box>
   );
 };
 
 Layout.prototypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
 };

@@ -1,66 +1,27 @@
-import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
-import CogIcon from '@heroicons/react/24/solid/CogIcon';
-import LockClosedIcon from '@heroicons/react/24/solid/LockClosedIcon';
-import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
-import UserIcon from '@heroicons/react/24/solid/UserIcon';
-import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
-import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
-import XCircleIcon from '@heroicons/react/24/solid/XCircleIcon';
-import { SvgIcon } from '@mui/material';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
+import FactoryIcon from '@mui/icons-material/DomainOutlined';
+import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 
 export const items = [
   {
-    title: 'Overview',
+    title: 'Accueil',
     path: '/',
-    icon: (
-      <SvgIcon fontSize="small">
-        <ChartBarIcon />
-      </SvgIcon>
-    )
+    icon: <HomeOutlinedIcon fontSize="small" />,
   },
   {
-    title: 'Users',
-    path: '/users',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    )
+    title: 'Ventes',
+    path: '/ventes',
+    icon: <AttachMoneyOutlinedIcon fontSize="small" />,
   },
   {
-    title: 'Clients',
-    path: '/clients',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    )
+    title: 'Production',
+    path: '/production',
+    icon: <FactoryIcon fontSize="small" />,
   },
   {
-    title: 'Affaires',
-    path: '/affaires',
-    icon: (
-      <SvgIcon fontSize="small">
-        <ShoppingBagIcon />
-      </SvgIcon>
-    )
+    title: 'Outils',
+    path: '/outils',
+    icon: <BuildOutlinedIcon fontSize="small" />,
   },
-  {
-    title: 'Account',
-    path: '/account',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UserIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Settings',
-    path: '/settings',
-    icon: (
-      <SvgIcon fontSize="small">
-        <CogIcon />
-      </SvgIcon>
-    )
-  }
 ];

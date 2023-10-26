@@ -14,7 +14,7 @@ import {
   Tab,
   Tabs,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
@@ -27,18 +27,14 @@ const Page = () => {
     initialValues: {
       email: 'admin@akabar.ma',
       password: 'devpass',
-      submit: null
+      submit: null,
     },
     validationSchema: Yup.object({
-      email: Yup
-        .string()
+      email: Yup.string()
         .email('Must be a valid email')
         .max(255)
         .required('Email is required'),
-      password: Yup
-        .string()
-        .max(255)
-        .required('Password is required')
+      password: Yup.string().max(255).required('Password is required'),
     }),
     onSubmit: async (values, helpers) => {
       try {
@@ -49,22 +45,17 @@ const Page = () => {
         helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
       }
-    }
+    },
   });
 
-  const handleMethodChange = useCallback(
-    (event, value) => {
-      setMethod(value);
-    },
-    []
-  );
+  const handleMethodChange = useCallback((event, value) => {
+    setMethod(value);
+  }, []);
 
   return (
     <>
       <Head>
-        <title>
-          Login | Akabar
-        </title>
+        <title>Login | Akabar</title>
       </Head>
       <Box
         sx={{
@@ -80,23 +71,15 @@ const Page = () => {
             maxWidth: 550,
             px: 3,
             py: '100px',
-            width: '100%'
+            width: '100%',
           }}
         >
           <div>
-            <Stack
-              spacing={1}
-              sx={{ mb: 3 }}
-            >
-              <Typography variant="h4">
-                Login
-              </Typography>
+            <Stack spacing={1} sx={{ mb: 3 }}>
+              <Typography variant="h4">Login</Typography>
             </Stack>
             {method === 'email' && (
-              <form
-                noValidate
-                onSubmit={formik.handleSubmit}
-              >
+              <form noValidate onSubmit={formik.handleSubmit}>
                 <Stack spacing={3}>
                   <TextField
                     error={!!(formik.touched.email && formik.errors.email)}
@@ -110,9 +93,13 @@ const Page = () => {
                     value={formik.values.email}
                   />
                   <TextField
-                    error={!!(formik.touched.password && formik.errors.password)}
+                    error={
+                      !!(formik.touched.password && formik.errors.password)
+                    }
                     fullWidth
-                    helperText={formik.touched.password && formik.errors.password}
+                    helperText={
+                      formik.touched.password && formik.errors.password
+                    }
                     label="Password"
                     name="password"
                     onBlur={formik.handleBlur}
@@ -122,11 +109,7 @@ const Page = () => {
                   />
                 </Stack>
                 {formik.errors.submit && (
-                  <Typography
-                    color="error"
-                    sx={{ mt: 3 }}
-                    variant="body2"
-                  >
+                  <Typography color="error" sx={{ mt: 3 }} variant="body2">
                     {formik.errors.submit}
                   </Typography>
                 )}
@@ -139,18 +122,15 @@ const Page = () => {
                 >
                   Continue
                 </Button>
-          
-                <Alert
-                  color="primary"
-                  severity="info"
-                  sx={{ mt: 3 }}
-                >
+
+                <Alert color="primary" severity="info" sx={{ mt: 3 }}>
                   <div>
-                    You can use <b>admin@akabar.ma</b> and password <b>devpass</b>
+                    You can use <b>admin@akabar.ma</b> and password{' '}
+                    <b>devpass</b>
                   </div>
                 </Alert>
               </form>
-            )}            
+            )}
           </div>
         </Box>
       </Box>
@@ -158,10 +138,6 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => (
-  <AuthLayout>
-    {page}
-  </AuthLayout>
-);
+Page.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
 
 export default Page;

@@ -11,7 +11,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
 } from '@mui/material';
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -19,46 +19,45 @@ import { styled } from '@mui/material/styles';
 
 const StyledListItem = styled(ListItem)(({ theme, active }) => ({
   '&:hover': {
-    backgroundColor: theme.palette.primary.main,
-    cursor: 'pointer'
+    backgroundColor: '#E0E0E0',
+    cursor: 'pointer',
   },
-  backgroundColor: active ? theme.palette.primary.main : 'transparent',
-  color: active ? theme.palette.primary.contrastText : 'inherit',
+  backgroundColor: active ? '#E0E0E0' : 'transparent',
+  color: 'black',
+  fontFamily: (theme) => theme.typography.fontFamily,
   '&.Mui-selected, &.Mui-selected:hover': {
-    backgroundColor: 'red',
-    color: theme.palette.primary.contrastText,
+    color: '#FFF',
   },
   transition: 'background-color 0.1s',
-  borderRadius: '10px'
+  borderRadius: '10px',
 }));
 
-
 export const SideNav = (props) => {
-  const { open, onClose, submenuItems  } = props;
+  const { open, onClose, submenuItems } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
-
 
   const content = (
     <Scrollbar
       sx={{
         height: '100%',
         '& .simplebar-content': {
-          height: '100%'
+          height: '100%',
         },
         '& .simplebar-scrollbar:before': {
-          background: 'neutral.400'
-        }
+          background: 'neutral.400',
+        },
       }}
     >
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          height: '100%'
+          height: '100%',
+          backgroundColor: '#F2F2F2',
         }}
       >
-        <Box sx={{ p: 3,display:'flex', gap:1 }}>
+        <Box sx={{ p: 3, display: 'flex', gap: 1 }}>
           <Box
             sx={{
               alignItems: 'center',
@@ -68,29 +67,32 @@ export const SideNav = (props) => {
               display: 'flex',
               gap: 1.5,
               width: '100%',
-              p: '12px'
+              p: '12px',
             }}
           >
-          <Logo />
+            <Logo />
             <div>
               <Typography
-                color="inherit"
+                color="black"
                 variant="subtitle1"
                 fontFamily={'cursive'}
                 letterSpacing={'5px'}
+                fontWeight={'bold'}
+                fontSize={'18px'}
+                marginTop={'5px'}
               >
                 Akabar
               </Typography>
             </div>
           </Box>
         </Box>
-        <Divider sx={{ borderColor: 'neutral.700' }} />
+        <Divider sx={{ borderColor: 'neutral.300' }} />
         <Box
           component="nav"
           sx={{
             flexGrow: 1,
             px: 2,
-            py: 3
+            py: 3,
           }}
         >
           <Stack
@@ -99,14 +101,20 @@ export const SideNav = (props) => {
             sx={{
               listStyle: 'none',
               p: 0,
-              m: 0
+              m: 0,
             }}
           >
-            <List component="nav" sx={{ '& > *': { marginBottom: '10px'} }}>
-              {submenuItems.map(item => {
+            <List component="nav" sx={{ '& > *': { marginBottom: '10px' } }}>
+              {submenuItems.map((item) => {
                 const isActive = item.path === pathname;
                 return (
-                  <StyledListItem key={item.label} button component={NextLink} href={item.path} active={isActive}>
+                  <StyledListItem
+                    key={item.label}
+                    button
+                    component={NextLink}
+                    href={item.path}
+                    active={isActive}
+                  >
                     <ListItemIcon>
                       <item.icon />
                     </ListItemIcon>
@@ -131,8 +139,8 @@ export const SideNav = (props) => {
           sx: {
             backgroundColor: 'neutral.800',
             color: 'common.white',
-            width: 280
-          }
+            width: 280,
+          },
         }}
         variant="permanent"
       >
@@ -150,8 +158,8 @@ export const SideNav = (props) => {
         sx: {
           backgroundColor: 'neutral.800',
           color: 'common.white',
-          width: 280
-        }
+          width: 280,
+        },
       }}
       sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}
       variant="temporary"
@@ -168,7 +176,7 @@ SideNav.propTypes = {
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       path: PropTypes.string.isRequired,
-      icon: PropTypes.elementType.isRequired
-    })
-  ).isRequired
+      icon: PropTypes.elementType.isRequired,
+    }),
+  ).isRequired,
 };
