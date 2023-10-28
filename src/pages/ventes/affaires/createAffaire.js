@@ -59,7 +59,7 @@ const CreateAffaire = () => {
       </Button>
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom marginTop="50px">
-          Create Affaire
+          Créer une affaire{' '}
         </Typography>
         <Divider />
 

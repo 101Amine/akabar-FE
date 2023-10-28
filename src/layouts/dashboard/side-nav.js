@@ -27,8 +27,6 @@ export const SideNav = (props) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  console.log('theme', theme.transitions);
-
   const StyledListItem = styled(({ theme, isIconOnly, ...rest }) => (
     <ListItem {...rest} />
   ))(({ theme, active, isIconOnly }) => ({
@@ -58,7 +56,7 @@ export const SideNav = (props) => {
   const content = (
     <Scrollbar
       onMouseEnter={() => dispatch(setIconOnly())}
-      // onMouseLeave={() => dispatch(disableIconOnly())}
+      onMouseLeave={() => dispatch(disableIconOnly())}
       sx={{
         height: '100%',
         '& .simplebar-content': {

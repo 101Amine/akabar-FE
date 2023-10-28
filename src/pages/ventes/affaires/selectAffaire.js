@@ -48,7 +48,7 @@ const Page = () => {
         </Button>
         <Stack spacing={3} marginTop={8}>
           <Typography variant="h4" gutterBottom marginTop={'50px'}>
-            Affaires
+            Sélectionner une affaire
           </Typography>
 
           <Select

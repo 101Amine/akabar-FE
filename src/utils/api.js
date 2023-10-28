@@ -13,11 +13,6 @@ export const fetchWithHeaders = async (endpoint, options = {}) => {
     headers,
   });
 
-  if (!response.ok) {
-    const errorMsg = await response.text();
-    throw new Error(errorMsg);
-  }
-
   return response.json();
 };
 

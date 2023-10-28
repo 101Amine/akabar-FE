@@ -65,20 +65,18 @@ const CreateClient = () => {
       if (success) {
         router.push('/ventes/clients');
       }
+
+      if (success && submitting) {
+        handleSnackbarOpen('Client ajouté avec succès !', 'success');
+      } else if (error && submitting) {
+        handleSnackbarOpen(
+          "Échec de l'ajout d'un client. Veuillez réessayer.",
+          'error',
+        );
+      }
     },
     [clientDetails, dispatch, router, success],
   );
-
-  useEffect(() => {
-    if (success && submitting) {
-      handleSnackbarOpen('Client ajouté avec succès !', 'success');
-    } else if (error && submitting) {
-      handleSnackbarOpen(
-        "Échec de l'ajout d'un client. Veuillez réessayer.",
-        'error',
-      );
-    }
-  }, [success, error, submitting]);
 
   const handleSnackbarOpen = (message, severity) => {
     setSnackbarMessage(message);
@@ -101,7 +99,7 @@ const CreateClient = () => {
       </Button>
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom marginTop="80px">
-          Créer un client
+          Créer un client{' '}
         </Typography>
         <Divider />
         <Box justifyContent="center" mt={4}>

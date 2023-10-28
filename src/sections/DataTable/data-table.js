@@ -111,9 +111,10 @@ export const DataTable = ({
                 <TableRow
                   key={item.id}
                   sx={{
-                    backgroundColor: item.active
-                      ? 'transparent'
-                      : 'hsla(0, 100%, 90%, 0.25)',
+                    backgroundColor:
+                      item.active === false
+                        ? 'hsla(0, 100%, 90%, 0.25)'
+                        : 'transparent',
                   }}
                 >
                   {columns.map((col) => (

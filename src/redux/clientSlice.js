@@ -62,10 +62,8 @@ export const fetchClients = createAsyncThunk(
       },
     );
 
-    console.log('response', response);
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch clients');
-    }
+    console.log('');
+
     return response.content;
   },
 );
