@@ -10,11 +10,10 @@ export function createTheme() {
   const shadows = createShadows();
   const typography = createTypography();
 
-  console.log('palette', palette);
   const transitions = {
     duration: {
-      enteringScreen: 10000,
-      leavingScreen: 10000,
+      enteringScreen: 1000,
+      leavingScreen: 1000,
     },
   };
 

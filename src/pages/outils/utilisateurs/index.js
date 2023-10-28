@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   Box,
   Button,
@@ -51,6 +52,10 @@ const Page = () => {
     [dispatch],
   );
 
+  const handleBack = () => {
+    router.back();
+  };
+
   const proceedToForm = () => {
     router.push('/outils/utilisateurs/createUser').then((r) => console.log(r));
   };
@@ -72,9 +77,21 @@ const Page = () => {
           style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
         >
           <Stack spacing={3}>
+            <Stack spacing={3}>
+              <Button
+                onClick={handleBack}
+                startIcon={<ArrowBackIcon />}
+                variant="outlined"
+                sx={{ position: 'absolute' }}
+              >
+                Back
+              </Button>
+            </Stack>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Utilisateurs</Typography>
+                <Typography variant="h4" marginTop={'70px'}>
+                  Utilisateurs
+                </Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
               <Divider />

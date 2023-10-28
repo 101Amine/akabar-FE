@@ -3,14 +3,11 @@ import { fetchWithHeaders } from '../utils/api';
 
 /**
  * @typedef {Object} ClientDetails
- * @property {string} userName - The client's name.
- * @property {string} password - The client's password.
- * @property {string} firstName - the client's firstName
- * @property {string} lastName - the client's lastName
- * @property {number} mobilePhoneNumber - the client's mobilePhoneNumber
+ * @property {string} nameClient - The client's name.
+ * @property {string} codeClient - The client's code.
+ * @property {string} ice - the client's ice
  * @property {number} phone - the client's phone
  * @property {string} fax - the client's fax
- * @property {string} ice - the client's ice
  * @property {string} bankAccount - the client's bankAccount
  * @property {string} address - the client's address
  */
@@ -90,7 +87,7 @@ const initialState = {
   },
   clients: [],
   page: 0,
-  rowsPerPage: 5,
+  rowsPerPage: 10,
   totalClients: 0,
   submitting: false,
   error: null,

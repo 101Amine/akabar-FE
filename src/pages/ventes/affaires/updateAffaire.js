@@ -19,6 +19,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { Layout as DashboardLayout } from '../../../layouts/dashboard/layout';
 import UpdateClient from '../clients/updateClient';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const UpdateAffaire = () => {
   const router = useRouter();
@@ -102,6 +103,14 @@ const UpdateAffaire = () => {
       style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
     >
       {' '}
+      <Button
+        onClick={handleBack}
+        startIcon={<ArrowBackIcon />}
+        variant="outlined"
+        sx={{ position: 'absolute' }}
+      >
+        Back
+      </Button>
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom>
           Mise à jour de l'Affaire

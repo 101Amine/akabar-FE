@@ -1,0 +1,19 @@
+@keyframes typing {
+  from { width: 0 }
+  to { width: 320px }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: black; }
+}
+
+.typing {
+  border-right: 0.1em solid black;
+  white-space: nowrap;
+  overflow: hidden;
+  font-family: monospace;
+  animation:
+    typing 2s steps(40, end) infinite,
+    blink-caret .75s step-end infinite;
+}

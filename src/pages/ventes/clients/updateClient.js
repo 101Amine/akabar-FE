@@ -9,7 +9,7 @@ import {
   Container,
   Typography,
 } from '@mui/material';
-import { fetchWithHeaders } from '../../../utils/api';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
@@ -51,6 +51,10 @@ const UpdateClient = () => {
     setSnackbarOpen(true);
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
@@ -85,10 +89,18 @@ const UpdateClient = () => {
   return (
     <Container
       maxWidth={isIconOnly ? 'false' : 'xl'}
-      style={{ marginLeft: isIconOnly ? '-100px' : '0' }}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
     >
+      <Button
+        onClick={handleBack}
+        startIcon={<ArrowBackIcon />}
+        variant="outlined"
+        sx={{ position: 'absolute' }}
+      >
+        Back
+      </Button>
       <Box marginTop={8}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom marginTop={'100px'}>
           Mise à jour du client
         </Typography>
         <Divider />

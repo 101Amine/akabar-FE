@@ -10,6 +10,7 @@ import {
   Stack,
   SvgIcon,
   Tooltip,
+  Typography,
   useMediaQuery,
 } from '@mui/material';
 import { usePopover } from 'src/hooks/use-popover';
@@ -18,6 +19,7 @@ import { items } from './config';
 import { usePathname } from 'next/navigation';
 import { SideNavItem } from './side-nav-item';
 import PersonIcon from '@mui/icons-material/Person';
+import { getInitials } from '../../utils/get-initials';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -32,6 +34,8 @@ export const TopNav = (props) => {
   const handleTopNavClick = (menuItemKey) => {
     setActiveTopNavItem(menuItemKey);
   };
+
+  const fullName = 'Becha Mohamed Amine';
 
   return (
     <>
@@ -117,17 +121,19 @@ export const TopNav = (props) => {
                 </Badge>
               </IconButton>
             </Tooltip>
-            <Avatar
-              onClick={accountPopover.handleOpen}
-              ref={accountPopover.anchorRef}
-              sx={{
-                cursor: 'pointer',
-                height: 40,
-                width: 40,
-              }}
-            >
-              <PersonIcon />
-            </Avatar>
+            <Stack alignItems="center" direction="row" spacing={2}>
+              <Avatar
+                onClick={accountPopover.handleOpen}
+                ref={accountPopover.anchorRef}
+                sx={{
+                  cursor: 'pointer',
+                  height: 40,
+                  width: 40,
+                }}
+              >
+                {getInitials(fullName)}
+              </Avatar>
+            </Stack>
           </Stack>
         </Stack>
       </Box>

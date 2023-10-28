@@ -102,7 +102,7 @@ export const SideNav = (props) => {
                   letterSpacing={'5px'}
                   fontWeight={'bold'}
                   fontSize={'18px'}
-                  marginTop={'5px'}
+                  marginTop={'-2px'}
                 >
                   Akabar
                 </Typography>

@@ -4,62 +4,122 @@ import {
   Container,
   Stack,
   Typography,
-  Select,
-  MenuItem,
+  SvgIcon,
+  Divider,
 } from '@mui/material';
-import { useState } from 'react';
+import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import { useCallback, useEffect } from 'react';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setPage, setRowsPerPage } from '../../redux/userSlice';
+import { DataTable } from '../../sections/DataTable/data-table';
+import Head from 'next/head';
+import { fetchAffaires } from '../../redux/affaireSlice';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { CompaniesSearch } from '../../sections/affaires/companies-search';
+
+const affaireColumns = [
+  { key: 'nameClient', label: 'Nom de client' },
+  { key: 'nomEtiquette', label: "Nom d'etiquette" },
+  { key: 'width', label: 'Width' },
+  { key: 'height', label: 'Height' },
+  { key: 'quantiteUnitaire', label: 'Quantité Unitaire' },
+  { key: 'supportPapier', label: 'Support (PAPIER)' },
+  { key: 'typeEtiquette', label: "Type d'etiquette" },
+];
 
 const Page = () => {
-  const [affaireType, setAffaireType] = useState('');
+  const affaires = useSelector((state) => state.affaire.affaires);
+  const dispatch = useDispatch();
   const router = useRouter();
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
-  const handleAffaireChange = (event) => {
-    setAffaireType(event.target.value);
+
+  useEffect(() => {
+    dispatch(fetchAffaires());
+  }, [dispatch]);
+
+  const handlePageChange = useCallback(
+    (event, value) => {
+      dispatch(setPage(value));
+    },
+    [dispatch],
+  );
+
+  const handleBack = () => {
+    router.back();
   };
 
+  const handleRowsPerPageChange = useCallback(
+    (event) => {
+      dispatch(setRowsPerPage(event.target.value));
+    },
+    [dispatch],
+  );
+
   const proceedToForm = () => {
-    router.push('/ventes/affaires/createAffaire');
+    router.push('/ventes/affaires/selectAffaire').then((r) => console.info(r));
   };
 
   return (
     <>
-      <Container
-        maxWidth={isIconOnly ? 'false' : 'xl'}
-        style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+      <Head>
+        <title>Clients | Akabar</title>
+      </Head>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          py: 8,
+        }}
       >
-        <Stack spacing={3} marginTop={8}>
-          <Typography variant="h4" gutterBottom>
-            Affaires
-          </Typography>
+        <Container
+          maxWidth={isIconOnly ? 'false' : 'xl'}
+          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+        >
+          <Stack spacing={3}>
+            <Button
+              onClick={handleBack}
+              startIcon={<ArrowBackIcon />}
+              variant="outlined"
+              sx={{ position: 'absolute' }}
+            >
+              Back
+            </Button>
+            <Stack direction="row" justifyContent="space-between" spacing={4}>
+              <Stack spacing={1}>
+                <Typography variant="h4" marginTop={'70px'}>
+                  Affaires
+                </Typography>
+                <Stack alignItems="center" direction="row" spacing={1}></Stack>
+              </Stack>
 
-          <Select
-            value={affaireType}
-            onChange={handleAffaireChange}
-            displayEmpty
-            fullWidth
-            renderValue={(selectedValue) =>
-              selectedValue || "Choisir un type d'affaire"
-            }
-          >
-            <MenuItem value={'Etiquette'}>Etiquette</MenuItem>
-            <MenuItem value={'item2'}>Menu item 2</MenuItem>
-            <MenuItem value={'item3'}>Menu item 3</MenuItem>
-            <MenuItem value={'item4'}>Menu item 4</MenuItem>
-            <MenuItem value={'item5'}>Menu item 5</MenuItem>
-          </Select>
+              <Divider />
 
-          <Button
-            onClick={proceedToForm}
-            variant="contained"
-            style={{ maxWidth: '100px' }}
-          >
-            Suivant
-          </Button>
-        </Stack>
-      </Container>
+              <div>
+                <Button
+                  onClick={proceedToForm}
+                  startIcon={
+                    <SvgIcon fontSize="small">
+                      <PlusIcon />
+                    </SvgIcon>
+                  }
+                  variant="contained"
+                >
+                  Creé une Affaire
+                </Button>
+              </div>
+            </Stack>
+            <CompaniesSearch />
+            <DataTable
+              count={affaires?.length}
+              items={affaires}
+              entity="affaire"
+              columns={affaireColumns}
+            />
+          </Stack>
+        </Container>
+      </Box>
     </>
   );
 };

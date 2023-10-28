@@ -16,6 +16,7 @@ import { ClientsSearch } from 'src/sections/clients/client-search';
 import { DataTable } from '../../sections/DataTable/data-table';
 import { fetchClients, setPage, setRowsPerPage } from '../../redux/clientSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const clientColumns = [
   { key: 'nameClient', label: 'Nom du client' },
@@ -33,6 +34,7 @@ const Page = () => {
   const clients = useSelector((state) => state.client.clients);
   // const totalCustomers = useSelector(state => state.client.totalClients);
 
+  console.log('clients', clients);
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   const router = useRouter();
@@ -48,6 +50,10 @@ const Page = () => {
     },
     [dispatch],
   );
+
+  const handleBack = () => {
+    router.back();
+  };
 
   const handleRowsPerPageChange = useCallback(
     (event) => {
@@ -77,9 +83,19 @@ const Page = () => {
           style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
         >
           <Stack spacing={3}>
+            <Button
+              onClick={handleBack}
+              startIcon={<ArrowBackIcon />}
+              variant="outlined"
+              sx={{ position: 'absolute' }}
+            >
+              Back
+            </Button>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Clients</Typography>
+                <Typography variant="h4" marginTop={'70px'}>
+                  Clients
+                </Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
 

@@ -1,18 +1,28 @@
-import { useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import PropTypes from 'prop-types';
-import {
-  Box,
-  Divider,
-  MenuItem,
-  MenuList,
-  Popover,
-  Typography,
-} from '@mui/material';
-import { useAuth } from 'src/hooks/use-auth';
+import { Box, Typography } from '@mui/material';
+import { useState, useEffect } from 'react';
 import { ComingSoonLogo } from './coming-soon-logo';
+import animationStyle from '../styles/animation.module.scss';
+export const ComingSoon = () => {
+  const [text, setText] = useState('');
 
-export const ComingSoon = (props) => {
+  const fullText = 'Development in progress...';
+
+  useEffect(() => {
+    let index = 0;
+    const intervalId = setInterval(() => {
+      if (index < fullText.length) {
+        setText((prevText) => prevText + fullText[index]);
+        index++;
+      } else {
+        // Resetting the text and index for infinite loop
+        setText('');
+        index = 0;
+      }
+    }, 100); // speed of typing each character
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <Box
       display="flex"
@@ -23,7 +33,7 @@ export const ComingSoon = (props) => {
       width="100%"
     >
       <ComingSoonLogo />
-      <Typography variant="h5" mt={2}>
+      <Typography variant="h5" mt={2} className={animationStyle.typing}>
         Development in progress...
       </Typography>
     </Box>

@@ -10,16 +10,14 @@ import {
 const muiTheme = createTheme({
   transitions: {
     duration: {
-      enteringScreen: 5000,
-      leavingScreen: 5000,
+      enteringScreen: 1000,
+      leavingScreen: 1000,
     },
   },
 });
 
 export function createComponents(config) {
   const { palette } = config;
-
-  console.log(palette);
 
   return {
     MuiAvatar: {

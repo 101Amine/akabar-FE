@@ -99,10 +99,11 @@ export const fetchUsers = createAsyncThunk(
 
 const initialState = {
   userDetails: {
-    userName: '',
+    email: '',
+    firstName: '',
+    lastName: '',
     password: '',
     mobilePhoneNumber: '',
-    email: '',
   },
   users: [],
   page: 0,

@@ -11,6 +11,7 @@ import {
   Grid,
   Container,
   Typography,
+  Stack,
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import MuiAlert from '@mui/material/Alert';
@@ -22,6 +23,8 @@ import {
   setUserDetails,
 } from '../../../redux/userSlice';
 import { useRouter } from 'next/router';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 
 const CreateUser = () => {
   const dispatch = useDispatch();
@@ -37,6 +40,8 @@ const CreateUser = () => {
 
   const handleChange = useCallback(
     (event) => {
+      console.log('name', event.target.name);
+      console.log('value', event.target.value);
       dispatch(
         setUserDetails({
           ...userDetails,
@@ -47,12 +52,28 @@ const CreateUser = () => {
     [userDetails, dispatch],
   );
 
+  const handleBack = () => {
+    router.back();
+  };
+
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
       dispatch(addUser(userDetails));
       if (success) {
-        router.push('/outils/users');
+        router.push('/outils/utilisateurs');
+      }
+
+      if (success) {
+        handleSnackbarOpen(
+          "L'utilisateur a été ajouté avec succès !",
+          'success',
+        );
+      } else if (error) {
+        handleSnackbarOpen(
+          "L'ajout d'un utilisateur a échoué. Veuillez réessayer.",
+          'error',
+        );
       }
     },
     [userDetails, dispatch, router, success],
@@ -68,23 +89,23 @@ const CreateUser = () => {
     dispatch(clearUserDetails());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (success && submitting) {
-      handleSnackbarOpen("L'utilisateur a été ajouté avec succès !", 'success');
-    } else if (error && submitting) {
-      handleSnackbarOpen(
-        "L'ajout d'un utilisateur a échoué. Veuillez réessayer.",
-        'error',
-      );
-    }
-  }, [success, error]);
-
   return (
     <Container
       maxWidth={isIconOnly ? 'false' : 'xl'}
-      style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
     >
-      <Typography variant="h4" marginTop="40px" gutterBottom>
+      <Stack spacing={3}>
+        <Button
+          onClick={handleBack}
+          startIcon={<ArrowBackIcon />}
+          variant="outlined"
+          sx={{ position: 'absolute' }}
+        >
+          Back
+        </Button>
+      </Stack>
+
+      <Typography variant="h4" marginTop="80px" gutterBottom>
         Créer un utilisateur
       </Typography>
       <Divider />
@@ -133,7 +154,7 @@ const CreateUser = () => {
               <TextField
                 fullWidth
                 label="Email"
-                name="Adresse e-mail"
+                name="email"
                 onChange={handleChange}
                 required
                 type="email"
@@ -158,7 +179,7 @@ const CreateUser = () => {
               variant="contained"
               color="primary"
               type="submit"
-              disabled={submitting}
+              // disabled={submitting}
             >
               Soumettre
             </Button>

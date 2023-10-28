@@ -42,10 +42,20 @@ export const DataTable = ({
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const handleEdit = (item) => {
-    const route =
-      entity === 'client'
-        ? '/ventes/clients/updateClient'
-        : '/ventes/users/updateUser';
+    let route;
+
+    switch (entity) {
+      case 'client':
+        route = '/ventes/clients/updateClient';
+        break;
+      case 'affaire':
+        route = '/ventes/affaires/updateAffaire';
+        break;
+      default:
+        route = '/outils/utilisateurs/updateUser';
+        break;
+    }
+
     router.push({
       pathname: route,
       query: { [entity]: JSON.stringify(item) },
@@ -55,6 +65,7 @@ export const DataTable = ({
   const handleBlockOrUnblock = async (item) => {
     try {
       if (item.active) {
+        console.log('item.email', item.email);
         await dispatch(blockUser(item.id || item.email));
         setSnackbarMessage(
           `${
@@ -62,6 +73,7 @@ export const DataTable = ({
           } a été bloqué avec succès!`,
         );
       } else {
+        console.log('item.email', item);
         await dispatch(unblockUser(item.id || item.email));
         setSnackbarMessage(
           `${
@@ -127,15 +139,19 @@ export const DataTable = ({
                       >
                         <EditIcon />
                       </IconButton>
-                      <IconButton
-                        color={item.active ? 'secondary' : 'primary'}
-                        aria-label={
-                          item.active ? `block ${entity}` : `unblock ${entity}`
-                        }
-                        onClick={() => handleBlockOrUnblock(item)}
-                      >
-                        {item.active ? <BlockIcon /> : <LockOpenIcon />}
-                      </IconButton>
+                      {entity === 'user' && (
+                        <IconButton
+                          color={item.active ? 'secondary' : 'primary'}
+                          aria-label={
+                            item.active
+                              ? `block ${entity}`
+                              : `unblock ${entity}`
+                          }
+                          onClick={() => handleBlockOrUnblock(item)}
+                        >
+                          {item.active ? <BlockIcon /> : <LockOpenIcon />}
+                        </IconButton>
+                      )}
                     </Stack>
                   </TableCell>
                 </TableRow>

@@ -8,6 +8,8 @@ import {
   Container,
   Typography,
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -47,6 +49,10 @@ const CreateClient = () => {
     [clientDetails, dispatch],
   );
 
+  const handleBack = () => {
+    router.back();
+  };
+
   useEffect(() => {
     dispatch(clearClientDetails());
   }, [dispatch]);
@@ -56,7 +62,7 @@ const CreateClient = () => {
       event.preventDefault();
       dispatch(addClient(clientDetails));
 
-      if (success && submitting) {
+      if (success) {
         router.push('/ventes/clients');
       }
     },
@@ -83,10 +89,18 @@ const CreateClient = () => {
   return (
     <Container
       maxWidth={isIconOnly ? 'false' : 'xl'}
-      style={{ marginLeft: isIconOnly ? '-100px' : '0' }}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
     >
+      <Button
+        onClick={handleBack}
+        startIcon={<ArrowBackIcon />}
+        variant="outlined"
+        sx={{ position: 'absolute' }}
+      >
+        Back
+      </Button>
       <Box marginTop={8}>
-        <Typography variant="h4" marginTop="40px" gutterBottom>
+        <Typography variant="h4" gutterBottom marginTop="80px">
           Créer un client
         </Typography>
         <Divider />

@@ -14,9 +14,13 @@ import {
   Box,
   Divider,
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useRouter } from 'next/router';
 
 const CreateAffaire = () => {
   const [selectedOption, setSelectedOption] = useState('non');
@@ -26,6 +30,7 @@ const CreateAffaire = () => {
   const [selectedImpression, setSelectedImpression] = useState('');
   const [numberValue, setNumberValue] = useState('');
 
+  const router = useRouter();
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   const handleChangeNumber = (event) => {
@@ -35,13 +40,25 @@ const CreateAffaire = () => {
     }
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <Container
       maxWidth={isIconOnly ? 'false' : 'xl'}
-      style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
     >
+      <Button
+        onClick={handleBack}
+        startIcon={<ArrowBackIcon />}
+        variant="outlined"
+        sx={{ position: 'absolute' }}
+      >
+        Back
+      </Button>
       <Box marginTop={8}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom marginTop="50px">
           Create Affaire
         </Typography>
         <Divider />
