@@ -7,8 +7,14 @@ import {
   tableCellClasses,
 } from '@mui/material';
 
-// Used only to create transitions
-const muiTheme = createTheme();
+const muiTheme = createTheme({
+  transitions: {
+    duration: {
+      enteringScreen: 5000,
+      leavingScreen: 5000,
+    },
+  },
+});
 
 export function createComponents(config) {
   const { palette } = config;
@@ -156,10 +162,13 @@ export function createComponents(config) {
           borderWidth: 1,
           overflow: 'hidden',
           borderColor: palette.neutral[200],
-          transition: muiTheme.transitions.create([
-            'border-color',
-            'box-shadow',
-          ]),
+          transition: muiTheme.transitions.create(
+            ['border-color', 'box-shadow'],
+            {
+              easing: muiTheme.transitions.easing.sharp,
+              duration: muiTheme.transitions.duration.enteringScreen,
+            },
+          ),
           '&:hover': {
             backgroundColor: palette.action.hover,
           },
@@ -191,6 +200,13 @@ export function createComponents(config) {
     },
     MuiOutlinedInput: {
       styleOverrides: {
+        transition: muiTheme.transitions.create(
+          ['border-color', 'box-shadow'],
+          {
+            easing: muiTheme.transitions.easing.sharp,
+            duration: muiTheme.transitions.duration.enteringScreen,
+          },
+        ),
         root: {
           '&:hover': {
             backgroundColor: palette.action.hover,

@@ -23,6 +23,7 @@ import UpdateClient from '../clients/updateClient';
 const UpdateAffaire = () => {
   const router = useRouter();
   const { affaire: affaireJSON } = router.query;
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   const initialAffaireDetails = affaireJSON
     ? JSON.parse(affaireJSON)
@@ -96,7 +97,11 @@ const UpdateAffaire = () => {
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth={isIconOnly ? 'false' : 'xl'}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+    >
+      {' '}
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom>
           Mise à jour de l'Affaire

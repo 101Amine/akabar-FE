@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 const CreateAffaire = () => {
   const [selectedOption, setSelectedOption] = useState('non');
@@ -25,6 +26,8 @@ const CreateAffaire = () => {
   const [selectedImpression, setSelectedImpression] = useState('');
   const [numberValue, setNumberValue] = useState('');
 
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+
   const handleChangeNumber = (event) => {
     const value = event.target.value;
     if (value >= 1 && value <= 8) {
@@ -33,7 +36,10 @@ const CreateAffaire = () => {
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth={isIconOnly ? 'false' : 'xl'}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+    >
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom>
           Create Affaire

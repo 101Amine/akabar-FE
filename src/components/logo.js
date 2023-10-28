@@ -4,6 +4,7 @@ export const Logo = () => {
   const theme = useTheme();
   const fillColor = 'black';
 
+  console.log('black');
   return (
     <svg
       version="1.0"
@@ -14,7 +15,7 @@ export const Logo = () => {
     >
       <g
         transform="translate(0.000000,79.000000) scale(0.100000,-0.100000)"
-        fill={fillColor}
+        fill="black"
         stroke="none"
       >
         <path

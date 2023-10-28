@@ -15,30 +15,45 @@ import {
 } from '@mui/material';
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
-import { styled } from '@mui/material/styles';
-
-const StyledListItem = styled(ListItem)(({ theme, active }) => ({
-  '&:hover': {
-    backgroundColor: '#E0E0E0',
-    cursor: 'pointer',
-  },
-  backgroundColor: active ? '#E0E0E0' : 'transparent',
-  color: 'black',
-  fontFamily: (theme) => theme.typography.fontFamily,
-  '&.Mui-selected, &.Mui-selected:hover': {
-    color: '#FFF',
-  },
-  transition: 'background-color 0.1s',
-  borderRadius: '10px',
-}));
+import { styled, useTheme } from '@mui/material/styles';
+import { useDispatch } from 'react-redux';
+import { disableIconOnly, setIconOnly } from '../../redux/uiSlice';
 
 export const SideNav = (props) => {
   const { open, onClose, submenuItems } = props;
+  const { isIconOnly } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+  const theme = useTheme();
+  const dispatch = useDispatch();
+
+  const StyledListItem = styled(({ theme, isIconOnly, ...rest }) => (
+    <ListItem {...rest} />
+  ))(({ theme, active, isIconOnly }) => ({
+    '&:hover': {
+      backgroundColor: '#E8E8E8',
+      cursor: 'pointer',
+    },
+    backgroundColor: active ? '#E0E0E0' : 'transparent',
+    color: 'black',
+    fontFamily: theme.typography.fontFamily,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+
+    '&.Mui-selected, &.Mui-selected:hover': {
+      color: '#FFF',
+    },
+    borderRadius: '10px',
+    padding: isIconOnly ? '10px 0' : '10px 16px',
+    justifyContent: isIconOnly ? 'center' : 'flex-start',
+  }));
 
   const content = (
     <Scrollbar
+      onMouseEnter={() => dispatch(setIconOnly())}
+      onMouseLeave={() => dispatch(disableIconOnly())}
       sx={{
         height: '100%',
         '& .simplebar-content': {
@@ -65,25 +80,34 @@ export const SideNav = (props) => {
               borderRadius: 1,
               cursor: 'pointer',
               display: 'flex',
+              justifyContent: isIconOnly && 'center',
               gap: 1.5,
               width: '100%',
               p: '12px',
             }}
           >
-            <Logo />
-            <div>
-              <Typography
-                color="black"
-                variant="subtitle1"
-                fontFamily={'cursive'}
-                letterSpacing={'5px'}
-                fontWeight={'bold'}
-                fontSize={'18px'}
-                marginTop={'5px'}
-              >
-                Akabar
-              </Typography>
-            </div>
+            {isIconOnly ? (
+              <div>
+                <Logo />
+              </div>
+            ) : (
+              <>
+                <div>
+                  <Logo />
+                </div>
+                <Typography
+                  color="black"
+                  variant="subtitle1"
+                  fontFamily={'cursive'}
+                  letterSpacing={'5px'}
+                  fontWeight={'bold'}
+                  fontSize={'18px'}
+                  marginTop={'5px'}
+                >
+                  Akabar
+                </Typography>
+              </>
+            )}
           </Box>
         </Box>
         <Divider sx={{ borderColor: 'neutral.300' }} />
@@ -114,11 +138,17 @@ export const SideNav = (props) => {
                     component={NextLink}
                     href={item.path}
                     active={isActive}
+                    isIconOnly={isIconOnly}
                   >
-                    <ListItemIcon>
+                    <ListItemIcon
+                      sx={{
+                        justifyContent: isIconOnly ? 'center' : 'flex-start',
+                        width: isIconOnly ? '100%' : 'auto',
+                      }}
+                    >
                       <item.icon />
                     </ListItemIcon>
-                    <ListItemText primary={item.label} />
+                    {!isIconOnly && <ListItemText primary={item.label} />}
                   </StyledListItem>
                 );
               })}
@@ -135,11 +165,16 @@ export const SideNav = (props) => {
       <Drawer
         anchor="left"
         open
+        key={isIconOnly ? 'icon-only' : 'full-width'}
         PaperProps={{
           sx: {
             backgroundColor: 'neutral.800',
             color: 'common.white',
-            width: 280,
+            width: isIconOnly ? '80px' : '280px',
+            transition: theme.transitions.create('all', {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.enteringScreen,
+            }),
           },
         }}
         variant="permanent"
@@ -159,6 +194,10 @@ export const SideNav = (props) => {
           backgroundColor: 'neutral.800',
           color: 'common.white',
           width: 280,
+          transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
         },
       }}
       sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}

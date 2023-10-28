@@ -11,6 +11,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PeopleIcon from '@mui/icons-material/People';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleIconOnly } from '../../redux/uiSlice';
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -64,6 +66,7 @@ export const Layout = withAuthGuard((props) => {
     const path = window.location.pathname.split('/')[1];
     return path || null;
   });
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   const handlePathnameChange = useCallback(() => {
     if (openNav) {
@@ -86,11 +89,13 @@ export const Layout = withAuthGuard((props) => {
       <TopNav
         onNavOpen={() => setOpenNav(true)}
         setActiveTopNavItem={setActiveTopNavItem}
+        isIconOnly={isIconOnly}
       />
       <SideNav
         onClose={() => setOpenNav(false)}
         open={openNav}
         submenuItems={activeItems || []}
+        isIconOnly={isIconOnly}
       />
       <LayoutRoot>
         <LayoutContainer

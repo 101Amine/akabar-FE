@@ -28,12 +28,11 @@ const CreateClient = () => {
     (state) => state.client,
   );
 
-  console.log('clientDetails : ', clientDetails);
-
   // Local State for Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   // Handlers
   const handleChange = useCallback(
@@ -82,7 +81,10 @@ const CreateClient = () => {
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth={isIconOnly ? 'false' : 'xl'}
+      style={{ marginLeft: isIconOnly ? '-100px' : '0' }}
+    >
       <Box marginTop={8}>
         <Typography variant="h4" marginTop="40px" gutterBottom>
           Créer un client

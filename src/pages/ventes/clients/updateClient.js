@@ -14,7 +14,7 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import { updateClient } from '../../../redux/clientSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const UpdateClient = () => {
   const router = useRouter();
@@ -29,6 +29,7 @@ const UpdateClient = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   // Update clientDetails state when the router's query changes
   useEffect(() => {
@@ -82,7 +83,10 @@ const UpdateClient = () => {
   );
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth={isIconOnly ? 'false' : 'xl'}
+      style={{ marginLeft: isIconOnly ? '-100px' : '0' }}
+    >
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom>
           Mise à jour du client

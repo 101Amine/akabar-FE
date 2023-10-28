@@ -23,10 +23,11 @@ const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
 
 export const TopNav = (props) => {
-  const { onNavOpen, setActiveTopNavItem } = props;
+  const { onNavOpen, setActiveTopNavItem, isIconOnly } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const pathname = usePathname();
   const accountPopover = usePopover();
+  const paddingLeftValue = isIconOnly ? '80px' : `${SIDE_NAV_WIDTH}px`;
 
   const handleTopNavClick = (menuItemKey) => {
     setActiveTopNavItem(menuItemKey);
@@ -41,7 +42,7 @@ export const TopNav = (props) => {
           backgroundColor: '#164cc8',
           position: 'sticky',
           left: {
-            lg: `${SIDE_NAV_WIDTH}px`,
+            lg: paddingLeftValue,
           },
           top: 0,
           zIndex: (theme) => theme.zIndex.appBar,
@@ -70,7 +71,7 @@ export const TopNav = (props) => {
               style={{
                 display: 'flex',
                 gap: '8px',
-                paddingLeft: '275px',
+                paddingLeft: isIconOnly ? '80px' : `${SIDE_NAV_WIDTH - 5}px`,
                 listStyle: 'none',
               }}
             >

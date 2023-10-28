@@ -10,11 +10,12 @@ import {
 import { useState } from 'react';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 
 const Page = () => {
-  const [affaireType, setAffaireType] = useState(''); // state for selected affaire type
+  const [affaireType, setAffaireType] = useState('');
   const router = useRouter();
-
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
   const handleAffaireChange = (event) => {
     setAffaireType(event.target.value);
   };
@@ -25,7 +26,10 @@ const Page = () => {
 
   return (
     <>
-      <Container maxWidth="xl">
+      <Container
+        maxWidth={isIconOnly ? 'false' : 'xl'}
+        style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+      >
         <Stack spacing={3} marginTop={8}>
           <Typography variant="h4" gutterBottom>
             Affaires

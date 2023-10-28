@@ -1,4 +1,4 @@
-const ROOT_URL = 'http://localhost:8443';
+const ROOT_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchWithHeaders = async (endpoint, options = {}) => {
   const headers = {

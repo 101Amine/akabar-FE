@@ -33,6 +33,8 @@ const Page = () => {
   const clients = useSelector((state) => state.client.clients);
   // const totalCustomers = useSelector(state => state.client.totalClients);
 
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -70,7 +72,10 @@ const Page = () => {
           py: 8,
         }}
       >
-        <Container maxWidth="xl">
+        <Container
+          maxWidth={isIconOnly ? 'false' : 'xl'}
+          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+        >
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
