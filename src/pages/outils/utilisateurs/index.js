@@ -31,8 +31,7 @@ const Page = () => {
   const rowsPerPage = useSelector((state) => state.user.rowsPerPage);
   const users = useSelector((state) => state.user.users);
   const router = useRouter();
-
-  console.log('users', users);
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -45,8 +44,6 @@ const Page = () => {
     [dispatch],
   );
 
-  console.log('users', users);
-
   const handleRowsPerPageChange = useCallback(
     (event) => {
       dispatch(setRowsPerPage(event.target.value));
@@ -55,7 +52,7 @@ const Page = () => {
   );
 
   const proceedToForm = () => {
-    router.push('/users/createUser').then((r) => console.log(r));
+    router.push('/outils/utilisateurs/createUser').then((r) => console.log(r));
   };
 
   return (
@@ -70,7 +67,10 @@ const Page = () => {
           py: 8,
         }}
       >
-        <Container maxWidth="xl">
+        <Container
+          maxWidth={isIconOnly ? 'false' : 'xl'}
+          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+        >
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>

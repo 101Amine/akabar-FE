@@ -28,6 +28,8 @@ const CreateUser = () => {
   const { userDetails, submitting, error, success } = useSelector(
     (state) => state.user,
   );
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -78,12 +80,15 @@ const CreateUser = () => {
   }, [success, error]);
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth={isIconOnly ? 'false' : 'xl'}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+    >
       <Typography variant="h4" marginTop="40px" gutterBottom>
         Créer un utilisateur
       </Typography>
       <Divider />
-      <Box marginInline="50px" justifyContent="center" mt={4}>
+      <Box justifyContent="center" mt={4}>
         <form autoComplete="off" noValidate onSubmit={handleSubmit}>
           <Grid
             container

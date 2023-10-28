@@ -69,7 +69,7 @@ export const DataTable = ({
           } a été débloqué avec succès!`,
         );
       }
-      setSnackbarSeverity('succès');
+      setSnackbarSeverity('success');
       setSnackbarOpen(true);
     } catch (error) {
       setSnackbarMessage(

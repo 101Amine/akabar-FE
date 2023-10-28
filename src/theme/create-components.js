@@ -19,6 +19,8 @@ const muiTheme = createTheme({
 export function createComponents(config) {
   const { palette } = config;
 
+  console.log(palette);
+
   return {
     MuiAvatar: {
       styleOverrides: {

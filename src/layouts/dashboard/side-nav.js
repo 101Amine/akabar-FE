@@ -72,7 +72,7 @@ export const SideNav = (props) => {
           backgroundColor: '#F2F2F2',
         }}
       >
-        <Box sx={{ p: 3, display: 'flex', gap: 1 }}>
+        <Box sx={{ p: 3, display: 'flex', padding: '0', gap: 1 }}>
           <Box
             sx={{
               alignItems: 'center',
@@ -80,10 +80,10 @@ export const SideNav = (props) => {
               borderRadius: 1,
               cursor: 'pointer',
               display: 'flex',
-              justifyContent: isIconOnly && 'center',
               gap: 1.5,
               width: '100%',
               p: '12px',
+              justifyContent: 'center',
             }}
           >
             {isIconOnly ? (

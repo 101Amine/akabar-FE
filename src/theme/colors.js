@@ -11,7 +11,7 @@ const withAlphas = (color) => {
   };
 };
 
-export const neutral = {
+export const neutral = withAlphas({
   50: '#F8F9FA',
   100: '#F3F4F6',
   200: '#E5E7EB',
@@ -23,7 +23,8 @@ export const neutral = {
   800: '#1C2536',
   900: '#111927',
   1000: '#6366F1',
-};
+  main: '#6C737F',
+});
 
 export const indigo = withAlphas({
   lightest: '#F5F7FF',
