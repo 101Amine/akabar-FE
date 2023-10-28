@@ -6,21 +6,20 @@ export const initializeAuth = createAsyncThunk(
   authAPI.validateToken,
 );
 
+export const signOut = createAsyncThunk(
+  'auth/signOutAsync',
+  authAPI.logoutUser,
+);
+
 export const signIn = createAsyncThunk('auth/signIn', authAPI.loginUser);
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: null,
+    name: null,
     status: 'idle',
     error: null,
     isAuthenticated: false,
-  },
-  reducers: {
-    signOut: (state) => {
-      state.isAuthenticated = false;
-      state.user = null;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -33,15 +32,21 @@ const authSlice = createSlice({
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.isAuthenticated = true;
-        state.user = action.payload;
+        state.name = `${action.payload.claims.firstName} ${action.payload.claims.lastName}`;
       })
       .addCase(signIn.rejected, (state) => {
-        console.log('rejecting signIn....');
         state.isAuthenticated = false;
         state.error = 'signIn rejected, please try again..';
+      })
+      .addCase(signOut.fulfilled, (state, action) => {
+        state.isAuthenticated = false;
+        state.user = null;
+      })
+      .addCase(signOut.rejected, (state) => {
+        state.isAuthenticated = true;
+        state.error = 'signOut rejected, please try again..';
       });
   },
 });
 
 export default authSlice.reducer;
-export const { signOut } = authSlice.actions;

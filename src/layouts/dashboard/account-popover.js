@@ -10,17 +10,26 @@ import {
   Typography,
 } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
+import { useSelector } from 'react-redux';
 
 export const AccountPopover = (props) => {
   const { anchorEl, onClose, open } = props;
   const router = useRouter();
   const auth = useAuth();
+  const connectedUser = useSelector((state) => state.auth.name);
 
   const handleSignOut = useCallback(() => {
     onClose?.();
     auth.handleSignOut();
     router.push('/auth/login');
   }, [onClose, auth, router]);
+
+  function toTitleCase(str) {
+    return str
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
 
   return (
     <Popover
@@ -39,8 +48,16 @@ export const AccountPopover = (props) => {
           px: 2,
         }}
       >
-        <Typography color="text.secondary" variant="body2">
-          Becha Mohamed Amine
+        <Typography
+          color="text.main"
+          variant="body2"
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            fontWeight: '500',
+          }}
+        >
+          {toTitleCase(connectedUser)}
         </Typography>
       </Box>
       <Divider />
@@ -54,7 +71,12 @@ export const AccountPopover = (props) => {
           },
         }}
       >
-        <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
+        <MenuItem
+          sx={{ display: 'flex', justifyContent: 'center' }}
+          onClick={handleSignOut}
+        >
+          Se déconnecter
+        </MenuItem>
       </MenuList>
     </Popover>
   );

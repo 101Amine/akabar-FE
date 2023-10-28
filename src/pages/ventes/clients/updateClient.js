@@ -97,7 +97,7 @@ const UpdateClient = () => {
         variant="outlined"
         sx={{ position: 'absolute' }}
       >
-        Back
+        Retour
       </Button>
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom marginTop={'100px'}>
@@ -116,41 +116,71 @@ const UpdateClient = () => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Nom"
-                  name="firstName"
+                  label="Nom du client"
+                  name="nameClient"
                   onChange={handleChange}
                   required
-                  value={clientDetails.firstName}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Prenom"
-                  name="lastName"
-                  onChange={handleChange}
-                  required
-                  value={clientDetails.lastName}
+                  value={clientDetails.nameClient}
                 />
               </Grid>
 
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Email"
-                  name="email"
+                  label="Code du client"
+                  name="codeClient"
                   onChange={handleChange}
                   required
-                  value={clientDetails.email}
+                  value={clientDetails.codeClient}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Téléphone"
-                  name="mobilePhoneNumber"
+                  label="ice"
+                  name="ice"
                   onChange={handleChange}
-                  value={clientDetails.mobilePhoneNumber}
+                  value={clientDetails.ice}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Telephone"
+                  name="phone"
+                  onChange={handleChange}
+                  value={clientDetails.phone}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Fax"
+                  name="fax"
+                  onChange={handleChange}
+                  value={clientDetails.fax}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Compte bancaire"
+                  name="bankAccount"
+                  onChange={handleChange}
+                  value={clientDetails.bankAccount}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Addrese"
+                  name="address"
+                  onChange={handleChange}
+                  value={clientDetails.address}
                 />
               </Grid>
             </Grid>

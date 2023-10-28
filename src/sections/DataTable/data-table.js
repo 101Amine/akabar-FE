@@ -113,7 +113,7 @@ export const DataTable = ({
                   sx={{
                     backgroundColor: item.active
                       ? 'transparent'
-                      : 'rgba(255,0,0,0.1)',
+                      : 'hsla(0, 100%, 90%, 0.25)',
                   }}
                 >
                   {columns.map((col) => (
@@ -125,6 +125,12 @@ export const DataTable = ({
                             {fullName}
                           </Typography>
                         </Stack>
+                      ) : col.key === 'active' ? (
+                        item[col.key] ? (
+                          'Active'
+                        ) : (
+                          'Bloqué'
+                        )
                       ) : (
                         item[col.key]
                       )}

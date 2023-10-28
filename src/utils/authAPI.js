@@ -1,4 +1,4 @@
-import { fetchWithHeaders, fetchWithHeadersLogin } from '../utils/api';
+import { fetchWithHeaders, fetchWithHeadersLogin } from './api';
 
 export const validateToken = async () => {
   const response = await fetchWithHeaders('/auth/validate-token', {
@@ -22,5 +22,20 @@ export const loginUser = async (credentials) => {
     throw new Error('Error logging in');
   }
 
-  return response.message;
+  return response.content;
+};
+
+export const logoutUser = async () => {
+  const response = await fetchWithHeadersLogin('/auth/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Logout failed');
+  }
+
+  return response.json();
 };

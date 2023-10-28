@@ -27,11 +27,13 @@ export const SideNav = (props) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
+  console.log('theme', theme.transitions);
+
   const StyledListItem = styled(({ theme, isIconOnly, ...rest }) => (
     <ListItem {...rest} />
   ))(({ theme, active, isIconOnly }) => ({
     '&:hover': {
-      backgroundColor: '#E8E8E8',
+      backgroundColor: active ? '#E0E0E0' : '#E8E8E8',
       cursor: 'pointer',
     },
     backgroundColor: active ? '#E0E0E0' : 'transparent',
@@ -41,6 +43,9 @@ export const SideNav = (props) => {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
+    span: {
+      fontWeight: '500',
+    },
 
     '&.Mui-selected, &.Mui-selected:hover': {
       color: '#FFF',
@@ -53,7 +58,7 @@ export const SideNav = (props) => {
   const content = (
     <Scrollbar
       onMouseEnter={() => dispatch(setIconOnly())}
-      onMouseLeave={() => dispatch(disableIconOnly())}
+      // onMouseLeave={() => dispatch(disableIconOnly())}
       sx={{
         height: '100%',
         '& .simplebar-content': {
@@ -128,7 +133,10 @@ export const SideNav = (props) => {
               m: 0,
             }}
           >
-            <List component="nav" sx={{ '& > *': { marginBottom: '10px' } }}>
+            <List
+              component="nav"
+              sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
+            >
               {submenuItems.map((item) => {
                 const isActive = item.path === pathname;
                 return (
@@ -171,7 +179,7 @@ export const SideNav = (props) => {
             backgroundColor: 'neutral.800',
             color: 'common.white',
             width: isIconOnly ? '80px' : '280px',
-            transition: theme.transitions.create('all', {
+            transition: theme.transitions.create('width', {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.enteringScreen,
             }),
@@ -189,6 +197,7 @@ export const SideNav = (props) => {
       anchor="left"
       onClose={onClose}
       open={open}
+      variant="temporary"
       PaperProps={{
         sx: {
           backgroundColor: 'neutral.800',
@@ -198,10 +207,12 @@ export const SideNav = (props) => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
+          style: {
+            transitionDuration: `${theme.transitions.duration.enteringScreen}ms`,
+          },
         },
       }}
       sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}
-      variant="temporary"
     >
       {content}
     </Drawer>

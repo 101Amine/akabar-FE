@@ -20,6 +20,7 @@ import { usePathname } from 'next/navigation';
 import { SideNavItem } from './side-nav-item';
 import PersonIcon from '@mui/icons-material/Person';
 import { getInitials } from '../../utils/get-initials';
+import { useSelector } from 'react-redux';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -30,12 +31,11 @@ export const TopNav = (props) => {
   const pathname = usePathname();
   const accountPopover = usePopover();
   const paddingLeftValue = isIconOnly ? '80px' : `${SIDE_NAV_WIDTH}px`;
+  const connectedUser = useSelector((state) => state.auth.name);
 
   const handleTopNavClick = (menuItemKey) => {
     setActiveTopNavItem(menuItemKey);
   };
-
-  const fullName = 'Becha Mohamed Amine';
 
   return (
     <>
@@ -105,22 +105,6 @@ export const TopNav = (props) => {
             </div>
           </Stack>
           <Stack alignItems="center" direction="row" spacing={2}>
-            <Tooltip title="Contacts">
-              <IconButton>
-                <SvgIcon fontSize="small" style={{ color: '#FFF' }}>
-                  <UsersIcon />
-                </SvgIcon>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Notifications">
-              <IconButton color="primary">
-                <Badge badgeContent={4} variant="dot">
-                  <SvgIcon fontSize="small" style={{ color: '#FFF' }}>
-                    <BellIcon />
-                  </SvgIcon>
-                </Badge>
-              </IconButton>
-            </Tooltip>
             <Stack alignItems="center" direction="row" spacing={2}>
               <Avatar
                 onClick={accountPopover.handleOpen}
@@ -131,7 +115,7 @@ export const TopNav = (props) => {
                   width: 40,
                 }}
               >
-                {getInitials(fullName)}
+                {getInitials(connectedUser)}
               </Avatar>
             </Stack>
           </Stack>

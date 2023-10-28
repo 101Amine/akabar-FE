@@ -101,7 +101,7 @@ const CreateUser = () => {
           variant="outlined"
           sx={{ position: 'absolute' }}
         >
-          Back
+          Retour
         </Button>
       </Stack>
 

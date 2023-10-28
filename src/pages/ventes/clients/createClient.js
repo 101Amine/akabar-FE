@@ -97,7 +97,7 @@ const CreateClient = () => {
         variant="outlined"
         sx={{ position: 'absolute' }}
       >
-        Back
+        Retour
       </Button>
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom marginTop="80px">
@@ -126,52 +126,11 @@ const CreateClient = () => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Email"
-                  name="email"
+                  label="Code du client"
+                  name="codeClient"
                   onChange={handleChange}
                   required
-                  value={clientDetails.email}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Mot de passe"
-                  name="password"
-                  onChange={handleChange}
-                  required
-                  type="password"
-                  value={clientDetails.password}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Nom"
-                  name="firstName"
-                  onChange={handleChange}
-                  required
-                  value={clientDetails.firstName}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Prenom"
-                  name="lastName"
-                  onChange={handleChange}
-                  required
-                  value={clientDetails.lastName}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Téléphone"
-                  name="mobilePhoneNumber"
-                  onChange={handleChange}
-                  value={clientDetails.mobilePhoneNumber}
+                  value={clientDetails.codeClient}
                 />
               </Grid>
               <Grid item xs={12} md={4}>

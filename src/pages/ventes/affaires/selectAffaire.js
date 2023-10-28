@@ -44,7 +44,7 @@ const Page = () => {
           variant="outlined"
           sx={{ position: 'absolute' }}
         >
-          Back
+          Retour
         </Button>
         <Stack spacing={3} marginTop={8}>
           <Typography variant="h4" gutterBottom marginTop={'50px'}>

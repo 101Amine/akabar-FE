@@ -84,7 +84,7 @@ const Page = () => {
               variant="outlined"
               sx={{ position: 'absolute' }}
             >
-              Back
+              Retour
             </Button>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>

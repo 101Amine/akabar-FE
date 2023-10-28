@@ -19,7 +19,7 @@ import { fetchUsers, setPage } from '../../../redux/userSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
 
 const userColumns = [
-  { key: 'name', label: 'Name' },
+  { key: 'name', label: 'Nom' },
   { key: 'email', label: 'Email' },
   { key: 'mobilePhoneNumber', label: 'Telephone' },
   { key: 'active', label: 'Status' },
@@ -84,13 +84,13 @@ const Page = () => {
                 variant="outlined"
                 sx={{ position: 'absolute' }}
               >
-                Back
+                Retour
               </Button>
             </Stack>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4" marginTop={'70px'}>
-                  Utilisateurs
+                  Liste des utilisateurs
                 </Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>

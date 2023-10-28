@@ -120,13 +120,13 @@ const Page = () => {
                   type="submit"
                   variant="contained"
                 >
-                  Continue
+                  Se connecter
                 </Button>
 
                 <Alert color="primary" severity="info" sx={{ mt: 3 }}>
                   <div>
-                    You can use <b>admin@akabar.ma</b> and password{' '}
-                    <b>devpass</b>
+                    Vous pouvez utiliser <b>admin@akabar.ma</b> et le mot de
+                    passe <b>devpass</b>
                   </div>
                 </Alert>
               </form>

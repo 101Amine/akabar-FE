@@ -51,15 +51,14 @@ export const updateClient = createAsyncThunk(
 
 export const fetchClients = createAsyncThunk(
   'client/fetchClients',
-  async (_, { getState }) => {
+  async (searchFilter = {}, { getState }) => {
     // const { page, rowsPerPage } = getState().client;
+
     const response = await fetchWithHeaders(
       `/users/client/list?offset=0&limit=10`,
       {
         method: 'POST',
-        body: JSON.stringify({
-          searchFilter: {},
-        }),
+        body: JSON.stringify(searchFilter),
       },
     );
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
@@ -12,7 +12,10 @@ import {
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
-import { ClientsSearch } from 'src/sections/clients/client-search';
+import {
+  ClientFilters,
+  ClientsSearch,
+} from 'src/sections/clients/client-search';
 import { DataTable } from '../../sections/DataTable/data-table';
 import { fetchClients, setPage, setRowsPerPage } from '../../redux/clientSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,9 +23,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const clientColumns = [
   { key: 'nameClient', label: 'Nom du client' },
-  { key: 'email', label: 'Email' },
-  { key: 'mobilePhoneNumber', label: 'telephone' },
-  { key: 'phone', label: 'fix' },
+  { key: 'phone', label: 'Telephone' },
+  { key: 'fax', label: 'fax' },
   { key: 'ice', label: 'Ice' },
   { key: 'address', label: 'Addresse' },
   { key: 'bankAccount', label: 'Compte bancaire' },
@@ -34,15 +36,44 @@ const Page = () => {
   const clients = useSelector((state) => state.client.clients);
   // const totalCustomers = useSelector(state => state.client.totalClients);
 
-  console.log('clients', clients);
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+  const [filters, setFilters] = useState({
+    nameClient: '',
+    codeClient: '',
+    ICE: '',
+  });
 
   const router = useRouter();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchClients());
+    dispatch(fetchClients({}));
   }, [dispatch]);
+
+  const fetchFilteredClients = useCallback(() => {
+    const searchCriteriaList = Object.entries(filters)
+      .map(([key, value]) => {
+        if (value) {
+          return {
+            filterKey: key,
+            operation: 'cn',
+            value: value,
+            dataOption: 'all',
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    const searchFilter = {
+      searchCriteriaList: searchCriteriaList,
+      dataOption: 'all',
+    };
+
+    console.log('searchFilter', searchFilter);
+
+    dispatch(fetchClients(searchFilter));
+  }, [dispatch, filters]);
 
   const handlePageChange = useCallback(
     (event, value) => {
@@ -65,6 +96,8 @@ const Page = () => {
   const proceedToForm = () => {
     router.push('/ventes/clients/createClient').then((r) => console.info(r));
   };
+
+  console.log('clients', clients);
 
   return (
     <>
@@ -89,7 +122,7 @@ const Page = () => {
               variant="outlined"
               sx={{ position: 'absolute' }}
             >
-              Back
+              Retour
             </Button>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
@@ -111,11 +144,22 @@ const Page = () => {
                   }
                   variant="contained"
                 >
-                  Ajouté
+                  Ajouter
                 </Button>
               </div>
             </Stack>
-            <ClientsSearch />
+            <ClientFilters
+              filters={filters}
+              onFilterChange={(filterKey, value) => {
+                setFilters((prevFilters) => ({
+                  ...prevFilters,
+                  [filterKey]: value,
+                }));
+              }}
+              onFilterSubmit={() => {
+                fetchFilteredClients();
+              }}
+            />
             <DataTable
               count={clients?.length}
               items={clients}
