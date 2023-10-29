@@ -52,6 +52,15 @@ const Page = () => {
     setMethod(value);
   }, []);
 
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .required('Email is required')
+      .matches(
+        /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{1,}$/,
+        'Invalid email format',
+      ),
+  });
+
   return (
     <>
       <Head>
@@ -91,6 +100,7 @@ const Page = () => {
                     onChange={formik.handleChange}
                     type="email"
                     value={formik.values.email}
+                    validationSchema={validationSchema}
                   />
                   <TextField
                     error={

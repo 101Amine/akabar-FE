@@ -24,30 +24,35 @@ import {
 } from '../../../redux/userSlice';
 import { useRouter } from 'next/router';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import createClientValidationSchema from '../../../utils/validationService';
 
 const CreateUser = () => {
   const dispatch = useDispatch();
   const { userDetails, submitting, error, success } = useSelector(
     (state) => state.user,
   );
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [formErrors, setFormErrors] = useState({});
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const router = useRouter();
 
   const handleChange = useCallback(
     (event) => {
-      console.log('name', event.target.name);
-      console.log('value', event.target.value);
-      dispatch(
-        setUserDetails({
-          ...userDetails,
-          [event.target.name]: event.target.value,
-        }),
-      );
+      const { name, value } = event.target;
+      if (name === 'passwordConfirmation') {
+        setPasswordConfirmation(value);
+      } else {
+        dispatch(
+          setUserDetails({
+            ...userDetails,
+            [name]: value,
+          }),
+        );
+      }
     },
     [userDetails, dispatch],
   );
@@ -59,22 +64,42 @@ const CreateUser = () => {
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
-      dispatch(addUser(userDetails));
-      if (success) {
-        router.push('/outils/utilisateurs');
-      }
 
-      if (success) {
+      // Check if passwords match
+      if (userDetails.password !== passwordConfirmation) {
         handleSnackbarOpen(
-          "L'utilisateur a été ajouté avec succès !",
-          'success',
-        );
-      } else if (error) {
-        handleSnackbarOpen(
-          "L'ajout d'un utilisateur a échoué. Veuillez réessayer.",
+          'Les deux mots de passe ne correspondent pas, veuillez les répéter.',
           'error',
         );
+        return;
       }
+
+      createClientValidationSchema
+        .validate(userDetails, { abortEarly: false })
+        .then(() => {
+          dispatch(addUser(userDetails));
+
+          console.log('success', success);
+          if (success && !submitting) {
+            router.push('/outils/utilisateurs');
+            handleSnackbarOpen(
+              "L'utilisateur a été ajouté avec succès !",
+              'success',
+            );
+          } else {
+            handleSnackbarOpen(
+              "L'ajout d'un utilisateur a échoué. Veuillez réessayer.",
+              'error',
+            );
+          }
+        })
+        .catch((err) => {
+          let errors = {};
+          err.inner.forEach((error) => {
+            errors[error.path] = error.message;
+          });
+          setFormErrors(errors);
+        });
     },
     [userDetails, dispatch, router, success],
   );
@@ -126,6 +151,8 @@ const CreateUser = () => {
                 onChange={handleChange}
                 required
                 value={userDetails.firstName}
+                error={Boolean(formErrors.firstName)}
+                helperText={formErrors.firstName}
               />
             </Grid>
 
@@ -137,6 +164,8 @@ const CreateUser = () => {
                 onChange={handleChange}
                 required
                 value={userDetails.lastName}
+                error={Boolean(formErrors.lastName)}
+                helperText={formErrors.lastName}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -148,6 +177,19 @@ const CreateUser = () => {
                 required
                 type="password"
                 value={userDetails.password}
+                error={Boolean(formErrors.password)}
+                helperText={formErrors.password}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Confirmer le mot de passe"
+                name="passwordConfirmation"
+                onChange={handleChange}
+                required
+                type="password"
+                value={passwordConfirmation}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -159,6 +201,8 @@ const CreateUser = () => {
                 required
                 type="email"
                 value={userDetails.email}
+                error={Boolean(formErrors.email)}
+                helperText={formErrors.email}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -170,6 +214,8 @@ const CreateUser = () => {
                 required
                 type="tel"
                 value={userDetails.mobilePhoneNumber}
+                error={Boolean(formErrors.mobilePhoneNumber)}
+                helperText={formErrors.mobilePhoneNumber}
               />
             </Grid>
           </Grid>

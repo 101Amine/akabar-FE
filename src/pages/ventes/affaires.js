@@ -106,7 +106,7 @@ const Page = () => {
                   }
                   variant="contained"
                 >
-                  Creé une Affaire
+                  Créer une Affaire
                 </Button>
               </div>
             </Stack>

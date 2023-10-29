@@ -23,7 +23,7 @@ const menuItems = {
 
   outils: [
     {
-      label: 'Paramètres ',
+      label: 'Paramètres',
       path: '/outils/parametres',
       icon: SettingsIcon,
     },

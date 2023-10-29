@@ -13,10 +13,6 @@ export const AuthProvider = (props) => {
   const error = useSelector((state) => state.auth.error);
 
   useEffect(() => {
-    console.log('isAuthenticated', isAuthenticated);
-  }, [isAuthenticated]);
-
-  useEffect(() => {
     dispatch(initializeAuth());
   }, [dispatch]);
 

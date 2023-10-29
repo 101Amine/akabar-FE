@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
+import * as Yup from 'yup';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -20,6 +20,7 @@ import {
   clearClientDetails,
 } from '../../../redux/clientSlice';
 import { useRouter } from 'next/router';
+import { createClientValidationSchema } from '../../../utils/validationService';
 
 const CreateClient = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ const CreateClient = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [formErrors, setFormErrors] = useState({});
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
 
   // Handlers
@@ -60,22 +62,36 @@ const CreateClient = () => {
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
-      dispatch(addClient(clientDetails));
 
-      if (success) {
-        router.push('/ventes/clients');
-      }
+      createClientValidationSchema
+        .validate(clientDetails, { abortEarly: false })
+        .then(() => {
+          // If validation is successful
+          dispatch(addClient(clientDetails));
 
-      if (success && submitting) {
-        handleSnackbarOpen('Client ajouté avec succès !', 'success');
-      } else if (error && submitting) {
-        handleSnackbarOpen(
-          "Échec de l'ajout d'un client. Veuillez réessayer.",
-          'error',
-        );
-      }
+          if (success) {
+            router.push('/ventes/clients');
+          }
+
+          if (success) {
+            handleSnackbarOpen('Client ajouté avec succès !', 'success');
+          } else if (error) {
+            handleSnackbarOpen(
+              "Échec de l'ajout d'un client. Veuillez réessayer.",
+              'error',
+            );
+          }
+        })
+        .catch((err) => {
+          // If validation fails, set the errors to state
+          let errors = {};
+          err.inner.forEach((error) => {
+            errors[error.path] = error.message;
+          });
+          setFormErrors(errors);
+        });
     },
-    [clientDetails, dispatch, router, success],
+    [clientDetails, dispatch, router, success, submitting],
   );
 
   const handleSnackbarOpen = (message, severity) => {
@@ -87,7 +103,7 @@ const CreateClient = () => {
   return (
     <Container
       maxWidth={isIconOnly ? 'false' : 'xl'}
-      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '100px' }}
     >
       <Button
         onClick={handleBack}
@@ -119,6 +135,8 @@ const CreateClient = () => {
                   onChange={handleChange}
                   required
                   value={clientDetails.nameClient}
+                  error={Boolean(formErrors.nameClient)}
+                  helperText={formErrors.nameClient}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -129,6 +147,8 @@ const CreateClient = () => {
                   onChange={handleChange}
                   required
                   value={clientDetails.codeClient}
+                  error={Boolean(formErrors.codeClient)}
+                  helperText={formErrors.codeClient}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -138,6 +158,8 @@ const CreateClient = () => {
                   name="phone"
                   onChange={handleChange}
                   value={clientDetails.phone}
+                  error={Boolean(formErrors.phone)}
+                  helperText={formErrors.phone}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -147,6 +169,8 @@ const CreateClient = () => {
                   name="fax"
                   onChange={handleChange}
                   value={clientDetails.fax}
+                  error={Boolean(formErrors.fax)}
+                  helperText={formErrors.fax}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -156,6 +180,8 @@ const CreateClient = () => {
                   name="ice"
                   onChange={handleChange}
                   value={clientDetails.ice}
+                  error={Boolean(formErrors.ice)}
+                  helperText={formErrors.ice}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -165,6 +191,8 @@ const CreateClient = () => {
                   name="bankAccount"
                   onChange={handleChange}
                   value={clientDetails.bankAccount}
+                  error={Boolean(formErrors.bankAccount)}
+                  helperText={formErrors.bankAccount}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -174,6 +202,8 @@ const CreateClient = () => {
                   name="address"
                   onChange={handleChange}
                   value={clientDetails.address}
+                  error={Boolean(formErrors.address)}
+                  helperText={formErrors.address}
                 />
               </Grid>
             </Grid>

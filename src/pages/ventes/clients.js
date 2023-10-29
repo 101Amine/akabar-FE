@@ -22,7 +22,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const clientColumns = [
-  { key: 'nameClient', label: 'Nom du client' },
+  { key: 'nameClient', label: 'Nom' },
+  { key: 'codeClient', label: 'Code' },
   { key: 'phone', label: 'Telephone' },
   { key: 'fax', label: 'fax' },
   { key: 'ice', label: 'Ice' },

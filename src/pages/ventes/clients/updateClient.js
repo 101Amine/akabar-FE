@@ -15,6 +15,7 @@ import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import { updateClient } from '../../../redux/clientSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { updateClientlientValidationSchema } from '../../../utils/validationService';
 
 const UpdateClient = () => {
   const router = useRouter();
@@ -30,6 +31,7 @@ const UpdateClient = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+  const [formErrors, setFormErrors] = useState({});
 
   // Update clientDetails state when the router's query changes
   useEffect(() => {
@@ -59,33 +61,44 @@ const UpdateClient = () => {
     async (event) => {
       event.preventDefault();
       setSubmitting(true);
-      dispatch(updateClient(clientDetails))
-        .then((responseAction) => {
-          if (updateClient.fulfilled.match(responseAction)) {
-            handleSnackbarOpen(
-              'Le client a été mis à jour avec succès !',
-              'success',
-            );
-            router.push('/ventes/clients');
-            setSubmitting(false);
-          } else {
-            handleSnackbarOpen(
-              'Échec de la mise à jour du client. Veuillez réessayer !',
-              'error',
-            );
-          }
+
+      updateClientlientValidationSchema
+        .validate(clientDetails, { abortEarly: false })
+        .then(() => {
+          dispatch(updateClient(clientDetails))
+            .then((responseAction) => {
+              if (updateClient.fulfilled.match(responseAction)) {
+                handleSnackbarOpen(
+                  'Le client a été mis à jour avec succès !',
+                  'success',
+                );
+                router.push('/ventes/clients');
+                setSubmitting(false);
+              } else {
+                handleSnackbarOpen(
+                  'Échec de la mise à jour du client. Veuillez réessayer !',
+                  'error',
+                );
+              }
+            })
+            .catch((error) => {
+              setSubmitting(false);
+              handleSnackbarOpen(
+                'Échec de la mise à jour du client. Veuillez réessayer !',
+                'error',
+              );
+            });
         })
-        .catch((error) => {
-          setSubmitting(false);
-          handleSnackbarOpen(
-            'Échec de la mise à jour du client. Veuillez réessayer !',
-            'error',
-          );
+        .catch((err) => {
+          let errors = {};
+          err.inner.forEach((error) => {
+            errors[error.path] = error.message;
+          });
+          setFormErrors(errors);
         });
     },
     [clientDetails, dispatch],
   );
-
   return (
     <Container
       maxWidth={isIconOnly ? 'false' : 'xl'}
@@ -121,6 +134,8 @@ const UpdateClient = () => {
                   onChange={handleChange}
                   required
                   value={clientDetails.nameClient}
+                  error={Boolean(formErrors.nameClient)}
+                  helperText={formErrors.nameClient}
                 />
               </Grid>
 
@@ -132,6 +147,8 @@ const UpdateClient = () => {
                   onChange={handleChange}
                   required
                   value={clientDetails.codeClient}
+                  error={Boolean(formErrors.codeClient)}
+                  helperText={formErrors.codeClient}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -141,6 +158,8 @@ const UpdateClient = () => {
                   name="ice"
                   onChange={handleChange}
                   value={clientDetails.ice}
+                  error={Boolean(formErrors.ice)}
+                  helperText={formErrors.ice}
                 />
               </Grid>
 
@@ -151,6 +170,8 @@ const UpdateClient = () => {
                   name="phone"
                   onChange={handleChange}
                   value={clientDetails.phone}
+                  error={Boolean(formErrors.phone)}
+                  helperText={formErrors.phone}
                 />
               </Grid>
 
@@ -161,6 +182,8 @@ const UpdateClient = () => {
                   name="fax"
                   onChange={handleChange}
                   value={clientDetails.fax}
+                  error={Boolean(formErrors.fax)}
+                  helperText={formErrors.fax}
                 />
               </Grid>
 
@@ -171,6 +194,8 @@ const UpdateClient = () => {
                   name="bankAccount"
                   onChange={handleChange}
                   value={clientDetails.bankAccount}
+                  error={Boolean(formErrors.bankAccount)}
+                  helperText={formErrors.bankAccount}
                 />
               </Grid>
 
@@ -181,6 +206,8 @@ const UpdateClient = () => {
                   name="address"
                   onChange={handleChange}
                   value={clientDetails.address}
+                  error={Boolean(formErrors.address)}
+                  helperText={formErrors.address}
                 />
               </Grid>
             </Grid>

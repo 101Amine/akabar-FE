@@ -84,10 +84,9 @@ export const TopNav = (props) => {
                 if (item.path === '/') {
                   active = pathname === item.path;
                 } else {
-                  active =
-                    item.path &&
-                    pathname !== '/' &&
-                    pathname.includes(item.path);
+                  const pathParts = item.path.split('/');
+                  const pathnameParts = pathname.split('/');
+                  active = pathParts[1] && pathParts[1] === pathnameParts[1];
                 }
                 return (
                   <SideNavItem

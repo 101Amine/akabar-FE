@@ -65,7 +65,6 @@ export const DataTable = ({
   const handleBlockOrUnblock = async (item) => {
     try {
       if (item.active) {
-        console.log('item.email', item.email);
         await dispatch(blockUser(item.id || item.email));
         setSnackbarMessage(
           `${
@@ -73,7 +72,6 @@ export const DataTable = ({
           } a été bloqué avec succès!`,
         );
       } else {
-        console.log('item.email', item);
         await dispatch(unblockUser(item.id || item.email));
         setSnackbarMessage(
           `${
@@ -99,9 +97,14 @@ export const DataTable = ({
           <TableHead>
             <TableRow>
               {columns.map((col) => (
-                <TableCell key={col.key}>{col.label}</TableCell>
+                <TableCell
+                  key={col.key}
+                  sx={{ backgroundColor: '#164CC8', color: 'white' }}
+                >
+                  {col.label}
+                </TableCell>
               ))}
-              <TableCell></TableCell>
+              <TableCell sx={{ backgroundColor: '#164CC8' }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -132,8 +135,10 @@ export const DataTable = ({
                         ) : (
                           'Bloqué'
                         )
-                      ) : (
+                      ) : item[col.key] ? (
                         item[col.key]
+                      ) : (
+                        <Box>N/A</Box>
                       )}
                     </TableCell>
                   ))}

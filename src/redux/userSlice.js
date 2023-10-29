@@ -107,6 +107,7 @@ const initialState = {
   },
   users: [],
   page: 0,
+  totalPages: 0,
   rowsPerPage: 5,
   totalUsers: 0,
   fetching: false,

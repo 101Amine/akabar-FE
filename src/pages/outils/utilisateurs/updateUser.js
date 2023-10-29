@@ -12,11 +12,11 @@ import {
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { fetchWithHeaders } from '../../../utils/api';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import { updateUser } from '../../../redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { updateUserValidationSchema } from '../../../utils/validationService';
 
 const UpdateUser = () => {
   const router = useRouter();
@@ -63,10 +63,34 @@ const UpdateUser = () => {
     router.back();
   };
 
+  const [errors, setErrors] = useState({}); // State for validation errors
+
+  const validate = async () => {
+    try {
+      await updateUserValidationSchema.validate(userDetails, {
+        abortEarly: false,
+      });
+      return true;
+    } catch (validationErrors) {
+      const yupErrors = {};
+      validationErrors.inner.forEach((error) => {
+        yupErrors[error.path] = error.message;
+      });
+      setErrors(yupErrors);
+      return false;
+    }
+  };
+
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
       setSubmitting(true);
+
+      const isValid = await validate();
+      if (!isValid) {
+        setSubmitting(false);
+        return;
+      }
 
       try {
         const resultAction = await dispatch(updateUser(userDetails));
@@ -125,6 +149,8 @@ const UpdateUser = () => {
                   onChange={handleChange}
                   required
                   value={userDetails.firstName}
+                  error={!!errors.firstName}
+                  helperText={errors.firstName}
                 />
               </Grid>
 
@@ -136,6 +162,8 @@ const UpdateUser = () => {
                   onChange={handleChange}
                   required
                   value={userDetails.lastName}
+                  error={!!errors.lastName}
+                  helperText={errors.lastName}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -147,6 +175,8 @@ const UpdateUser = () => {
                   required
                   type="email"
                   value={userDetails.email}
+                  error={!!errors.email}
+                  helperText={errors.email}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -158,6 +188,8 @@ const UpdateUser = () => {
                   required
                   type="tel"
                   value={userDetails.mobilePhoneNumber}
+                  error={!!errors.mobilePhoneNumber}
+                  helperText={errors.mobilePhoneNumber}
                 />
               </Grid>
             </Grid>
