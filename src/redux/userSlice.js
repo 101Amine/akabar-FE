@@ -75,24 +75,17 @@ export const updateUser = createAsyncThunk(
 
 export const fetchUsers = createAsyncThunk(
   'user/fetchUsers',
-  async (_, { getState }) => {
-    console.log('getState', getState);
+  async (searchFilter = {}, { getState }) => {
     const { page, rowsPerPage } = getState().user;
+
     const response = await fetchWithHeaders(
-      `/users/staff/list?offset=${page * rowsPerPage}&limit=${rowsPerPage}`,
+      `/users/staff/list?offset=${rowsPerPage * page}&limit=${rowsPerPage}`,
       {
         method: 'POST',
-        body: JSON.stringify({
-          searchFilter: {},
-          offset: page * rowsPerPage,
-          limit: rowsPerPage,
-        }),
+        body: JSON.stringify(searchFilter),
       },
     );
 
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch users');
-    }
     return response.content;
   },
 );
@@ -107,7 +100,7 @@ const initialState = {
   },
   users: [],
   page: 0,
-  totalPages: 0,
+  totalPages: 1,
   rowsPerPage: 5,
   totalUsers: 0,
   fetching: false,
@@ -128,6 +121,9 @@ const userSlice = createSlice({
     },
     setRowsPerPage: (state, action) => {
       state.rowsPerPage = action.payload;
+    },
+    setTotalPages: (state, action) => {
+      state.totalPages = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -150,8 +146,10 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.fetching = false;
+        console.log('new action.payload', action.payload.currentPageData);
         state.users = action.payload.currentPageData || [];
-        state.totalUsers = action.payload.totalPages;
+        state.totalUsers = action.payload.totalElements;
+        state.totalPages = action.payload.totalPages;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.fetching = false;

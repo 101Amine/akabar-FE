@@ -22,6 +22,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { blockUser, unblockUser } from '../../redux/userSlice';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+import { jsx } from '@emotion/react';
 
 export const DataTable = ({
   count = 0,
@@ -29,10 +30,10 @@ export const DataTable = ({
   onPageChange = () => {},
   onRowsPerPageChange,
   page = 0,
-  rowsPerPage = 0,
+  rowsPerPage = 5,
   selected = [],
   columns,
-  entity = 'user',
+  entity,
 }) => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -40,6 +41,31 @@ export const DataTable = ({
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+  const handlePageChange = (event, newPage) => {
+    onPageChange(newPage);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    onRowsPerPageChange(event.target.value);
+  };
+
+  const renderColumnContent = (col, item, fullName) => {
+    if (col.key === 'name') {
+      return (
+        <Stack alignItems="center" direction="row" spacing={2}>
+          <Avatar>{getInitials(fullName)}</Avatar>
+          <Typography variant="subtitle2">{fullName}</Typography>
+        </Stack>
+      );
+    }
+
+    if (col.key === 'active') {
+      return item[col.key] ? 'Active' : 'Bloqué';
+    }
+
+    return item[col.key] ? item[col.key] : <Box>N/A</Box>;
+  };
 
   const handleEdit = (item) => {
     let route;
@@ -51,7 +77,7 @@ export const DataTable = ({
       case 'affaire':
         route = '/ventes/affaires/updateAffaire';
         break;
-      default:
+      case 'user':
         route = '/outils/utilisateurs/updateUser';
         break;
     }
@@ -61,6 +87,10 @@ export const DataTable = ({
       query: { [entity]: JSON.stringify(item) },
     });
   };
+
+  console.log('count', count);
+  console.log('page', page);
+  console.log('rowsPerPage', rowsPerPage);
 
   const handleBlockOrUnblock = async (item) => {
     try {
@@ -122,24 +152,7 @@ export const DataTable = ({
                 >
                   {columns.map((col) => (
                     <TableCell key={col.key}>
-                      {col.key === 'name' ? (
-                        <Stack alignItems="center" direction="row" spacing={2}>
-                          <Avatar>{getInitials(fullName)}</Avatar>
-                          <Typography variant="subtitle2">
-                            {fullName}
-                          </Typography>
-                        </Stack>
-                      ) : col.key === 'active' ? (
-                        item[col.key] ? (
-                          'Active'
-                        ) : (
-                          'Bloqué'
-                        )
-                      ) : item[col.key] ? (
-                        item[col.key]
-                      ) : (
-                        <Box>N/A</Box>
-                      )}
+                      {renderColumnContent(col, item, fullName)}
                     </TableCell>
                   ))}
                   <TableCell>
@@ -175,11 +188,11 @@ export const DataTable = ({
       <TablePagination
         component="div"
         count={count}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
         page={page}
+        onPageChange={handlePageChange}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
+        onRowsPerPageChange={handleRowsPerPageChange}
+        rowsPerPageOptions={[5, 10, 25, 50]}
       />
       <Snackbar
         open={snackbarOpen}

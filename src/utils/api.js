@@ -28,10 +28,10 @@ export const fetchWithHeadersLogin = async (endpoint, options = {}) => {
     headers,
   });
 
-  if (!response.ok) {
-    const errorMsg = await response.json();
-    throw new Error(errorMsg);
-  }
+  // if (!response.ok) {
+  //   const errorMsg = await response.json();
+  //   throw new Error(errorMsg);
+  // }
 
   return response.json();
 };

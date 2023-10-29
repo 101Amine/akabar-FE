@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeAuth, signIn, signOut } from '../redux/authSlice';
@@ -16,25 +22,31 @@ export const AuthProvider = (props) => {
     dispatch(initializeAuth());
   }, [dispatch]);
 
-  const handleSignIn = async (username, password) => {
-    try {
-      await dispatch(signIn({ username, password }));
-    } catch (err) {
-      console.error('Failed to authenticate:', err.message);
-    }
-  };
+  const handleSignIn = useCallback(
+    async (username, password) => {
+      try {
+        await dispatch(signIn({ username, password }));
+      } catch (err) {
+        console.error('Failed to authenticate:', err.message);
+      }
+    },
+    [dispatch],
+  );
 
-  const handleSignOut = () => {
+  const handleSignOut = useCallback(() => {
     dispatch(signOut());
-  };
+  }, [dispatch]);
 
   return (
     <AuthContext.Provider
-      value={{
-        handleSignIn,
-        handleSignOut,
-        isAuthenticated,
-      }}
+      value={useMemo(
+        () => ({
+          handleSignIn,
+          handleSignOut,
+          isAuthenticated,
+        }),
+        [handleSignIn, handleSignOut, isAuthenticated],
+      )}
     >
       {children}
     </AuthContext.Provider>

@@ -103,7 +103,7 @@ const CreateClient = () => {
   return (
     <Container
       maxWidth={isIconOnly ? 'false' : 'xl'}
-      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '100px' }}
+      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
     >
       <Button
         onClick={handleBack}
@@ -208,7 +208,7 @@ const CreateClient = () => {
               </Grid>
             </Grid>
             <Divider />
-            <Box display="flex" justifyContent="flex-end" mt={2}>
+            <Box display="flex" justifyContent="flex-end" mt={2} mb={2}>
               <Button variant="contained" color="primary" type="submit">
                 Soumettre
               </Button>

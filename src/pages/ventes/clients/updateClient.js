@@ -26,7 +26,6 @@ const UpdateClient = () => {
   const initialClientDetails = clientJSON ? JSON.parse(clientJSON) : {};
 
   const [clientDetails, setClientDetails] = useState(initialClientDetails);
-  const [submitting, setSubmitting] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');

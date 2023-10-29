@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -12,11 +12,12 @@ import {
   Typography,
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { UsersSearch } from 'src/sections/users/users-search';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, setPage } from '../../../redux/userSlice';
+import { fetchUsers, setPage, setRowsPerPage } from '../../../redux/userSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
+import { fetchClients } from '../../../redux/clientSlice';
+import { UsersFilters } from '../../../sections/users/users-search';
 
 const userColumns = [
   { key: 'name', label: 'Nom' },
@@ -27,30 +28,66 @@ const userColumns = [
 
 const Page = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const page = useSelector((state) => state.user.page);
   const rowsPerPage = useSelector((state) => state.user.rowsPerPage);
   const users = useSelector((state) => state.user.users);
-  const router = useRouter();
+  const totalUsers = useSelector((state) => state.user.totalUsers);
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+
+  const [filters, setFilters] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    active: '',
+  });
+  const [hasInteractedWithStatus, setHasInteractedWithStatus] = useState(false);
 
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
 
   const handlePageChange = useCallback(
-    (event, value) => {
-      dispatch(setPage(value));
+    (event) => {
+      dispatch(setPage(event));
+      dispatch(fetchUsers({}));
     },
     [dispatch],
   );
 
   const handleRowsPerPageChange = useCallback(
-    (event) => {
-      dispatch(setRowsPerPage(event.target.value));
+    (value) => {
+      dispatch(setRowsPerPage(value));
+      dispatch(fetchUsers({}));
     },
     [dispatch],
   );
+
+  const fetchFilteredUsers = useCallback(() => {
+    const searchCriteriaList = Object.entries(filters)
+      .map(([key, value]) => {
+        if (key !== 'active' || (hasInteractedWithStatus && value !== 'ALL')) {
+          return {
+            filterKey: key,
+            operation: key === 'active' ? 'eq' : 'cn',
+            value: value,
+            dataOption: 'all',
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    const searchFilter = {
+      searchCriteriaList: searchCriteriaList,
+      dataOption: 'all',
+    };
+
+    console.log('searchFilter', searchFilter);
+
+    dispatch(fetchUsers(searchFilter));
+  }, [dispatch, filters]);
 
   const handleBack = () => {
     router.back();
@@ -109,12 +146,28 @@ const Page = () => {
                 </Button>
               </div>
             </Stack>
-            <UsersSearch />
+            <UsersFilters
+              setHasInteractedWithStatus={setHasInteractedWithStatus}
+              filters={filters}
+              onFilterChange={(filterKey, value) => {
+                setFilters((prevFilters) => ({
+                  ...prevFilters,
+                  [filterKey]: value,
+                }));
+              }}
+              onFilterSubmit={() => {
+                fetchFilteredUsers();
+              }}
+            />{' '}
             <DataTable
-              count={users?.length}
+              count={totalUsers}
               items={users}
               columns={userColumns}
               entity="user"
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
             />
           </Stack>
         </Container>

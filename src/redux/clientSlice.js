@@ -1,6 +1,30 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchWithHeaders } from '../utils/api';
 
+// Initial state
+const initialState = {
+  clientDetails: {
+    nameClient: '',
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    mobilePhoneNumber: '',
+    phone: '',
+    fax: '',
+    ice: '',
+    bankAccount: '',
+  },
+  clients: [],
+  page: 0,
+  rowsPerPage: 5,
+  totalPages: 1,
+  totalClients: 0,
+  submitting: false,
+  error: null,
+  success: false,
+};
+
 /**
  * @typedef {Object} ClientDetails
  * @property {string} nameClient - The client's name.
@@ -52,45 +76,19 @@ export const updateClient = createAsyncThunk(
 export const fetchClients = createAsyncThunk(
   'client/fetchClients',
   async (searchFilter = {}, { getState }) => {
-    // const { page, rowsPerPage } = getState().client;
+    const { page, rowsPerPage } = getState().client;
 
     const response = await fetchWithHeaders(
-      `/users/client/list?offset=0&limit=10`,
+      `/users/client/list?offset=${rowsPerPage * page}&limit=${rowsPerPage}`,
       {
         method: 'POST',
         body: JSON.stringify(searchFilter),
       },
     );
 
-    console.log('');
-
     return response.content;
   },
 );
-
-// Initial state
-const initialState = {
-  clientDetails: {
-    nameClient: '',
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    mobilePhoneNumber: '',
-    phone: '',
-    fax: '',
-    ice: '',
-    bankAccount: '',
-  },
-  clients: [],
-  page: 0,
-  rowsPerPage: 5,
-  totalPages: 0,
-  totalClients: 0,
-  submitting: false,
-  error: null,
-  success: false,
-};
 
 const clientSlice = createSlice({
   name: 'client',
@@ -107,6 +105,9 @@ const clientSlice = createSlice({
     },
     setRowsPerPage: (state, action) => {
       state.rowsPerPage = action.payload;
+    },
+    setOffset: (state, action) => {
+      state.offset = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -129,11 +130,11 @@ const clientSlice = createSlice({
       })
       .addCase(fetchClients.fulfilled, (state, action) => {
         state.fetching = false;
-        console.log('action.payload', action.payload);
         state.clients = action.payload.currentPageData || [];
-        state.totalClients = action.payload.totalPages;
+        state.totalClients = action.payload.totalElements;
+        state.totalPages = action.payload.totalPages;
       })
-      .addCase(fetchClients.rejected, (state, action) => {
+      .addCase(fetchClients.rejected, (state) => {
         state.fetching = false;
         state.error = 'error while fetching clients';
       })
@@ -141,7 +142,7 @@ const clientSlice = createSlice({
         state.submitting = true;
         state.error = null;
       })
-      .addCase(updateClient.fulfilled, (state, action) => {
+      .addCase(updateClient.fulfilled, (state) => {
         state.submitting = false;
         state.success = true;
       })
@@ -152,7 +153,12 @@ const clientSlice = createSlice({
   },
 });
 
-export const { setClientDetails, clearClientDetails, setPage, setRowsPerPage } =
-  clientSlice.actions;
+export const {
+  setClientDetails,
+  clearClientDetails,
+  setPage,
+  setRowsPerPage,
+  setOffset,
+} = clientSlice.actions;
 
 export default clientSlice.reducer;

@@ -30,6 +30,7 @@ const menuItems = {
     {
       label: 'Utilisateurs',
       path: '/outils/utilisateurs',
+      pathCreate: '/outils/utilisateurs',
       icon: PeopleIcon,
     },
   ],

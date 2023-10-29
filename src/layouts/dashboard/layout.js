@@ -34,7 +34,12 @@ const LayoutContainer = styled('div')({
 
 const menuItems = {
   ventes: [
-    { label: 'Clients', path: '/ventes/clients', icon: GroupIcon },
+    {
+      label: 'Clients',
+      path: '/ventes/clients',
+      pathCreate: '/ventes/clients/createClient',
+      icon: GroupIcon,
+    },
     { label: 'Affaires', path: '/ventes/affaires', icon: BusinessCenterIcon },
     { label: 'Devis', path: '/ventes/devis', icon: ReceiptIcon },
     { label: 'Commandes', path: '/ventes/commandes', icon: ShoppingCartIcon },
@@ -53,6 +58,7 @@ const menuItems = {
     {
       label: 'Utilisateurs',
       path: '/outils/utilisateurs',
+      pathCreate: '/outils/utilisateurs/createUser',
       icon: PeopleIcon,
     },
   ],

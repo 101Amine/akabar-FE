@@ -21,6 +21,10 @@ const authSlice = createSlice({
     error: null,
     isAuthenticated: false,
   },
+  setAuthenticated: (state, action) => {
+    state.isAuthenticated = action.payload;
+    console.log('Setting isAuthenticated:', state.isAuthenticated);
+  },
   extraReducers: (builder) => {
     builder
       .addCase(initializeAuth.fulfilled, (state) => {

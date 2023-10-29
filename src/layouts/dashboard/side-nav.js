@@ -136,7 +136,10 @@ export const SideNav = (props) => {
               sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
             >
               {submenuItems.map((item) => {
-                const isActive = item.path === pathname;
+                console.log('item.path', item);
+                console.log('pathName', pathname);
+                const isActive =
+                  item.path === pathname || item.pathCreate === pathname;
                 return (
                   <StyledListItem
                     key={item.label}

@@ -24,11 +24,11 @@ import {
 } from '../../../redux/userSlice';
 import { useRouter } from 'next/router';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import createClientValidationSchema from '../../../utils/validationService';
+import { createUserValidationSchema } from '../../../utils/validationService';
 
 const CreateUser = () => {
   const dispatch = useDispatch();
-  const { userDetails, submitting, error, success } = useSelector(
+  const { userDetails, submitting, success } = useSelector(
     (state) => state.user,
   );
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -65,7 +65,6 @@ const CreateUser = () => {
     (event) => {
       event.preventDefault();
 
-      // Check if passwords match
       if (userDetails.password !== passwordConfirmation) {
         handleSnackbarOpen(
           'Les deux mots de passe ne correspondent pas, veuillez les répéter.',
@@ -74,12 +73,11 @@ const CreateUser = () => {
         return;
       }
 
-      createClientValidationSchema
+      createUserValidationSchema
         .validate(userDetails, { abortEarly: false })
         .then(() => {
           dispatch(addUser(userDetails));
 
-          console.log('success', success);
           if (success && !submitting) {
             router.push('/outils/utilisateurs');
             handleSnackbarOpen(
@@ -220,7 +218,9 @@ const CreateUser = () => {
             </Grid>
           </Grid>
           <Divider />
-          <CardActions sx={{ justifyContent: 'flex-end' }}>
+          <CardActions
+            sx={{ justifyContent: 'flex-end', marginBottom: '20px' }}
+          >
             <Button
               variant="contained"
               color="primary"

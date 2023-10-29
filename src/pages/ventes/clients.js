@@ -17,7 +17,12 @@ import {
   ClientsSearch,
 } from 'src/sections/clients/client-search';
 import { DataTable } from '../../sections/DataTable/data-table';
-import { fetchClients, setPage, setRowsPerPage } from '../../redux/clientSlice';
+import {
+  fetchClients,
+  setOffset,
+  setPage,
+  setRowsPerPage,
+} from '../../redux/clientSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -32,10 +37,10 @@ const clientColumns = [
 ];
 
 const Page = () => {
-  // const page = useSelector(state => state.client.page);
-  // const rowsPerPage = useSelector(state => state.client.rowsPerPage);
+  const page = useSelector((state) => state.client.page);
+  const rowsPerPage = useSelector((state) => state.client.rowsPerPage);
+  const totalClients = useSelector((state) => state.client.totalClients);
   const clients = useSelector((state) => state.client.clients);
-  // const totalCustomers = useSelector(state => state.client.totalClients);
 
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
   const [filters, setFilters] = useState({
@@ -71,14 +76,13 @@ const Page = () => {
       dataOption: 'all',
     };
 
-    console.log('searchFilter', searchFilter);
-
     dispatch(fetchClients(searchFilter));
   }, [dispatch, filters]);
 
   const handlePageChange = useCallback(
-    (event, value) => {
-      dispatch(setPage(value));
+    (event) => {
+      dispatch(setPage(event));
+      dispatch(fetchClients({}));
     },
     [dispatch],
   );
@@ -88,8 +92,9 @@ const Page = () => {
   };
 
   const handleRowsPerPageChange = useCallback(
-    (event) => {
-      dispatch(setRowsPerPage(event.target.value));
+    (value) => {
+      dispatch(setRowsPerPage(value));
+      dispatch(fetchClients({}));
     },
     [dispatch],
   );
@@ -97,8 +102,6 @@ const Page = () => {
   const proceedToForm = () => {
     router.push('/ventes/clients/createClient').then((r) => console.info(r));
   };
-
-  console.log('clients', clients);
 
   return (
     <>
@@ -162,10 +165,14 @@ const Page = () => {
               }}
             />
             <DataTable
-              count={clients?.length}
+              count={totalClients}
               items={clients}
-              entity="client"
               columns={clientColumns}
+              entity="client"
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
             />
           </Stack>
         </Container>
