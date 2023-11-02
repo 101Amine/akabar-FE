@@ -7,9 +7,10 @@ import {
   Grid,
   Container,
   Typography,
+  Card,
+  CardContent,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import * as Yup from 'yup';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -41,10 +42,19 @@ const CreateClient = () => {
   // Handlers
   const handleChange = useCallback(
     (event) => {
+      const { name, value } = event.target;
+
+      let updatedValue = value;
+
+      // If the change is for 'nameClient', convert the value to uppercase
+      if (name === 'nameClient') {
+        updatedValue = value.toUpperCase();
+      }
+
       dispatch(
         setClientDetails({
           ...clientDetails,
-          [event.target.name]: event.target.value,
+          [name]: updatedValue,
         }),
       );
     },
@@ -119,101 +129,106 @@ const CreateClient = () => {
         </Typography>
         <Divider />
         <Box justifyContent="center" mt={4}>
-          <form autoComplete="off" noValidate onSubmit={handleSubmit}>
-            <Grid
-              container
-              spacing={3}
-              padding={2}
-              display="flex"
-              flexDirection="column"
-            >
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Nom du client"
-                  name="nameClient"
-                  onChange={handleChange}
-                  required
-                  value={clientDetails.nameClient}
-                  error={Boolean(formErrors.nameClient)}
-                  helperText={formErrors.nameClient}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Code du client"
-                  name="codeClient"
-                  onChange={handleChange}
-                  required
-                  value={clientDetails.codeClient}
-                  error={Boolean(formErrors.codeClient)}
-                  helperText={formErrors.codeClient}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Téléphone Fix"
-                  name="phone"
-                  onChange={handleChange}
-                  value={clientDetails.phone}
-                  error={Boolean(formErrors.phone)}
-                  helperText={formErrors.phone}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Fax"
-                  name="fax"
-                  onChange={handleChange}
-                  value={clientDetails.fax}
-                  error={Boolean(formErrors.fax)}
-                  helperText={formErrors.fax}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="ICE"
-                  name="ice"
-                  onChange={handleChange}
-                  value={clientDetails.ice}
-                  error={Boolean(formErrors.ice)}
-                  helperText={formErrors.ice}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Compte bancaire"
-                  name="bankAccount"
-                  onChange={handleChange}
-                  value={clientDetails.bankAccount}
-                  error={Boolean(formErrors.bankAccount)}
-                  helperText={formErrors.bankAccount}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  label="Adresse"
-                  name="address"
-                  onChange={handleChange}
-                  value={clientDetails.address}
-                  error={Boolean(formErrors.address)}
-                  helperText={formErrors.address}
-                />
-              </Grid>
-            </Grid>
-            <Divider />
-            <Box display="flex" justifyContent="flex-end" mt={2} mb={2}>
-              <Button variant="contained" color="primary" type="submit">
-                Soumettre
-              </Button>
-            </Box>
-          </form>
+          <Card
+            style={{ width: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+          >
+            <CardContent>
+              <form autoComplete="off" noValidate onSubmit={handleSubmit}>
+                <Grid
+                  container
+                  spacing={3}
+                  padding={2}
+                  display="flex"
+                  flexDirection="column"
+                >
+                  <Grid item xs={12} md={8}>
+                    <TextField
+                      fullWidth
+                      label="Code du client"
+                      name="codeClient"
+                      onChange={handleChange}
+                      value={clientDetails.codeClient}
+                      error={Boolean(formErrors.codeClient)}
+                      helperText={formErrors.codeClient}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                    <TextField
+                      fullWidth
+                      label="Nom du client"
+                      name="nameClient"
+                      onChange={handleChange}
+                      required
+                      value={clientDetails.nameClient}
+                      error={Boolean(formErrors.nameClient)}
+                      helperText={formErrors.nameClient}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                    <TextField
+                      fullWidth
+                      label="Téléphone Fix"
+                      name="phone"
+                      onChange={handleChange}
+                      value={clientDetails.phone}
+                      error={Boolean(formErrors.phone)}
+                      helperText={formErrors.phone}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                    <TextField
+                      fullWidth
+                      label="Fax"
+                      name="fax"
+                      onChange={handleChange}
+                      value={clientDetails.fax}
+                      error={Boolean(formErrors.fax)}
+                      helperText={formErrors.fax}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                    <TextField
+                      fullWidth
+                      label="ICE"
+                      name="ice"
+                      onChange={handleChange}
+                      value={clientDetails.ice}
+                      error={Boolean(formErrors.ice)}
+                      helperText={formErrors.ice}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                    <TextField
+                      fullWidth
+                      label="Compte bancaire"
+                      name="bankAccount"
+                      onChange={handleChange}
+                      value={clientDetails.bankAccount}
+                      error={Boolean(formErrors.bankAccount)}
+                      helperText={formErrors.bankAccount}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                    <TextField
+                      fullWidth
+                      label="Adresse"
+                      name="address"
+                      onChange={handleChange}
+                      value={clientDetails.address}
+                      error={Boolean(formErrors.address)}
+                      helperText={formErrors.address}
+                    />
+                  </Grid>
+                </Grid>
+                <Divider />
+                <Box display="flex" justifyContent="flex-end" mt={2} mb={2}>
+                  <Button variant="contained" color="primary" type="submit">
+                    Enregistrer
+                  </Button>
+                </Box>
+              </form>
+            </CardContent>
+          </Card>
           <Snackbar
             open={snackbarOpen}
             autoHideDuration={3000}

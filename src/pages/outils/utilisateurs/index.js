@@ -18,6 +18,7 @@ import { fetchUsers, setPage, setRowsPerPage } from '../../../redux/userSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
 import { fetchClients } from '../../../redux/clientSlice';
 import { UsersFilters } from '../../../sections/users/users-search';
+import BackButton from '../../../components/BackButton';
 
 const userColumns = [
   { key: 'name', label: 'Nom' },
@@ -115,14 +116,7 @@ const Page = () => {
         >
           <Stack spacing={3}>
             <Stack spacing={3}>
-              <Button
-                onClick={handleBack}
-                startIcon={<ArrowBackIcon />}
-                variant="outlined"
-                sx={{ position: 'absolute' }}
-              >
-                Retour
-              </Button>
+              <BackButton />
             </Stack>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
@@ -142,7 +136,7 @@ const Page = () => {
                   }
                   variant="contained"
                 >
-                  Ajouter
+                  Nouveau utilisateur
                 </Button>
               </div>
             </Stack>

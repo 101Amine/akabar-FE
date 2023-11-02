@@ -13,6 +13,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleIconOnly } from '../../redux/uiSlice';
+import { menuItems } from './config';
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -31,38 +32,6 @@ const LayoutContainer = styled('div')({
   flexDirection: 'column',
   width: '100%',
 });
-
-const menuItems = {
-  ventes: [
-    {
-      label: 'Clients',
-      path: '/ventes/clients',
-      pathCreate: '/ventes/clients/createClient',
-      icon: GroupIcon,
-    },
-    { label: 'Affaires', path: '/ventes/affaires', icon: BusinessCenterIcon },
-    { label: 'Devis', path: '/ventes/devis', icon: ReceiptIcon },
-    { label: 'Commandes', path: '/ventes/commandes', icon: ShoppingCartIcon },
-  ],
-  production: [
-    // For now, I'm leaving this empty as you didn't provide specific items.
-    // But you can use icons like SettingsIcon for settings or configurations related to production.
-  ],
-
-  outils: [
-    {
-      label: 'Paramètres ',
-      path: '/outils/parametres',
-      icon: SettingsIcon,
-    },
-    {
-      label: 'Utilisateurs',
-      path: '/outils/utilisateurs',
-      pathCreate: '/outils/utilisateurs/createUser',
-      icon: PeopleIcon,
-    },
-  ],
-};
 
 export const Layout = withAuthGuard((props) => {
   const { children, isComingSoon } = props;

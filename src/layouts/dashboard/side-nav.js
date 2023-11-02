@@ -75,7 +75,15 @@ export const SideNav = (props) => {
           backgroundColor: '#F2F2F2',
         }}
       >
-        <Box sx={{ p: 3, display: 'flex', padding: '0', gap: 1 }}>
+        <Box
+          sx={{
+            p: 3,
+            display: 'flex',
+            padding: '0',
+            gap: 1,
+            backgroundColor: '#164cc8',
+          }}
+        >
           <Box
             sx={{
               alignItems: 'center',
@@ -99,7 +107,7 @@ export const SideNav = (props) => {
                   <Logo />
                 </div>
                 <Typography
-                  color="black"
+                  color="white"
                   variant="subtitle1"
                   fontFamily={'cursive'}
                   letterSpacing={'5px'}

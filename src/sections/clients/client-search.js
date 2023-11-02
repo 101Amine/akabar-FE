@@ -71,7 +71,7 @@ export const ClientFilters = ({ filters, onFilterChange, onFilterSubmit }) => {
           color="primary"
           sx={{ width: '100px' }}
         >
-          Filter
+          Chercher
         </Button>
       </Box>
     </Card>

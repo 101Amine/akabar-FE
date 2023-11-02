@@ -15,25 +15,29 @@ export const createUserValidationSchema = Yup.object().shape({
     .required('Numéro de téléphone est requis'),
 });
 
+export const createAffaireValidationSchema = Yup.object().shape({
+  name: Yup.string().required("Nom de l'affaire est requis"),
+});
+
 export const createClientValidationSchema = Yup.object().shape({
   nameClient: Yup.string().required('Nom du client est requis'),
 
-  codeClient: Yup.string().required('Code du client est requis'),
-
-  phone: Yup.string()
-    .matches(/^[0-9]+$/, 'Seuls les chiffres sont autorisés')
-    .length(10, 'Le numéro de téléphone doit comporter 10 chiffres'),
-
-  fax: Yup.string().matches(/^[0-9]+$/, 'Seuls les chiffres sont autorisés'),
-
-  ice: Yup.string().matches(/^[0-9]+$/, 'ICE du client est requis'),
-
-  bankAccount: Yup.string().matches(
-    /^[0-9]+$/,
-    'Seuls les chiffres sont autorisés',
-  ),
-
-  address: Yup.string().required('Adresse est requise'),
+  // codeClient: Yup.string().required('Code du client est requis'),
+  //
+  // phone: Yup.string()
+  //   .matches(/^[0-9]+$/, 'Seuls les chiffres sont autorisés')
+  //   .length(10, 'Le numéro de téléphone doit comporter 10 chiffres'),
+  //
+  // fax: Yup.string().matches(/^[0-9]+$/, 'Seuls les chiffres sont autorisés'),
+  //
+  // ice: Yup.string().matches(/^[0-9]+$/, 'ICE du client est requis'),
+  //
+  // bankAccount: Yup.string().matches(
+  //   /^[0-9]+$/,
+  //   'Seuls les chiffres sont autorisés',
+  // ),
+  //
+  // address: Yup.string().required('Adresse est requise'),
 });
 
 export const updateUserValidationSchema = Yup.object().shape({

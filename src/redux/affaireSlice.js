@@ -1,6 +1,47 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchWithHeaders } from '../utils/api';
 
+const initialState = {
+  affaireDetails: {
+    clientName: null,
+    date: null,
+    name: '',
+    productType: null,
+    type: null,
+    quantiteUnitaire: null,
+    laize: null,
+    developpe: null,
+    supportPapier: null,
+    forme: null,
+    avecImpression: false,
+    impressionSide: null,
+    colorNumber: null,
+    etiquetteModel: '',
+    lienAudio: '',
+    texteInformatif: '',
+    sortieDirection: null,
+    repiquage: false,
+    vernis: false,
+    dorure: false,
+    plasification: false,
+    existanceDeRayonDeCoin: false,
+    mandrin: null,
+    poseEtiquette: null,
+    nbrEtqParBobine: null,
+    nbrEtqDeFront: null,
+    formeDeDecoupeId: null,
+    clicheId: null,
+  },
+  affaires: [],
+  page: 0,
+  rowsPerPage: 5,
+  totalPages: 1,
+  totalAffaires: 0,
+  submitting: false,
+  error: null,
+  success: false,
+};
+
 export const addAffaire = createAsyncThunk(
   'affaire/addAffaire',
   async (affaireDetails) => {
@@ -11,52 +52,23 @@ export const addAffaire = createAsyncThunk(
   },
 );
 
-export const updateAffaire = createAsyncThunk(
-  'affaire/updateAffaire',
-  async (affaireUpdateDetails) => {
-    const response = await fetchWithHeaders(`/affaires/update`, {
-      method: 'POST',
-      body: JSON.stringify(affaireUpdateDetails),
-    });
-    if (response.status !== 200) {
-      throw new Error('Failed to update affaire. Please try again.');
-    }
+export const fetchAffaires = createAsyncThunk(
+  'affaire/fetchAffaires',
+  async (searchFilter = {}, { getState }) => {
+    const { page, rowsPerPage } = getState().affaire;
+
+    const response = await fetchWithHeaders(
+      `/affaires/list?offset=${rowsPerPage * page}&limit=${rowsPerPage}`,
+      {
+        method: 'POST',
+        body: JSON.stringify(searchFilter),
+      },
+    );
+
     return response.json();
   },
 );
 
-export const fetchAffaires = createAsyncThunk(
-  'affaire/fetchAffaires',
-  async () => {
-    const response = await fetchWithHeaders(`/affaires/list`);
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch affaires');
-    }
-    return response.content;
-  },
-);
-
-// Initial state
-const initialState = {
-  affaireDetails: {
-    nameClient: '',
-    nomEtiquette: '',
-    width: '',
-    height: '',
-    quantiteUnitaire: '',
-    supportPapier: '',
-    typeEtiquette: '',
-  },
-  affaires: [],
-  page: 0,
-  rowsPerPage: 10,
-  totalAffaires: 0,
-  submitting: false,
-  error: null,
-  success: false,
-};
-
-// Create the affaire slice
 const affaireSlice = createSlice({
   name: 'affaire',
   initialState,
@@ -80,36 +92,25 @@ const affaireSlice = createSlice({
         state.submitting = true;
         state.error = null;
       })
-      .addCase(addAffaire.fulfilled, (state, action) => {
+      .addCase(addAffaire.fulfilled, (state) => {
         state.submitting = false;
         state.success = true;
       })
       .addCase(addAffaire.rejected, (state, action) => {
         state.submitting = false;
-        state.error = action.error;
+        state.error = action.error.message;
       })
       .addCase(fetchAffaires.pending, (state) => {
-        state.fetching = true;
-        state.error = null;
-      })
-      .addCase(fetchAffaires.fulfilled, (state, action) => {
-        state.fetching = false;
-        state.affaires = action.payload || [];
-        state.totalAffaires = action.payload.length;
-      })
-      .addCase(fetchAffaires.rejected, (state, action) => {
-        state.fetching = false;
-        state.error = 'error while fetching affaires';
-      })
-      .addCase(updateAffaire.pending, (state) => {
         state.submitting = true;
         state.error = null;
       })
-      .addCase(updateAffaire.fulfilled, (state, action) => {
+      .addCase(fetchAffaires.fulfilled, (state, action) => {
         state.submitting = false;
-        state.success = true;
+        state.affaires = action.payload || [];
+        state.totalAffaires = action.payload.length;
+        // state.totalPages = Math.ceil(action.payload.length / state.rowsPerPage);
       })
-      .addCase(updateAffaire.rejected, (state, action) => {
+      .addCase(fetchAffaires.rejected, (state, action) => {
         state.submitting = false;
         state.error = action.error.message;
       });

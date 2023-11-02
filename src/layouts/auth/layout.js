@@ -46,7 +46,7 @@ export const Layout = (props) => {
                 width: 32,
               }}
             >
-              <Logo />
+              <Logo fillColor={'black'} />
             </Box>
           </Box>
           {children}

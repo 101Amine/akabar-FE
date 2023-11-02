@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material/styles';
 
-export const Logo = () => {
+export const Logo = ({ fillColor }) => {
   const theme = useTheme();
-  const fillColor = 'black';
+  const fillColorFomProps = fillColor ? fillColor : 'white';
 
   console.log('black');
   return (
@@ -15,7 +15,7 @@ export const Logo = () => {
     >
       <g
         transform="translate(0.000000,79.000000) scale(0.100000,-0.100000)"
-        fill="black"
+        fill={fillColorFomProps}
         stroke="none"
       >
         <path

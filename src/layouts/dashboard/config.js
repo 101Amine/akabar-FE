@@ -9,16 +9,18 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PeopleIcon from '@mui/icons-material/People';
 
-const menuItems = {
+export const menuItems = {
   ventes: [
     { label: 'Clients', path: '/ventes/clients', icon: GroupIcon },
-    { label: 'Affaires', path: '/ventes/affaires', icon: BusinessCenterIcon },
     { label: 'Devis', path: '/ventes/devis', icon: ReceiptIcon },
     { label: 'Commandes', path: '/ventes/commandes', icon: ShoppingCartIcon },
   ],
   production: [
-    // For now, I'm leaving this empty as you didn't provide specific items.
-    // But you can use icons like SettingsIcon for settings or configurations related to production.
+    {
+      label: 'Affaires',
+      path: '/production/affaires',
+      icon: BusinessCenterIcon,
+    },
   ],
 
   outils: [
@@ -44,12 +46,12 @@ export const items = [
   },
   {
     title: 'Ventes',
-    path: menuItems.ventes[0]?.path || '/ventes', // Pointing to the first side-nav route
+    path: menuItems.ventes[0]?.path || '/ventes',
     icon: <AttachMoneyOutlinedIcon fontSize="small" />,
   },
   {
     title: 'Production',
-    path: menuItems.production[0]?.path || '/production', // Similarly, pointing to the first route or to the general path if no items
+    path: menuItems.production[0]?.path || '/production',
     icon: <FactoryIcon fontSize="small" />,
   },
   {

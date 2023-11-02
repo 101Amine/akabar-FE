@@ -11,6 +11,7 @@ import {
   Stack,
   Typography,
   IconButton,
+  Button,
   Snackbar,
   Alert,
 } from '@mui/material';
@@ -18,11 +19,11 @@ import { getInitials } from 'src/utils/get-initials';
 import EditIcon from '@mui/icons-material/Edit';
 import BlockIcon from '@mui/icons-material/Block';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { blockUser, unblockUser } from '../../redux/userSlice';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import { jsx } from '@emotion/react';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 
 export const DataTable = ({
   count = 0,
@@ -30,10 +31,13 @@ export const DataTable = ({
   onPageChange = () => {},
   onRowsPerPageChange,
   page = 0,
-  rowsPerPage = 5,
+  rowsPerPage = 8,
   selected = [],
+  onRowClick,
+  isDialog = false,
   columns,
   entity,
+  showPagination = true,
 }) => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -87,10 +91,6 @@ export const DataTable = ({
       query: { [entity]: JSON.stringify(item) },
     });
   };
-
-  console.log('count', count);
-  console.log('page', page);
-  console.log('rowsPerPage', rowsPerPage);
 
   const handleBlockOrUnblock = async (item) => {
     try {
@@ -148,7 +148,14 @@ export const DataTable = ({
                       item.active === false
                         ? 'hsla(0, 100%, 90%, 0.25)'
                         : 'transparent',
+                    cursor: isDialog ? 'pointer' : 'default',
+                    '&:hover': {
+                      backgroundColor: isDialog
+                        ? 'rgba(22,76,200,0.1)'
+                        : undefined,
+                    },
                   }}
+                  onClick={() => isDialog && onRowClick && onRowClick(item)}
                 >
                   {columns.map((col) => (
                     <TableCell key={col.key}>
@@ -157,13 +164,15 @@ export const DataTable = ({
                   ))}
                   <TableCell>
                     <Stack direction="row" spacing={1} sx={{ float: 'right' }}>
-                      <IconButton
-                        color="primary"
-                        aria-label={`edit ${entity}`}
-                        onClick={() => handleEdit(item)}
-                      >
-                        <EditIcon />
-                      </IconButton>
+                      {!isDialog && (
+                        <IconButton
+                          color="primary"
+                          aria-label={`edit ${entity}`}
+                          onClick={() => handleEdit(item)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      )}
                       {entity === 'user' && (
                         <IconButton
                           color={item.active ? 'secondary' : 'primary'}
@@ -185,15 +194,18 @@ export const DataTable = ({
           </TableBody>
         </Table>
       </Box>
-      <TablePagination
-        component="div"
-        count={count}
-        page={page}
-        onPageChange={handlePageChange}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        rowsPerPageOptions={[5, 10, 25, 50]}
-      />
+      {showPagination && (
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          onPageChange={handlePageChange}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          labelRowsPerPage="Lignes par page:"
+        />
+      )}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

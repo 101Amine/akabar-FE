@@ -25,6 +25,7 @@ import {
 import { useRouter } from 'next/router';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { createUserValidationSchema } from '../../../utils/validationService';
+import BackButton from '../../../components/BackButton';
 
 const CreateUser = () => {
   const dispatch = useDispatch();
@@ -118,14 +119,7 @@ const CreateUser = () => {
       style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
     >
       <Stack spacing={3}>
-        <Button
-          onClick={handleBack}
-          startIcon={<ArrowBackIcon />}
-          variant="outlined"
-          sx={{ position: 'absolute' }}
-        >
-          Retour
-        </Button>
+        <BackButton />
       </Stack>
 
       <Typography variant="h4" marginTop="80px" gutterBottom>
@@ -133,104 +127,108 @@ const CreateUser = () => {
       </Typography>
       <Divider />
       <Box justifyContent="center" mt={4}>
-        <form autoComplete="off" noValidate onSubmit={handleSubmit}>
-          <Grid
-            container
-            spacing={3}
-            padding={2}
-            display="flex"
-            flexDirection="column"
-          >
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Nom"
-                name="firstName"
-                onChange={handleChange}
-                required
-                value={userDetails.firstName}
-                error={Boolean(formErrors.firstName)}
-                helperText={formErrors.firstName}
-              />
-            </Grid>
+        <Card style={{ width: '50%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+          <CardContent>
+            <form autoComplete="off" noValidate onSubmit={handleSubmit}>
+              <Grid
+                container
+                spacing={3}
+                padding={2}
+                display="flex"
+                flexDirection="column"
+              >
+                <Grid item xs={12} md={8}>
+                  <TextField
+                    fullWidth
+                    label="Nom"
+                    name="firstName"
+                    onChange={handleChange}
+                    required
+                    value={userDetails.firstName}
+                    error={Boolean(formErrors.firstName)}
+                    helperText={formErrors.firstName}
+                  />
+                </Grid>
 
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Prenom"
-                name="lastName"
-                onChange={handleChange}
-                required
-                value={userDetails.lastName}
-                error={Boolean(formErrors.lastName)}
-                helperText={formErrors.lastName}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Mot de passe"
-                name="password"
-                onChange={handleChange}
-                required
-                type="password"
-                value={userDetails.password}
-                error={Boolean(formErrors.password)}
-                helperText={formErrors.password}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Confirmer le mot de passe"
-                name="passwordConfirmation"
-                onChange={handleChange}
-                required
-                type="password"
-                value={passwordConfirmation}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                onChange={handleChange}
-                required
-                type="email"
-                value={userDetails.email}
-                error={Boolean(formErrors.email)}
-                helperText={formErrors.email}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Numéro de téléphone"
-                name="mobilePhoneNumber"
-                onChange={handleChange}
-                required
-                type="tel"
-                value={userDetails.mobilePhoneNumber}
-                error={Boolean(formErrors.mobilePhoneNumber)}
-                helperText={formErrors.mobilePhoneNumber}
-              />
-            </Grid>
-          </Grid>
-          <Divider />
-          <CardActions
-            sx={{ justifyContent: 'flex-end', marginBottom: '20px' }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              // disabled={submitting}
-            >
-              Soumettre
-            </Button>
-          </CardActions>
-        </form>
+                <Grid item xs={12} md={8}>
+                  <TextField
+                    fullWidth
+                    label="Prenom"
+                    name="lastName"
+                    onChange={handleChange}
+                    required
+                    value={userDetails.lastName}
+                    error={Boolean(formErrors.lastName)}
+                    helperText={formErrors.lastName}
+                  />
+                </Grid>
+                <Grid item xs={12} md={8}>
+                  <TextField
+                    fullWidth
+                    label="Mot de passe"
+                    name="password"
+                    onChange={handleChange}
+                    required
+                    type="password"
+                    value={userDetails.password}
+                    error={Boolean(formErrors.password)}
+                    helperText={formErrors.password}
+                  />
+                </Grid>
+                <Grid item xs={12} md={8}>
+                  <TextField
+                    fullWidth
+                    label="Confirmer le mot de passe"
+                    name="passwordConfirmation"
+                    onChange={handleChange}
+                    required
+                    type="password"
+                    value={passwordConfirmation}
+                  />
+                </Grid>
+                <Grid item xs={12} md={8}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    onChange={handleChange}
+                    required
+                    type="email"
+                    value={userDetails.email}
+                    error={Boolean(formErrors.email)}
+                    helperText={formErrors.email}
+                  />
+                </Grid>
+                <Grid item xs={12} md={8}>
+                  <TextField
+                    fullWidth
+                    label="Numéro de téléphone"
+                    name="mobilePhoneNumber"
+                    onChange={handleChange}
+                    required
+                    type="tel"
+                    value={userDetails.mobilePhoneNumber}
+                    error={Boolean(formErrors.mobilePhoneNumber)}
+                    helperText={formErrors.mobilePhoneNumber}
+                  />
+                </Grid>
+              </Grid>
+              <Divider />
+              <CardActions
+                sx={{ justifyContent: 'flex-end', marginBlock: '20px' }}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  // disabled={submitting}
+                >
+                  Enregistrer
+                </Button>
+              </CardActions>
+            </form>
+          </CardContent>
+        </Card>
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={3000}

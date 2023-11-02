@@ -18,12 +18,11 @@ import { AccountPopover } from './account-popover';
 import { items } from './config';
 import { usePathname } from 'next/navigation';
 import { SideNavItem } from './side-nav-item';
-import PersonIcon from '@mui/icons-material/Person';
 import { getInitials } from '../../utils/get-initials';
 import { useSelector } from 'react-redux';
 
 const SIDE_NAV_WIDTH = 280;
-const TOP_NAV_HEIGHT = 64;
+const TOP_NAV_HEIGHT = 64.5;
 
 export const TopNav = (props) => {
   const { onNavOpen, setActiveTopNavItem, isIconOnly } = props;
@@ -49,6 +48,7 @@ export const TopNav = (props) => {
             lg: paddingLeftValue,
           },
           top: 0,
+          marginLeft: '15px',
           zIndex: (theme) => theme.zIndex.appBar,
         }}
       >
@@ -74,7 +74,7 @@ export const TopNav = (props) => {
             <div
               style={{
                 display: 'flex',
-                gap: '8px',
+                gap: '15px',
                 paddingLeft: isIconOnly ? '80px' : `${SIDE_NAV_WIDTH - 5}px`,
                 listStyle: 'none',
               }}

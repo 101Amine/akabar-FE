@@ -17,6 +17,7 @@ import Snackbar from '@mui/material/Snackbar';
 import { updateUser } from '../../../redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUserValidationSchema } from '../../../utils/validationService';
+import BackButton from '../../../components/BackButton';
 
 const UpdateUser = () => {
   const router = useRouter();
@@ -119,14 +120,7 @@ const UpdateUser = () => {
       style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '70px' }}
     >
       {' '}
-      <Button
-        onClick={handleBack}
-        startIcon={<ArrowBackIcon />}
-        variant="outlined"
-        sx={{ position: 'absolute' }}
-      >
-        Retour
-      </Button>
+      <BackButton />
       <Box marginTop={'80px'}>
         <Typography variant="h4" marginTop="40px" gutterBottom>
           Mettre à jour l'utilisateur

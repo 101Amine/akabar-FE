@@ -25,6 +25,8 @@ import {
 } from '../../redux/clientSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useClientFilters } from '../../hooks/useClientFilters';
+import BackButton from '../../components/BackButton';
 
 const clientColumns = [
   { key: 'nameClient', label: 'Nom' },
@@ -43,11 +45,7 @@ const Page = () => {
   const clients = useSelector((state) => state.client.clients);
 
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
-  const [filters, setFilters] = useState({
-    nameClient: '',
-    codeClient: '',
-    ICE: '',
-  });
+  const { filters, setFilters, fetchFilteredClients } = useClientFilters();
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -55,29 +53,6 @@ const Page = () => {
   useEffect(() => {
     dispatch(fetchClients({}));
   }, [dispatch]);
-
-  const fetchFilteredClients = useCallback(() => {
-    const searchCriteriaList = Object.entries(filters)
-      .map(([key, value]) => {
-        if (value) {
-          return {
-            filterKey: key,
-            operation: 'cn',
-            value: value,
-            dataOption: 'all',
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-
-    const searchFilter = {
-      searchCriteriaList: searchCriteriaList,
-      dataOption: 'all',
-    };
-
-    dispatch(fetchClients(searchFilter));
-  }, [dispatch, filters]);
 
   const handlePageChange = useCallback(
     (event) => {
@@ -120,14 +95,7 @@ const Page = () => {
           style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
         >
           <Stack spacing={3}>
-            <Button
-              onClick={handleBack}
-              startIcon={<ArrowBackIcon />}
-              variant="outlined"
-              sx={{ position: 'absolute' }}
-            >
-              Retour
-            </Button>
+            <BackButton />
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4" marginTop={'70px'}>
@@ -148,7 +116,7 @@ const Page = () => {
                   }
                   variant="contained"
                 >
-                  Ajouter
+                  Nouveau client
                 </Button>
               </div>
             </Stack>
