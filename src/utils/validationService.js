@@ -68,3 +68,11 @@ export const updateClientlientValidationSchema = Yup.object().shape({
   ),
   address: Yup.string().required('Adresse est requise'),
 });
+
+export const affaireSelectionValidationSchema = Yup.object().shape({
+  clientName: Yup.string().required('Le nom du client est requis'),
+  name: Yup.string()
+    .required('Le nom de l’affaire est requis')
+    .min(3, 'Le nom de l’affaire doit comporter au moins 3 caractères'),
+  productType: Yup.string().required("Le type d'affaire est requis"),
+});

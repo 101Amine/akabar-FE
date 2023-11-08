@@ -38,9 +38,12 @@ export const DataTable = ({
   columns,
   entity,
   showPagination = true,
+  isAffaire = false,
 }) => {
   const router = useRouter();
   const dispatch = useDispatch();
+
+  console.log('items', items);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -55,7 +58,7 @@ export const DataTable = ({
   };
 
   const renderColumnContent = (col, item, fullName) => {
-    if (col.key === 'name') {
+    if (col.key === 'name' && !isAffaire) {
       return (
         <Stack alignItems="center" direction="row" spacing={2}>
           <Avatar>{getInitials(fullName)}</Avatar>
@@ -64,11 +67,35 @@ export const DataTable = ({
       );
     }
 
+    if (
+      col.key === 'status' &&
+      isAffaire &&
+      item[col.key] === 'EN_PREPARATION'
+    ) {
+      return 'En cours de préparation';
+    }
+
     if (col.key === 'active') {
       return item[col.key] ? 'Active' : 'Bloqué';
     }
 
     return item[col.key] ? item[col.key] : <Box>N/A</Box>;
+  };
+
+  const getStatusColor = (status) => {
+    console.log('status', status);
+    switch (status) {
+      case 'EN_PREPARATION':
+        return '#ebcb0c';
+      case 'Bloqué':
+      case false:
+        return '#E53E3E';
+      case 'Active':
+      case true:
+        return '#38A169';
+      default:
+        return 'transparent';
+    }
   };
 
   const handleEdit = (item) => {
@@ -157,11 +184,42 @@ export const DataTable = ({
                   }}
                   onClick={() => isDialog && onRowClick && onRowClick(item)}
                 >
-                  {columns.map((col) => (
-                    <TableCell key={col.key}>
-                      {renderColumnContent(col, item, fullName)}
-                    </TableCell>
-                  ))}
+                  {columns.map((col) => {
+                    console.log('item[col.key]', item[col.key]);
+                    console.log('col.key ', col.key);
+                    const isStatusColumn =
+                      col.key === 'status' || col.key === 'active';
+                    const cellStyle = isStatusColumn
+                      ? {
+                          backgroundColor: getStatusColor(item[col.key]),
+                          borderRadius: '8px',
+                          color: '#fff',
+                          padding: '4px 8px',
+                        }
+                      : {};
+
+                    return (
+                      <TableCell key={col.key}>
+                        {isStatusColumn ? (
+                          <Box
+                            sx={{
+                              ...cellStyle,
+                              display: 'block',
+                              width: 'fit-content',
+                            }}
+                          >
+                            {typeof item[col.key] === 'boolean'
+                              ? item[col.key]
+                                ? 'Active'
+                                : 'Bloqué'
+                              : item[col.key]}{' '}
+                          </Box>
+                        ) : (
+                          renderColumnContent(col, item, fullName)
+                        )}
+                      </TableCell>
+                    );
+                  })}
                   <TableCell>
                     <Stack direction="row" spacing={1} sx={{ float: 'right' }}>
                       {!isDialog && (
@@ -173,7 +231,7 @@ export const DataTable = ({
                           <EditIcon />
                         </IconButton>
                       )}
-                      {entity === 'user' && (
+                      {entity === 'user' && !isAffaire && (
                         <IconButton
                           color={item.active ? 'secondary' : 'primary'}
                           aria-label={

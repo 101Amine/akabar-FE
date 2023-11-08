@@ -15,7 +15,9 @@ export const AuthProvider = (props) => {
   const { children } = props;
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isAuthenticated =
+    typeof window !== 'undefined' &&
+    localStorage.getItem('isAuthenticated') === 'true';
   const error = useSelector((state) => state.auth.error);
 
   useEffect(() => {

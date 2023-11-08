@@ -3,6 +3,7 @@ import { fetchWithHeaders } from '../utils/api';
 
 const initialState = {
   affaireDetails: {
+    clientId: null,
     clientName: null,
     date: null,
     name: '',
@@ -31,6 +32,7 @@ const initialState = {
     nbrEtqDeFront: null,
     formeDeDecoupeId: null,
     clicheId: null,
+    active: null,
   },
   affaires: [],
   page: 0,
@@ -65,7 +67,8 @@ export const fetchAffaires = createAsyncThunk(
       },
     );
 
-    return response.json();
+    console.log('response', response);
+    return response.content;
   },
 );
 
@@ -106,8 +109,8 @@ const affaireSlice = createSlice({
       })
       .addCase(fetchAffaires.fulfilled, (state, action) => {
         state.submitting = false;
-        state.affaires = action.payload || [];
-        state.totalAffaires = action.payload.length;
+        state.affaires = action.payload.currentPageData || [];
+        state.totalAffaires = action.payload.currentPageData.totalElements;
         // state.totalPages = Math.ceil(action.payload.length / state.rowsPerPage);
       })
       .addCase(fetchAffaires.rejected, (state, action) => {

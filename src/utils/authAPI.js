@@ -7,7 +7,7 @@ export const validateToken = async () => {
   if (response.status !== 200) {
     throw new Error('Token validation failed');
   }
-  return response.data;
+  return response.status;
 };
 
 export const loginUser = async (credentials) => {
@@ -22,6 +22,8 @@ export const loginUser = async (credentials) => {
     throw new Error('Error logging in');
   }
 
+  console.log('response', response);
+
   return response.content;
 };
 
@@ -33,9 +35,9 @@ export const logoutUser = async () => {
     },
   });
 
-  if (!response.ok) {
+  if (response.status !== 200) {
     throw new Error('Logout failed');
   }
 
-  return response.json();
+  return response.status;
 };

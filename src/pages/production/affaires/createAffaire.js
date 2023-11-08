@@ -36,21 +36,30 @@ const CreateAffaire = () => {
   const router = useRouter();
   const { affaireDetails, submitting, error, success } = useSelector(
     (state) => state.affaire,
-  ); // Adjust according to your redux structure
+  );
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
-
+  const booleanGroups = [
+    'avecImpression',
+    'typeSortie',
+    'repiquage',
+    'vernis',
+    'dorure',
+    'plasification',
+    'existanceDeRayonDeCoin',
+  ];
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [selectedValue, setSelectedValue] = useState('');
   const [selectedMandarin, setSelecteMandarin] = useState('');
-  const [selectedSortie, setSelecteSortie] = useState('');
+  const [selectedSortie, setSelectedSortie] = useState('');
   const [selectedImpression, setSelectedImpression] = useState('');
   const [numberValue, setNumberValue] = useState('');
   const [selectedOption, setSelectedOption] = useState('non');
   const [radioValues, setRadioValues] = useState({
     type: '',
     avecImpression: '',
+    typeSortie: '',
     repiquage: '',
     vernis: '',
     dorure: '',
@@ -59,51 +68,102 @@ const CreateAffaire = () => {
   });
   const [formErrors, setFormErrors] = useState({});
 
+  useEffect(() => {
+    console.log('affaireDetails', affaireDetails);
+  }, [affaireDetails]);
+
+  const getSortieDirection = (direction, position) => {
+    console.log('position', position);
+    const positionNumber = parseInt(position.replace('N_', ''), 10);
+
+    console.log('EXT_${positionNumber}', `EXT_${positionNumber}`);
+    console.log('INT_${positionNumber}', `INT_${positionNumber}`);
+    return direction === 'Externe'
+      ? `EXT_${positionNumber}`
+      : `INT_${positionNumber}`;
+  };
+
   const handleChange = useCallback(
     (event) => {
       const { name, value } = event.target;
 
-      dispatch(setAffaireDetails({ ...affaireDetails, [name]: value }));
+      console.log('name', name);
+      console.log('value', value);
+
+      if (name === 'supportPapier') {
+        const newSortieDirection = getSortieDirection(
+          radioValues.typeSortie,
+          value,
+        );
+
+        console.log('newSortieDirection', newSortieDirection);
+        setSelectedSortie(newSortieDirection);
+        dispatch(
+          setAffaireDetails({
+            ...affaireDetails,
+            sortieDirection: newSortieDirection,
+          }),
+        );
+      } else if (value === '') {
+        dispatch(setAffaireDetails({ ...affaireDetails, [name]: value }));
+      } else {
+        const numericValue = Number(value);
+        dispatch(
+          setAffaireDetails({ ...affaireDetails, [name]: numericValue }),
+        );
+      }
     },
-    [affaireDetails, dispatch],
+    [affaireDetails, radioValues, dispatch],
   );
 
   const handleRadioChange = (groupName) => (event) => {
     const value = event.target.value;
 
-    // Update the local radioValues state
     setRadioValues((prevValues) => ({
       ...prevValues,
       [groupName]: value,
     }));
 
-    // Dispatch the updated value to redux store
-    dispatch(setAffaireDetails({ ...affaireDetails, [groupName]: value }));
-  };
+    // Determine if the value should be a boolean or remain as a string.
+    const shouldConvertToBoolean = booleanGroups.includes(groupName);
 
-  const handleBack = () => {
-    router.back();
-  };
+    console.log('shouldConvertToBoolean', shouldConvertToBoolean);
+    console.log('groupName', groupName);
+    const dispatchedValue = shouldConvertToBoolean ? value === 'oui' : value;
 
-  const handleChangeNumber = (event) => {
-    const value = event.target.value;
-    if (value >= 1 && value <= 8) {
-      setNumberValue(value);
+    // Special handling for 'typeSortie' as it requires additional logic.
+
+    console.log('groupName', groupName);
+    if (groupName === 'typeSortie' && selectedSortie) {
+      const newSortieDirection = getSortieDirection(
+        dispatchedValue,
+        selectedSortie,
+      );
+
+      console.log('newSortieDirection', newSortieDirection);
+      setSelectedSortie(newSortieDirection);
+      dispatch(
+        setAffaireDetails({
+          ...affaireDetails,
+          sortieDirection: newSortieDirection,
+        }),
+      );
+    } else {
+      // Dispatch the appropriate value to the store.
+      dispatch(
+        setAffaireDetails({ ...affaireDetails, [groupName]: dispatchedValue }),
+      );
     }
   };
 
-  useEffect(() => {
-    console.log('affaireDetails', affaireDetails);
-  }, [affaireDetails]);
-
-  useEffect(() => {
-    dispatch(clearAffaireDetails());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(clearAffaireDetails());
+  // }, [dispatch]);
 
   useEffect(() => {
     if (success) {
       handleSnackbarOpen('Affaire ajouté avec succès !', 'success');
-      router.push('/path-to-affaires-list'); // Update with the correct path
+      router.push('/production/affaires');
     } else if (error) {
       handleSnackbarOpen(
         "Échec de l'ajout d'une affaire. Veuillez réessayer.",
@@ -158,14 +218,14 @@ const CreateAffaire = () => {
               <Grid container spacing={3}>
                 <Grid item>
                   <FormControlLabel
-                    value="Standard"
+                    value="STANDARD"
                     control={<Radio />}
                     label="standard"
                   />
                 </Grid>
                 <Grid item>
                   <FormControlLabel
-                    value="Personalisé"
+                    value="PERSONNALISE"
                     control={<Radio />}
                     label="personalisé"
                   />
@@ -337,7 +397,7 @@ const CreateAffaire = () => {
                   justifyContent: 'center',
                 }}
               >
-                {radioValues.avecImpression === 'oui' && (
+                {radioValues.avecImpression && (
                   <RadioGroup
                     value={radioValues.impressionSide}
                     onChange={handleRadioChange('impressionSide')}
@@ -346,14 +406,14 @@ const CreateAffaire = () => {
                     <Grid container spacing={1}>
                       <Grid item>
                         <FormControlLabel
-                          value="recto"
+                          value="RECTO"
                           control={<Radio />}
                           label="Recto"
                         />
                       </Grid>
                       <Grid item>
                         <FormControlLabel
-                          value="verso"
+                          value="VERSO"
                           control={<Radio />}
                           label="Verso"
                         />
@@ -363,13 +423,14 @@ const CreateAffaire = () => {
                 )}
               </div>
 
-              {radioValues.avecImpression === 'oui' && (
+              {radioValues.avecImpression && (
                 <FormControl fullWidth margin="normal">
                   <TextField
                     label="Nbr couleur"
                     type="number"
+                    name="colorNumber"
                     onChange={handleChange}
-                    value={numberValue}
+                    value={affaireDetails.colorNumber}
                     inputProps={{ min: '1', max: '8', step: '1' }}
                     margin="normal"
                   />
@@ -380,7 +441,7 @@ const CreateAffaire = () => {
         </div>
 
         <Divider />
-        {affaireDetails.avecImpression === 'oui' && (
+        {affaireDetails.avecImpression && (
           <Grid>
             <Card
               style={{
@@ -395,9 +456,9 @@ const CreateAffaire = () => {
                 </Typography>
                 <RadioGroup
                   row
-                  value={radioValues.type}
-                  onChange={handleRadioChange('avecImpression')}
-                  s
+                  value={radioValues.typeSortie}
+                  onChange={handleRadioChange('typeSortie')}
+                  name="sortieType"
                 >
                   <FormControlLabel
                     value="Externe"
@@ -413,18 +474,32 @@ const CreateAffaire = () => {
 
                 <FormControl margin="normal" fullWidth>
                   {!selectedSortie && (
-                    <InputLabel shrink={false}>position</InputLabel>
+                    <InputLabel shrink={false}>Position</InputLabel>
                   )}
                   <Select
                     displayEmpty
                     name="supportPapier"
+                    value={
+                      selectedSortie
+                        ? selectedSortie
+                            .replace('EXT_', 'N_')
+                            .replace('INT_', 'N_')
+                        : ''
+                    }
                     onChange={handleChange}
-                    placeholder="selectionner position"
+                    placeholder="Sélectionner position"
                   >
-                    <MenuItem value={'N_1'}>N: 1</MenuItem>
-                    <MenuItem value={'N_2'}>N: 2</MenuItem>
-                    <MenuItem value={'N_3'}>N: 3</MenuItem>
-                    <MenuItem value={'N_4'}>N: 4</MenuItem>
+                    {radioValues.typeSortie === 'Externe'
+                      ? ['N_1', 'N_2', 'N_3', 'N_4'].map((value) => (
+                          <MenuItem key={value} value={value}>
+                            N: {value.split('_')[1]}
+                          </MenuItem>
+                        ))
+                      : ['N_5', 'N_6', 'N_7', 'N_8'].map((value) => (
+                          <MenuItem key={value} value={value}>
+                            N: {value.split('_')[1]}
+                          </MenuItem>
+                        ))}
                   </Select>
                 </FormControl>
 

@@ -61,7 +61,6 @@ const UpdateClient = () => {
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
-      setSubmitting(true);
 
       updateClientlientValidationSchema
         .validate(clientDetails, { abortEarly: false })
@@ -74,7 +73,6 @@ const UpdateClient = () => {
                   'success',
                 );
                 router.push('/ventes/clients');
-                setSubmitting(false);
               } else {
                 handleSnackbarOpen(
                   'Échec de la mise à jour du client. Veuillez réessayer !',
@@ -83,7 +81,6 @@ const UpdateClient = () => {
               }
             })
             .catch((error) => {
-              setSubmitting(false);
               handleSnackbarOpen(
                 'Échec de la mise à jour du client. Veuillez réessayer !',
                 'error',

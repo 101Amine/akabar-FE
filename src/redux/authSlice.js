@@ -3,52 +3,95 @@ import * as authAPI from '../utils/authAPI';
 
 export const initializeAuth = createAsyncThunk(
   'auth/initialize',
-  authAPI.validateToken,
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.validateToken();
+      if (response === 200) {
+        localStorage.setItem('isAuthenticated', 'true');
+        return true;
+      } else {
+        localStorage.removeItem('isAuthenticated');
+        return false;
+      }
+    } catch (error) {
+      localStorage.removeItem('isAuthenticated');
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const signIn = createAsyncThunk(
+  'auth/signIn',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.loginUser(credentials);
+      console.log('response', response);
+      if (response) {
+        localStorage.setItem('isAuthenticated', 'true');
+        return response.claims;
+      } else {
+        throw new Error('Sign in failed');
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
 );
 
 export const signOut = createAsyncThunk(
-  'auth/signOutAsync',
-  authAPI.logoutUser,
+  'auth/signOut',
+  async (_, { rejectWithValue }) => {
+    try {
+      console.log('hitting it');
+      const response = await authAPI.logoutUser();
+      console.log('response in logout', response);
+      if (response === 200) {
+        localStorage.removeItem('isAuthenticated');
+        return;
+      } else {
+        throw new Error('Sign out failed');
+      }
+    } catch (error) {
+      console.log('error message', error);
+      return rejectWithValue(error.message);
+    }
+  },
 );
-
-export const signIn = createAsyncThunk('auth/signIn', authAPI.loginUser);
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    name: null,
+    user: null,
+    name: '',
     status: 'idle',
     error: null,
     isAuthenticated: false,
   },
-  setAuthenticated: (state, action) => {
-    state.isAuthenticated = action.payload;
-    console.log('Setting isAuthenticated:', state.isAuthenticated);
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(initializeAuth.fulfilled, (state) => {
+      .addCase(initializeAuth.fulfilled, (state, action) => {
         state.isAuthenticated = true;
       })
-      .addCase(initializeAuth.rejected, (state) => {
+      .addCase(initializeAuth.rejected, (state, action) => {
         state.isAuthenticated = false;
-        state.error = 'validating Token failed';
+        state.error = action.payload;
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.isAuthenticated = true;
-        state.name = `${action.payload.claims.firstName} ${action.payload.claims.lastName}`;
+        console.log('action.payload', action);
+        state.name = `${action.payload.firstName} ${action.payload.lastName}`;
       })
-      .addCase(signIn.rejected, (state) => {
+      .addCase(signIn.rejected, (state, action) => {
         state.isAuthenticated = false;
-        state.error = 'signIn rejected, please try again..';
+        state.error = action.payload;
       })
-      .addCase(signOut.fulfilled, (state, action) => {
+      .addCase(signOut.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
       })
-      .addCase(signOut.rejected, (state) => {
-        state.isAuthenticated = true;
-        state.error = 'signOut rejected, please try again..';
+      .addCase(signOut.rejected, (state, action) => {
+        state.error = action.payload;
       });
   },
 });

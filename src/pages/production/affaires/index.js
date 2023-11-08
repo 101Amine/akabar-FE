@@ -1,85 +1,61 @@
+import { useCallback, useEffect, useState } from 'react';
+import Head from 'next/head';
+import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
   Box,
   Button,
   Container,
+  Divider,
   Stack,
+  SvgIcon,
   Typography,
-  Select,
-  MenuItem,
-  TextField,
-  Card,
-  CardContent,
 } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { ClientFilters } from '../../../sections/clients/client-search';
+import { setPage, setRowsPerPage } from '../../../redux/userSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-
-import {
-  fetchClients,
-  setPage,
-  setRowsPerPage,
-} from '../../../redux/clientSlice';
-import Fade from '@mui/material/Fade';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import EditIcon from '@mui/icons-material/Edit';
-import dayjs from 'dayjs';
-import { useClientFilters } from '../../../hooks/useClientFilters';
+import { UsersFilters } from '../../../sections/users/users-search';
 import BackButton from '../../../components/BackButton';
-import { setAffaireDetails } from '../../../redux/affaireSlice';
+import { fetchAffaires } from '../../../redux/affaireSlice';
+import { AffairesFilters } from '../../../sections/affaires/affaires-search';
+
+const affaireColumns = [
+  { key: 'name', label: 'Nom' },
+  { key: 'clientName', label: 'Client' },
+  { key: 'type', label: 'Type affaire' },
+  { key: 'productType', label: 'Type produit' },
+  { key: 'date', label: 'Date' },
+  { key: 'status', label: 'Status' },
+];
 
 const Page = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
 
-  const [affaireType, setAffaireType] = useState('');
-  const [affaireName, setAffaireName] = useState('');
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedClient, setSelectedClient] = useState(null);
-  const page = useSelector((state) => state.client.page);
-  const totalClients = useSelector((state) => state.client.totalClients);
-  const clients = useSelector((state) => state.client.clients);
-  const [selectDate, setSelectedDate] = useState(new Date());
-  const { affaireDetails, submitting, error, success } = useSelector(
-    (state) => state.affaire,
-  );
+  const page = useSelector((state) => state.affaire.page);
+  const rowsPerPage = useSelector((state) => state.affaire.rowsPerPage);
+  const affaires = useSelector((state) => state.affaire.affaires);
+  const totalAffaires = useSelector((state) => state.affaire.totalAffaires);
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+
+  const [filters, setFilters] = useState({
+    'client.nameClient': '',
+    name: '',
+  });
 
   useEffect(() => {
-    console.log('affaireDetails', affaireDetails);
-  }, [affaireDetails]);
+    console.log('filters', filters);
+  }, [filters]);
 
-  const { filters, setFilters, fetchFilteredClients } = useClientFilters();
-
-  const handleAffaireDetailsChange = useCallback(
-    (nameOrEvent, value) => {
-      let newName, newValue;
-
-      if (nameOrEvent && nameOrEvent.target) {
-        newName = nameOrEvent.target.name;
-        newValue = nameOrEvent.target.value;
-      } else {
-        newName = nameOrEvent;
-        newValue = value;
-      }
-
-      dispatch(setAffaireDetails({ ...affaireDetails, [newName]: newValue }));
-    },
-    [affaireDetails, dispatch],
-  );
+  useEffect(() => {
+    dispatch(fetchAffaires({}));
+  }, [dispatch]);
 
   const handlePageChange = useCallback(
     (event) => {
       dispatch(setPage(event));
-      dispatch(fetchClients({}));
+      dispatch(fetchAffaires({}));
     },
     [dispatch],
   );
@@ -87,227 +63,108 @@ const Page = () => {
   const handleRowsPerPageChange = useCallback(
     (value) => {
       dispatch(setRowsPerPage(value));
-      dispatch(fetchClients({}));
+      dispatch(fetchAffaires({}));
     },
     [dispatch],
   );
 
-  const router = useRouter();
-  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
-  const handleAffaireChange = (event) => {
-    setAffaireType(event.target.value);
-    handleAffaireDetailsChange('productType', event.target.value);
-  };
+  const fetchFilteredAffaires = useCallback(() => {
+    const searchCriteriaList = Object.entries(filters)
+      .map(([key, value]) => {
+        return {
+          filterKey: key,
+          operation: 'cn',
+          value: value,
+          dataOption: 'all',
+        };
+      })
+      .filter(Boolean);
+
+    console.log('searchCriteriaList', searchCriteriaList);
+
+    const searchFilter = {
+      searchCriteriaList: searchCriteriaList,
+      dataOption: 'all',
+    };
+
+    dispatch(fetchAffaires(searchFilter));
+  }, [dispatch, filters]);
 
   const proceedToForm = () => {
-    router.push('/production/affaires/createAffaire');
-  };
-
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-    dispatch(fetchClients({}));
-    setFilters({
-      nameClient: '',
-      codeClient: '',
-      ICE: '',
-    });
-  };
-
-  const handleBack = () => {
-    router.back();
+    router
+      .push('/production/affaires/selectAffaire')
+      .then((r) => console.log(r));
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Container
-        maxWidth={isIconOnly ? 'false' : 'xl'}
-        style={{
-          marginLeft: isIconOnly ? '-100px' : '50px',
-          marginTop: '50px',
+    <>
+      <Head>
+        <title>Affaires | Akabar</title>
+      </Head>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          py: 8,
         }}
       >
-        <Box mb={10}>
-          <BackButton />
-        </Box>
-        <Stack>
-          <Card>
-            <CardContent>
-              <Typography variant="h4" gutterBottom marginBottom={'50px'}>
-                Sélectionner une affaire
-              </Typography>
-
-              <Box
-                width="50%"
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '30px',
-                }}
-              >
-                <Button
-                  onClick={() => handleOpenDialog()}
-                  color="primary"
-                  sx={{
-                    width: '50%',
-                    backgroundColor: 'primary.main',
-                    color: '#fff',
-                    '&:hover': { backgroundColor: 'primary.dark' },
-                  }}
-                >
-                  {selectedClient ? (
-                    <EditIcon sx={{ marginRight: '8px' }} />
-                  ) : null}
-                  {selectedClient
-                    ? 'Changer le client'
-                    : 'Sélectionner un client'}
-                </Button>
-
-                <Dialog
-                  open={openDialog}
-                  onClose={() => setOpenDialog(false)}
-                  fullWidth
-                  maxWidth="md"
-                  TransitionComponent={Fade}
-                  TransitionProps={{ timeout: 100 }}
-                >
-                  <DialogTitle
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      paddingRight: (theme) => theme.spacing(2),
-                    }}
-                  >
-                    Sélectionner un client
-                    <IconButton
-                      edge="end"
-                      color="inherit"
-                      onClick={() => setOpenDialog(false)}
-                      aria-label="close"
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  </DialogTitle>
-                  <DialogContent sx={{ padding: (theme) => theme.spacing(3) }}>
-                    <ClientFilters
-                      filters={filters}
-                      onFilterChange={(filterKey, value) => {
-                        setFilters((prevFilters) => ({
-                          ...prevFilters,
-                          [filterKey]: value,
-                        }));
-                      }}
-                      onFilterSubmit={fetchFilteredClients}
-                    />
-                    <DataTable
-                      count={totalClients}
-                      items={clients}
-                      columns={[
-                        { key: 'nameClient', label: 'Nom' },
-                        { key: 'codeClient', label: 'Code' },
-                      ]}
-                      entity="client"
-                      onPageChange={handlePageChange}
-                      onRowsPerPageChange={handleRowsPerPageChange}
-                      page={page}
-                      isDialog={true}
-                      showPagination={false}
-                      rowsPerPage={8}
-                      onRowClick={(client) => {
-                        setSelectedClient(client);
-                        setOpenDialog(false);
-                        handleAffaireDetailsChange(
-                          'clientName',
-                          client.nameClient,
-                        );
-                      }}
-                    />
-                  </DialogContent>
-                </Dialog>
-
-                {affaireDetails.clientName !== '' && (
-                  <TextField
-                    fullWidth
-                    label="Client sélectionné"
-                    value={selectedClient ? selectedClient.nameClient : ''}
-                    disabled
-                  />
-                )}
-
-                <DatePicker
-                  defaultValue={dayjs()}
-                  label="Select Date"
-                  format="DD/MM/YYYY"
-                  renderInput={(params) => <TextField {...params} />}
-                  onChange={(newValue) => {
-                    const currentTime = dayjs();
-                    const hours = currentTime.hour();
-                    const minutes = currentTime.minute();
-                    const seconds = currentTime.second();
-                    const finalDateTime = newValue
-                      .hour(hours)
-                      .minute(minutes)
-                      .second(seconds);
-                    setSelectedDate(finalDateTime);
-                    handleAffaireDetailsChange('date', finalDateTime);
-                  }}
-                />
-
-                <TextField
-                  fullWidth
-                  label="Nom"
-                  value={affaireName}
-                  onChange={(e) => {
-                    setAffaireName(e.target.value);
-                    handleAffaireDetailsChange('nom', e.target.value);
-                  }}
-                />
-
-                <Select
-                  value={affaireType}
-                  onChange={handleAffaireChange}
-                  displayEmpty
-                  fullWidth
-                  renderValue={(selectedValue) => (
-                    <Typography
-                      variant="body2"
-                      sx={
-                        !selectedValue
-                          ? {
-                              opacity: 0.6,
-                              fontSize: 14,
-                              fontWeight: 600,
-                            }
-                          : {
-                              opacity: 0.9,
-                              fontWeight: 600,
-                            }
-                      }
-                    >
-                      {selectedValue || "Choisir un type d'affaire"}
-                    </Typography>
-                  )}
-                >
-                  <MenuItem value={'Etiquette'}>Etiquette</MenuItem>
-                  <MenuItem value={'item2'}>Menu item 2</MenuItem>
-                  <MenuItem value={'item3'}>Menu item 3</MenuItem>
-                  <MenuItem value={'item4'}>Menu item 4</MenuItem>
-                  <MenuItem value={'item5'}>Menu item 5</MenuItem>
-                </Select>
-
+        <Container
+          maxWidth={isIconOnly ? 'false' : 'xl'}
+          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+        >
+          <Stack spacing={3}>
+            <Stack spacing={3}>
+              <BackButton />
+            </Stack>
+            <Stack direction="row" justifyContent="space-between" spacing={4}>
+              <Stack spacing={1}>
+                <Typography variant="h4" marginTop={'70px'}>
+                  Liste des affaires
+                </Typography>
+                <Stack alignItems="center" direction="row" spacing={1}></Stack>
+              </Stack>
+              <Divider />
+              <div>
                 <Button
                   onClick={proceedToForm}
+                  startIcon={
+                    <SvgIcon fontSize="small">
+                      <PlusIcon />
+                    </SvgIcon>
+                  }
                   variant="contained"
-                  style={{ maxWidth: '100px' }}
                 >
-                  Suivant
+                  Nouveau affaire
                 </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Stack>
-      </Container>
-    </LocalizationProvider>
+              </div>
+            </Stack>
+            <AffairesFilters
+              filters={filters}
+              onFilterChange={(filterKey, value) => {
+                setFilters((prevFilters) => ({
+                  ...prevFilters,
+                  [filterKey]: value,
+                }));
+              }}
+              onFilterSubmit={() => {
+                fetchFilteredAffaires();
+              }}
+            />{' '}
+            <DataTable
+              count={totalAffaires}
+              items={affaires}
+              isAffaire={true}
+              columns={affaireColumns}
+              entity="user"
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
+            />
+          </Stack>
+        </Container>
+      </Box>
+    </>
   );
 };
 

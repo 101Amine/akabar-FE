@@ -3,8 +3,6 @@ import { useTheme } from '@mui/material/styles';
 export const Logo = ({ fillColor }) => {
   const theme = useTheme();
   const fillColorFomProps = fillColor ? fillColor : 'white';
-
-  console.log('black');
   return (
     <svg
       version="1.0"
