@@ -42,11 +42,14 @@ import SortieSelectionCard from './senseSortieCheckBoxes';
 import { creeateAffaireValidationSchema } from '../../../utils/validationService';
 import { fetchWithHeaders } from '../../../utils/api';
 import AudioRecorder from '../../../components/AudioRecorder';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Loader from '../../../components/Loader';
 
 const CreateAffaire = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { affaireDetails, submitting, error, success } = useSelector(
+  const { affaireDetails, submitting, error, success, loading } = useSelector(
     (state) => state.affaire,
   );
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
@@ -227,10 +230,14 @@ const CreateAffaire = () => {
   return (
     <Container
       maxWidth={isIconOnly ? 'false' : 'xl'}
-      style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
+      style={{
+        marginLeft: isIconOnly ? '-100px' : '50px',
+        marginTop: '50px',
+        filter: loading ? 'blur(5px)' : '',
+      }}
     >
       <BackButton />
-
+      {loading && <Loader />}
       <Card
         style={{
           marginTop: '0em',
@@ -274,7 +281,6 @@ const CreateAffaire = () => {
           )}
         </CardContent>
       </Card>
-
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom marginTop="50px">
           Nouvelle affaire{' '}
@@ -996,6 +1002,21 @@ const CreateAffaire = () => {
         >
           Enregistrer
         </Button>
+
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            severity={snackbarSeverity}
+            onClose={() => setSnackbarOpen(false)}
+          >
+            {snackbarMessage}
+          </MuiAlert>
+        </Snackbar>
       </Box>
     </Container>
   );

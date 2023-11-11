@@ -93,28 +93,34 @@ const affaireSlice = createSlice({
     builder
       .addCase(addAffaire.pending, (state) => {
         state.submitting = true;
+        state.loading = true;
         state.error = null;
       })
       .addCase(addAffaire.fulfilled, (state) => {
         state.submitting = false;
+        state.loading = false;
         state.success = true;
       })
       .addCase(addAffaire.rejected, (state, action) => {
         state.submitting = false;
+        state.loading = false;
         state.error = action.error.message;
       })
       .addCase(fetchAffaires.pending, (state) => {
         state.submitting = true;
+        state.loading = true;
         state.error = null;
       })
       .addCase(fetchAffaires.fulfilled, (state, action) => {
         state.submitting = false;
+        state.loading = false;
         state.affaires = action.payload.currentPageData || [];
         state.totalAffaires = action.payload.currentPageData.totalElements;
         // state.totalPages = Math.ceil(action.payload.length / state.rowsPerPage);
       })
       .addCase(fetchAffaires.rejected, (state, action) => {
         state.submitting = false;
+        state.loading = false;
         state.error = action.error.message;
       });
   },

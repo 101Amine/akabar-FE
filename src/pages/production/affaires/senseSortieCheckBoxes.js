@@ -66,7 +66,7 @@ function SortieSelectionCard({
         </FormControl>
         {sortieType && (
           <FormGroup row>
-            {positions.map((position) => {
+            {positions?.map((position) => {
               return (
                 <FormControlLabel
                   key={position}
@@ -81,12 +81,6 @@ function SortieSelectionCard({
                 />
               );
             })}
-
-            {formErrors.sortieDirection && (
-              <FormHelperText error>
-                {formErrors.sortieDirection}
-              </FormHelperText>
-            )}
           </FormGroup>
         )}
       </CardContent>
