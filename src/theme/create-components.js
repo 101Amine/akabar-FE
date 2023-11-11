@@ -187,10 +187,6 @@ export function createComponents(config) {
             borderColor: palette.primary.main,
             boxShadow: `${palette.primary.main} 0 0 0 2px`,
           },
-          [`&.${filledInputClasses.error}`]: {
-            borderColor: palette.error.main,
-            boxShadow: `${palette.error.main} 0 0 0 2px`,
-          },
         },
         input: {
           fontSize: 14,
@@ -213,12 +209,6 @@ export function createComponents(config) {
             backgroundColor: palette.action.hover,
             [`& .${outlinedInputClasses.notchedOutline}`]: {
               borderColor: palette.neutral[200],
-            },
-          },
-          [`&.${filledInputClasses.error}`]: {
-            [`& .${outlinedInputClasses.notchedOutline}`]: {
-              borderColor: palette.error.main,
-              boxShadow: `${palette.error.main} 0 0 0 2px`,
             },
           },
         },

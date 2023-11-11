@@ -7,9 +7,6 @@ import {
   FormControlLabel,
   Radio,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Checkbox,
   FormGroup,
   CardContent,
@@ -32,7 +29,7 @@ const iconPaths = {
 };
 
 function SortieSelectionCard({
-  sortieType,
+  sortieType = 'Externe',
   onSortieTypeChange,
   selectedPositions,
   onPositionChange,
@@ -45,27 +42,27 @@ function SortieSelectionCard({
         <Typography variant="h6" gutterBottom>
           Sens de sortie :
         </Typography>
-        <FormControl error={Boolean(formErrors.sortieType)}>
+        <FormControl>
           <RadioGroup
             row
             value={sortieType}
             onChange={onSortieTypeChange}
             name="sortieType"
+            checked={sortieType === 'Interne'}
           >
             <FormControlLabel
               value="Externe"
               control={<Radio />}
               label="Externe"
+              checked={sortieType === 'Externe'}
             />
+
             <FormControlLabel
               value="Interne"
               control={<Radio />}
               label="Interne"
             />
           </RadioGroup>
-          <FormHelperText sx={{ marginBottom: '30px' }}>
-            {formErrors.sortieType}
-          </FormHelperText>
         </FormControl>
         {sortieType && (
           <FormGroup row>
@@ -85,9 +82,9 @@ function SortieSelectionCard({
               );
             })}
 
-            {formErrors.selectedPositions && (
+            {formErrors.sortieDirection && (
               <FormHelperText error>
-                {formErrors.selectedPositions}
+                {formErrors.sortieDirection}
               </FormHelperText>
             )}
           </FormGroup>

@@ -71,6 +71,7 @@ const CreateAffaire = () => {
   const [radioValues, setRadioValues] = useState({
     type: '',
     avecImpression: '',
+    poseEtiquette: '',
     typeSortie: '',
     repiquage: '',
     vernis: '',
@@ -79,11 +80,6 @@ const CreateAffaire = () => {
     existanceDeRayonDeCoin: '',
   });
   const [formErrors, setFormErrors] = useState({});
-
-  useEffect(() => {
-    console.log('affaireDetails', affaireDetails);
-    console.log('formErrors', formErrors);
-  }, [affaireDetails, formErrors]);
 
   const getSortieDirection = (direction, position) => {
     const positionNumber = parseInt(position.replace('N_', ''), 10);
@@ -97,7 +93,10 @@ const CreateAffaire = () => {
     (event) => {
       const { name, value, checked, type } = event.target;
 
+      console.log('name', name);
+      console.log('value', value);
       if (type === 'checkbox') {
+        // Condition to check if the checkbox is checked
         if (checked) {
           const newSortieDirection = getSortieDirection(
             radioValues.typeSortie,
@@ -112,14 +111,14 @@ const CreateAffaire = () => {
               sortieDirection: newSortieDirection,
             }),
           );
-        } else {
         }
-      } else if (name === 'supportPapier') {
+      } else if (name === 'typeSortie') {
         const newSortieDirection = getSortieDirection(
           radioValues.typeSortie,
           value,
         );
 
+        console.log('typeSortie : ', newSortieDirection);
         setSelectedSortie(newSortieDirection);
         dispatch(
           setAffaireDetails({
@@ -199,19 +198,15 @@ const CreateAffaire = () => {
         .then(() => {
           // If validation is successful
           dispatch(addAffaire(affaireDetails));
-
-          if (success) {
-            dispatch(clearAffaireDetails());
-            handleSnackbarOpen('Affaire ajouté avec succès !', 'success');
-            router.push('/production/affaires');
-          } else if (error) {
-            handleSnackbarOpen(
-              "Échec de l'ajout d'une affaire. Veuillez réessayer.",
-              'error',
-            );
-          }
+          dispatch(clearAffaireDetails());
+          handleSnackbarOpen('Affaire ajouté avec succès !', 'success');
+          router.push('/production/affaires');
         })
         .catch((err) => {
+          handleSnackbarOpen(
+            "Échec de l'ajout d'une affaire. Veuillez réessayer.",
+            'error',
+          );
           let errors = {};
           err.inner.forEach((error) => {
             console.log('error', error);
@@ -270,16 +265,9 @@ const CreateAffaire = () => {
                   value={
                     affaireDetails.date ? dayjs(affaireDetails.date) : dayjs()
                   }
-                  label="Select Date"
+                  label="Selected Date"
                   format="DD/MM/YYYY"
                   renderInput={(params) => <TextField {...params} disabled />}
-                  onChange={(newValue) => {
-                    const formattedDateTime = newValue.format(
-                      'YYYY-MM-DDTHH:mm:ss',
-                    );
-                    setSelectedDate(newValue);
-                    handleAffaireDetailsChange('date', formattedDateTime);
-                  }}
                 />
               </div>
             </>
@@ -371,6 +359,7 @@ const CreateAffaire = () => {
                   name="laize"
                   label="LAIZE (EN MM)"
                   margin="normal"
+                  onChange={handleChange}
                   error={Boolean(formErrors.laize)}
                   helperText={formErrors.laize}
                 />
@@ -414,81 +403,74 @@ const CreateAffaire = () => {
                     <MenuItem value="AUTRE">Autre</MenuItem>
                   </Select>
                   <FormHelperText
-                    style={{ minHeight: formErrors.format ? '4em' : undefined }}
+                  // style={{ minHeight: formErrors.format ? '4em' : undefined }}
                   >
                     {formErrors.format}
                   </FormHelperText>
                 </FormControl>
               </div>
 
-              <FormControl
-                style={{ flex: 0.35, width: '100%' }}
-                margin="normal"
-                name="supportPapier"
-                onChange={handleChange}
-                error={Boolean(formErrors.support)}
-                helperText={formErrors.support}
-              >
-                <Typography
-                  variant="subtitle2"
-                  marginBottom="0.5em"
-                  marginLeft="0.5em"
-                  opacity="0.6"
+              <div style={{ display: 'flex', gap: '20px' }}>
+                <FormControl
+                  style={{ width: '50%' }}
+                  margin="normal"
+                  error={Boolean(formErrors.support)}
+                  helperText={formErrors.support}
                 >
-                  Support (PAPIER)
-                </Typography>
+                  <InputLabel>Support (PAPIER)</InputLabel>
 
-                <Select
-                  displayEmpty
-                  name="supportPapier"
+                  <Select
+                    displayEmpty
+                    label={'Support (PAPIER)'}
+                    name="supportPapier"
+                    value={affaireDetails.supportPapier}
+                    onChange={handleChange}
+                  >
+                    <MenuItem value="PAPIER_ADHESIF_THERMIQUE_ECO">
+                      papier adhesif thermique eco
+                    </MenuItem>
+                    <MenuItem value="PAPIER_ADHESIF_THERMIQUE_1_ER_CHOIX">
+                      papier adhesif thermique 1 er choix
+                    </MenuItem>
+                    <MenuItem value="PAPIER_ADHESIF_THERMIQUE_AVEC_COLLE_TRES_FORTE">
+                      papier adhesif thermique avec colle tres forte
+                    </MenuItem>
+                    <MenuItem value="PAPIER_ADHESIF_COUCHÉ_AVEC_COLLE_SIMPLE">
+                      papier adhesif couche avec colle simple{' '}
+                    </MenuItem>
+                    <MenuItem value="PAPIER_ADHESIF_COUCHÉ_AVEC_COLLE_TRES_FORTE">
+                      papier adhesif couche avec colle tres forte{' '}
+                    </MenuItem>
+                    <MenuItem value="FILMS_PP_TRANSPARENT">
+                      films pp transparent{' '}
+                    </MenuItem>
+                    <MenuItem value="FILMS_PP_BLANC_PVC">
+                      {' '}
+                      pilms pp blanc (pvc){' '}
+                    </MenuItem>
+                    <MenuItem value="PAPIER_THERMIQUE_COMPOSTABLE_BIODEGRADABLE">
+                      papier thermique compostable biodegradable
+                    </MenuItem>
+                    <MenuItem value="PAPIER_FRUI_TAG_THERMIQUE">
+                      papier frui tag thermique
+                    </MenuItem>
+                    <MenuItem value="AUTRE">autre</MenuItem>
+                  </Select>
+
+                  <FormHelperText>{formErrors.support}</FormHelperText>
+                </FormControl>
+
+                <TextField
+                  name="quantiteUnitaire"
+                  label="Quantité Unitaire"
+                  type="number"
+                  margin="normal"
+                  style={{ width: '50%' }}
                   onChange={handleChange}
-                  placeholder="Support (PAPIER)"
-                >
-                  <MenuItem value="PAPIER_ADHESIF_THERMIQUE_ECO">
-                    papier adhesif thermique eco
-                  </MenuItem>
-                  <MenuItem value="PAPIER_ADHESIF_THERMIQUE_1_ER_CHOIX">
-                    papier adhesif thermique 1 er choix
-                  </MenuItem>
-                  <MenuItem value="PAPIER_ADHESIF_THERMIQUE_AVEC_COLLE_TRES_FORTE">
-                    papier adhesif thermique avec colle tres forte
-                  </MenuItem>
-                  <MenuItem value="PAPIER_ADHESIF_COUCHÉ_AVEC_COLLE_SIMPLE">
-                    papier adhesif couche avec colle simple{' '}
-                  </MenuItem>
-                  <MenuItem value="PAPIER_ADHESIF_COUCHÉ_AVEC_COLLE_TRES_FORTE">
-                    papier adhesif couche avec colle tres forte{' '}
-                  </MenuItem>
-                  <MenuItem value="FILMS_PP_TRANSPARENT">
-                    films pp transparent{' '}
-                  </MenuItem>
-                  <MenuItem value="FILMS_PP_BLANC_PVC">
-                    {' '}
-                    pilms pp blanc (pvc){' '}
-                  </MenuItem>
-                  <MenuItem value="PAPIER_THERMIQUE_COMPOSTABLE_BIODEGRADABLE">
-                    papier thermique compostable biodegradable
-                  </MenuItem>
-                  <MenuItem value="PAPIER_FRUI_TAG_THERMIQUE">
-                    papier frui tag thermique
-                  </MenuItem>
-                  <MenuItem value="AUTRE">autre</MenuItem>
-                </Select>
-
-                <FormHelperText>{formErrors.support}</FormHelperText>
-              </FormControl>
-
-              <TextField
-                name="quantiteUnitaire"
-                label="Quantité Unitaire"
-                type="number"
-                margin="normal"
-                width="100%"
-                onChange={handleChange}
-                error={Boolean(formErrors.quantite)}
-                helperText={formErrors.quantite}
-                $
-              />
+                  error={Boolean(formErrors.quantiteUnitaire)}
+                  helperText={formErrors.quantiteUnitaire}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -546,7 +528,7 @@ const CreateAffaire = () => {
                 {radioValues.avecImpression === 'oui' && (
                   <FormControl
                     component="fieldset"
-                    error={Boolean(formErrors.RectoVerso)}
+                    error={Boolean(formErrors.impressionSide)}
                   >
                     <RadioGroup
                       value={radioValues.impressionSide}
@@ -582,7 +564,7 @@ const CreateAffaire = () => {
                     <FormHelperText
                       sx={{ display: 'flex', justifyContent: 'center' }}
                     >
-                      {formErrors.RectoVerso}
+                      {formErrors.impressionSide}
                     </FormHelperText>
                   </FormControl>
                 )}
@@ -597,8 +579,8 @@ const CreateAffaire = () => {
                     value={affaireDetails.colorNumber}
                     inputProps={{ min: '1', max: '8', step: '1' }}
                     margin="normal"
-                    error={Boolean(formErrors.NbColor)}
-                    helperText={formErrors.NbColor}
+                    error={Boolean(formErrors.colorNumber)}
+                    helperText={formErrors.colorNumber}
                   />
                 </FormControl>
               )}
@@ -704,16 +686,16 @@ const CreateAffaire = () => {
                     fontWeight: 600,
                     fontSize: 18,
                     marginBottom: 10,
-                    marginTop: 10,
+                    marginTop: 30,
                   }}
                 >
                   Poses d'etiquette :
                 </Typography>
-                <FormControl error={Boolean(formErrors.sortieDirection)}>
+                <FormControl error={Boolean(formErrors.poseEtiquette)}>
                   <RadioGroup
                     row
-                    value={radioValues.sortieDirection}
-                    onChange={handleRadioChange('sortieDirection')}
+                    value={radioValues.poseEtiquette}
+                    onChange={handleRadioChange('poseEtiquette')}
                   >
                     <FormControlLabel
                       value="AUTO"
@@ -726,7 +708,7 @@ const CreateAffaire = () => {
                       label="Manuelle"
                     />
                   </RadioGroup>
-                  <FormHelperText>{formErrors.sortieDirection}</FormHelperText>
+                  <FormHelperText>{formErrors.poseEtiquette}</FormHelperText>
                 </FormControl>
                 <div style={{ display: 'flex', gap: 100, marginTop: 20 }}>
                   <div>
@@ -752,6 +734,7 @@ const CreateAffaire = () => {
                               value="oui"
                               control={<Radio />}
                               label="Oui"
+                              checked={affaireDetails.repiquage === true}
                             />
                           </Grid>
                           <Grid item>
@@ -759,6 +742,7 @@ const CreateAffaire = () => {
                               value="non"
                               control={<Radio />}
                               label="Non"
+                              checked={affaireDetails.repiquage === false}
                             />
                           </Grid>
                         </Grid>
@@ -789,6 +773,7 @@ const CreateAffaire = () => {
                               value="oui"
                               control={<Radio />}
                               label="Oui"
+                              checked={affaireDetails.vernis === true}
                             />
                           </Grid>
                           <Grid item>
@@ -796,6 +781,7 @@ const CreateAffaire = () => {
                               value="non"
                               control={<Radio />}
                               label="Non"
+                              checked={affaireDetails.vernis === false}
                             />
                           </Grid>
                         </Grid>
@@ -826,6 +812,7 @@ const CreateAffaire = () => {
                               value="oui"
                               control={<Radio />}
                               label="Oui"
+                              checked={affaireDetails.dorure === true}
                             />
                           </Grid>
                           <Grid item>
@@ -833,6 +820,7 @@ const CreateAffaire = () => {
                               value="non"
                               control={<Radio />}
                               label="Non"
+                              checked={affaireDetails.dorure === false}
                             />
                           </Grid>
                         </Grid>
@@ -863,6 +851,7 @@ const CreateAffaire = () => {
                               value="oui"
                               control={<Radio />}
                               label="Oui"
+                              checked={affaireDetails.plasification === true}
                             />
                           </Grid>
                           <Grid item>
@@ -870,6 +859,7 @@ const CreateAffaire = () => {
                               value="non"
                               control={<Radio />}
                               label="Non"
+                              checked={affaireDetails.plasification === false}
                             />
                           </Grid>
                         </Grid>
@@ -881,88 +871,104 @@ const CreateAffaire = () => {
                   </div>
 
                   <div>
-                    <Typography
-                      ariant="h3"
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 18,
-                        marginBottom: 10,
-                      }}
-                    >
-                      Existance de rayon de coin
-                    </Typography>
-                    <FormControl error={Boolean(formErrors.ExistanceRayon)}>
-                      <RadioGroup
-                        row
-                        value={affaireDetails.existanceDeRayonDeCoin}
-                        onChange={handleRadioChange('existanceDeRayonDeCoin')}
-                      >
-                        <Grid container spacing={1}>
-                          <Grid item>
-                            <FormControlLabel
-                              value="oui"
-                              control={<Radio />}
-                              label="Oui"
-                              disabled={
-                                affaireDetails.format === 'OVALE' ||
-                                affaireDetails.format === 'RONDE'
-                              }
-                            />
-                          </Grid>
-                          <Grid item>
-                            <FormControlLabel
-                              value="non"
-                              control={<Radio />}
-                              label="Non"
-                            />
-                          </Grid>
-                        </Grid>
-                      </RadioGroup>
-                      <FormHelperText>
-                        {formErrors.ExistanceRayon}
-                      </FormHelperText>
-                    </FormControl>
+                    {affaireDetails.format !== 'OVALE' &&
+                      affaireDetails.format !== 'RONDE' && (
+                        <>
+                          <Typography
+                            variant="h3"
+                            style={{
+                              fontWeight: 600,
+                              fontSize: 18,
+                              marginBottom: 10,
+                            }}
+                          >
+                            Existance de rayon de coin
+                          </Typography>
+
+                          <FormControl
+                            error={Boolean(formErrors.ExistanceRayon)}
+                          >
+                            <RadioGroup
+                              row
+                              value={affaireDetails.existanceDeRayonDeCoin}
+                              onChange={handleRadioChange(
+                                'existanceDeRayonDeCoin',
+                              )}
+                            >
+                              <Grid container spacing={1}>
+                                <Grid item>
+                                  <FormControlLabel
+                                    value="oui"
+                                    control={<Radio />}
+                                    label="Oui"
+                                    checked={
+                                      affaireDetails.existanceDeRayonDeCoin ===
+                                      true
+                                    }
+                                  />
+                                </Grid>
+                                <Grid item>
+                                  <FormControlLabel
+                                    value="non"
+                                    control={<Radio />}
+                                    label="Non"
+                                    checked={
+                                      affaireDetails.existanceDeRayonDeCoin ===
+                                      false
+                                    }
+                                  />
+                                </Grid>
+                              </Grid>
+                            </RadioGroup>
+                            <FormHelperText>
+                              {formErrors.ExistanceRayon}
+                            </FormHelperText>
+                          </FormControl>
+                        </>
+                      )}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 20, marginTop: 20 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    width: '100%',
+                    gap: 20,
+                    marginTop: 20,
+                  }}
+                >
                   <TextField
                     label="Nbr Etq / bobine"
                     name="nbrEtqParBobine"
                     type="number"
                     margin="normal"
+                    sx={{ width: '45%' }}
                     onChange={handleChange}
-                    error={Boolean(formErrors.NbBobine)}
-                    helperText={formErrors.NbBobine}
+                    error={Boolean(formErrors.nbrEtqParBobine)}
+                    helperText={formErrors.nbrEtqParBobine}
                   />
                   <TextField
                     label="Nbr Etq/ de front"
                     name="nbrEtqDeFront"
                     type="number"
                     margin="normal"
+                    sx={{ width: '45%' }}
                     onChange={handleChange}
-                    error={Boolean(formErrors.NbEtqFront)}
-                    helperText={formErrors.NbEtqFront}
+                    error={Boolean(formErrors.nbrEtqDeFront)}
+                    helperText={formErrors.nbrEtqDeFront}
                   />
-                </div>
 
-                <div>
                   <FormControl
                     margin="normal"
                     fullWidth
                     error={Boolean(formErrors.mandrin)}
                   >
-                    <Typography
-                      variant="subtitle2"
-                      marginBottom="0.5em"
-                      marginLeft="0.5em"
-                      opacity="0.6"
-                    >
-                      Mandarin
-                    </Typography>
+                    <InputLabel>Mandrin</InputLabel>
 
                     <Select
                       displayEmpty
+                      style={{ width: '100%' }}
+                      label={'Mandrin'}
                       value={affaireDetails.mandrin}
                       name="mandrin"
                       onChange={handleChange}
