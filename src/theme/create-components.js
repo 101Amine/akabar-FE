@@ -5,6 +5,7 @@ import {
   outlinedInputClasses,
   paperClasses,
   tableCellClasses,
+  TextField,
 } from '@mui/material';
 
 const muiTheme = createTheme({
@@ -212,13 +213,6 @@ export function createComponents(config) {
             backgroundColor: palette.action.hover,
             [`& .${outlinedInputClasses.notchedOutline}`]: {
               borderColor: palette.neutral[200],
-            },
-          },
-          [`&.${outlinedInputClasses.focused}`]: {
-            backgroundColor: 'transparent',
-            [`& .${outlinedInputClasses.notchedOutline}`]: {
-              borderColor: palette.primary.main,
-              boxShadow: `${palette.primary.main} 0 0 0 2px`,
             },
           },
           [`&.${filledInputClasses.error}`]: {

@@ -118,9 +118,7 @@ const Page = () => {
     async (event) => {
       event.preventDefault();
 
-      console.log('selectedClient', selectedClient);
-
-      if (selectedClient === null) {
+      if (affaireDetails.clientName === '' || !selectedClient) {
         handleSnackbarOpen(
           'Un client doit être sélectionné pour continuer.',
           'error',
@@ -179,9 +177,7 @@ const Page = () => {
     handleAffaireDetailsChange('clientName', client.nameClient);
   };
 
-  useEffect(() => {
-    console.log('affaireDetails.clientName', affaireDetails.clientName);
-  }, [affaireDetails]);
+  console.log('affaireDetails', affaireDetails);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -220,10 +216,10 @@ const Page = () => {
                     '&:hover': { backgroundColor: 'primary.dark' },
                   }}
                 >
-                  {selectedClient ? (
+                  {affaireDetails.clientName ? (
                     <EditIcon sx={{ marginRight: '8px' }} />
                   ) : null}
-                  {selectedClient
+                  {affaireDetails.clientName
                     ? 'Changer le client'
                     : 'Sélectionner un client'}
                 </Button>
@@ -291,6 +287,8 @@ const Page = () => {
                     value={
                       affaireDetails.clientName ? affaireDetails.clientName : ''
                     }
+                    error={Boolean(formErrors.clientName)}
+                    helperText={formErrors.clientName}
                     disabled
                   />
                 )}
@@ -309,18 +307,6 @@ const Page = () => {
 
                     setSelectedDate(newValue);
                     handleAffaireDetailsChange('date', formattedDateTime);
-                  }}
-                />
-
-                <TextField
-                  fullWidth
-                  label="Nom"
-                  value={affaireDetails.name}
-                  error={Boolean(formErrors.name)}
-                  helperText={formErrors.name}
-                  onChange={(e) => {
-                    setAffaireName(e.target.value);
-                    handleAffaireDetailsChange('name', e.target.value);
                   }}
                 />
 

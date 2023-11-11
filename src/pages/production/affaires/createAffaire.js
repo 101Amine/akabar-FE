@@ -9,27 +9,39 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
-  InputLabel,
   Grid,
   Box,
   Divider,
   CardContent,
   Card,
+  List,
+  ListItem,
+  ListItemText,
+  CardHeader,
+  Icon,
+  FormHelperText,
+  InputLabel,
+  ListItemIcon,
 } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import BackButton from '../../../components/BackButton';
-import { createAffaireValidationSchema } from '../../../utils/validationService';
 import {
   addAffaire,
   clearAffaireDetails,
   setAffaireDetails,
 } from '../../../redux/affaireSlice';
+import SortieSelectionCard from './senseSortieCheckBoxes';
+import { creeateAffaireValidationSchema } from '../../../utils/validationService';
+import { fetchWithHeaders } from '../../../utils/api';
+import AudioRecorder from '../../../components/AudioRecorder';
 
 const CreateAffaire = () => {
   const dispatch = useDispatch();
@@ -40,7 +52,7 @@ const CreateAffaire = () => {
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
   const booleanGroups = [
     'avecImpression',
-    'typeSortie',
+    // 'typeSortie',
     'repiquage',
     'vernis',
     'dorure',
@@ -70,14 +82,12 @@ const CreateAffaire = () => {
 
   useEffect(() => {
     console.log('affaireDetails', affaireDetails);
-  }, [affaireDetails]);
+    console.log('formErrors', formErrors);
+  }, [affaireDetails, formErrors]);
 
   const getSortieDirection = (direction, position) => {
-    console.log('position', position);
     const positionNumber = parseInt(position.replace('N_', ''), 10);
 
-    console.log('EXT_${positionNumber}', `EXT_${positionNumber}`);
-    console.log('INT_${positionNumber}', `INT_${positionNumber}`);
     return direction === 'Externe'
       ? `EXT_${positionNumber}`
       : `INT_${positionNumber}`;
@@ -85,18 +95,31 @@ const CreateAffaire = () => {
 
   const handleChange = useCallback(
     (event) => {
-      const { name, value } = event.target;
+      const { name, value, checked, type } = event.target;
 
-      console.log('name', name);
-      console.log('value', value);
+      if (type === 'checkbox') {
+        if (checked) {
+          const newSortieDirection = getSortieDirection(
+            radioValues.typeSortie,
+            name,
+          );
 
-      if (name === 'supportPapier') {
+          setSelectedSortie(newSortieDirection);
+
+          dispatch(
+            setAffaireDetails({
+              ...affaireDetails,
+              sortieDirection: newSortieDirection,
+            }),
+          );
+        } else {
+        }
+      } else if (name === 'supportPapier') {
         const newSortieDirection = getSortieDirection(
           radioValues.typeSortie,
           value,
         );
 
-        console.log('newSortieDirection', newSortieDirection);
         setSelectedSortie(newSortieDirection);
         dispatch(
           setAffaireDetails({
@@ -104,13 +127,8 @@ const CreateAffaire = () => {
             sortieDirection: newSortieDirection,
           }),
         );
-      } else if (value === '') {
-        dispatch(setAffaireDetails({ ...affaireDetails, [name]: value }));
       } else {
-        const numericValue = Number(value);
-        dispatch(
-          setAffaireDetails({ ...affaireDetails, [name]: numericValue }),
-        );
+        dispatch(setAffaireDetails({ ...affaireDetails, [name]: value }));
       }
     },
     [affaireDetails, radioValues, dispatch],
@@ -123,24 +141,16 @@ const CreateAffaire = () => {
       ...prevValues,
       [groupName]: value,
     }));
-
-    // Determine if the value should be a boolean or remain as a string.
     const shouldConvertToBoolean = booleanGroups.includes(groupName);
 
-    console.log('shouldConvertToBoolean', shouldConvertToBoolean);
-    console.log('groupName', groupName);
     const dispatchedValue = shouldConvertToBoolean ? value === 'oui' : value;
 
-    // Special handling for 'typeSortie' as it requires additional logic.
-
-    console.log('groupName', groupName);
     if (groupName === 'typeSortie' && selectedSortie) {
       const newSortieDirection = getSortieDirection(
         dispatchedValue,
         selectedSortie,
       );
 
-      console.log('newSortieDirection', newSortieDirection);
       setSelectedSortie(newSortieDirection);
       dispatch(
         setAffaireDetails({
@@ -149,36 +159,68 @@ const CreateAffaire = () => {
         }),
       );
     } else {
-      // Dispatch the appropriate value to the store.
       dispatch(
         setAffaireDetails({ ...affaireDetails, [groupName]: dispatchedValue }),
       );
     }
   };
 
-  // useEffect(() => {
-  //   dispatch(clearAffaireDetails());
-  // }, [dispatch]);
+  const onRecordingComplete = async (audioBlob) => {
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'recording.wav');
 
-  useEffect(() => {
-    if (success) {
-      handleSnackbarOpen('Affaire ajouté avec succès !', 'success');
-      router.push('/production/affaires');
-    } else if (error) {
-      handleSnackbarOpen(
-        "Échec de l'ajout d'une affaire. Veuillez réessayer.",
-        'error',
-      );
+    try {
+      const response = await fetchWithHeaders('/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert('File uploaded successfully');
+      } else {
+        alert('Error uploading file');
+      }
+    } catch (error) {
+      alert('Error uploading file');
     }
-  }, [success, error]);
+  };
+
+  const SortiePositions =
+    radioValues?.typeSortie === 'Externe'
+      ? ['N_1', 'N_2', 'N_3', 'N_4']
+      : ['N_5', 'N_6', 'N_7', 'N_8'];
 
   const handleSubmit = useCallback(
     (event) => {
-      console.log('test');
       event.preventDefault();
-      dispatch(addAffaire(affaireDetails));
+
+      creeateAffaireValidationSchema
+        .validate(affaireDetails, { abortEarly: false })
+        .then(() => {
+          // If validation is successful
+          dispatch(addAffaire(affaireDetails));
+
+          if (success) {
+            dispatch(clearAffaireDetails());
+            handleSnackbarOpen('Affaire ajouté avec succès !', 'success');
+            router.push('/production/affaires');
+          } else if (error) {
+            handleSnackbarOpen(
+              "Échec de l'ajout d'une affaire. Veuillez réessayer.",
+              'error',
+            );
+          }
+        })
+        .catch((err) => {
+          let errors = {};
+          err.inner.forEach((error) => {
+            console.log('error', error);
+            errors[error.path] = error.message;
+          });
+          setFormErrors(errors);
+        });
     },
-    [affaireDetails, dispatch],
+    [affaireDetails, dispatch, router, success, error],
   );
 
   const handleSnackbarOpen = (message, severity) => {
@@ -193,47 +235,129 @@ const CreateAffaire = () => {
       style={{ marginLeft: isIconOnly ? '-100px' : '50px', marginTop: '50px' }}
     >
       <BackButton />
+
+      <Card
+        style={{
+          marginTop: '0em',
+          marginBottom: '0em',
+          width: '50%',
+          marginLeft: 'auto',
+        }}
+      >
+        <CardContent sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
+          {affaireDetails.clientName && (
+            <>
+              <div style={{ width: '50%' }}>
+                <TextField
+                  fullWidth
+                  label="Client sélectionné"
+                  value={
+                    affaireDetails.clientName ? affaireDetails.clientName : ''
+                  }
+                  disabled
+                  InputProps={{
+                    style: {
+                      color: 'black', // Change the text color
+                      // Add any other styles you want to apply
+                    },
+                    // You can also style the underline if it's needed
+                    disableUnderline: true, // If you want to remove the underline
+                  }}
+                />
+              </div>
+              <div>
+                <DatePicker
+                  value={
+                    affaireDetails.date ? dayjs(affaireDetails.date) : dayjs()
+                  }
+                  label="Select Date"
+                  format="DD/MM/YYYY"
+                  renderInput={(params) => <TextField {...params} disabled />}
+                  onChange={(newValue) => {
+                    const formattedDateTime = newValue.format(
+                      'YYYY-MM-DDTHH:mm:ss',
+                    );
+                    setSelectedDate(newValue);
+                    handleAffaireDetailsChange('date', formattedDateTime);
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
       <Box marginTop={8}>
         <Typography variant="h4" gutterBottom marginTop="50px">
           Nouvelle affaire{' '}
         </Typography>
+
         <Divider />
 
-        <Card
-          style={{
-            marginTop: '2em',
-            marginBottom: '1em',
-          }}
-        >
-          <CardContent>
-            <Typography variant="h6" marginBottom="0.5em">
-              Type d'etiquette :
-            </Typography>
+        <div style={{ display: 'flex', gap: '50px' }}>
+          <Card
+            style={{
+              marginTop: '2em',
+              marginBottom: '1em',
+              width: '50%',
+            }}
+          >
+            <CardContent>
+              <TextField
+                fullWidth
+                label="Nom"
+                value={affaireDetails.name}
+                error={Boolean(formErrors.name)}
+                helperText={formErrors.name}
+                name="name"
+                onChange={handleChange}
+              />
+            </CardContent>
+          </Card>
 
-            <RadioGroup
-              row
-              value={radioValues.type}
-              onChange={handleRadioChange('type')}
-            >
-              <Grid container spacing={3}>
-                <Grid item>
-                  <FormControlLabel
-                    value="STANDARD"
-                    control={<Radio />}
-                    label="standard"
-                  />
-                </Grid>
-                <Grid item>
-                  <FormControlLabel
-                    value="PERSONNALISE"
-                    control={<Radio />}
-                    label="personalisé"
-                  />
-                </Grid>
-              </Grid>
-            </RadioGroup>
-          </CardContent>
-        </Card>
+          <Card
+            style={{
+              marginTop: '2em',
+              marginBottom: '1em',
+              width: '50%',
+            }}
+          >
+            <CardContent>
+              <Typography variant="h6" marginBottom="0.5em">
+                Type d'etiquette :
+              </Typography>
+
+              <FormControl
+                component="fieldset"
+                error={Boolean(formErrors.type)}
+              >
+                <RadioGroup
+                  row
+                  value={radioValues.type}
+                  onChange={handleRadioChange('type')}
+                >
+                  <Grid container spacing={3}>
+                    <Grid item>
+                      <FormControlLabel
+                        value="STANDARD"
+                        control={<Radio />}
+                        label="standard"
+                      />
+                    </Grid>
+                    <Grid item>
+                      <FormControlLabel
+                        value="PERSONNALISE"
+                        control={<Radio />}
+                        label="personalisé"
+                      />
+                    </Grid>
+                  </Grid>
+                </RadioGroup>
+                <FormHelperText>{formErrors.type}</FormHelperText>
+              </FormControl>
+            </CardContent>
+          </Card>
+        </div>
 
         <div style={{ display: 'flex', gap: '50px', marginBlock: '35px' }}>
           <Card
@@ -243,7 +367,13 @@ const CreateAffaire = () => {
               <div
                 style={{ display: 'flex', alignItems: 'center', flex: 0.35 }}
               >
-                <TextField name="laize" label="LAIZE (EN MM)" margin="normal" />
+                <TextField
+                  name="laize"
+                  label="LAIZE (EN MM)"
+                  margin="normal"
+                  error={Boolean(formErrors.laize)}
+                  helperText={formErrors.laize}
+                />
                 <Typography variant="h6" style={{ margin: '0 8px' }}>
                   X
                 </Typography>
@@ -252,18 +382,43 @@ const CreateAffaire = () => {
                   label="DEVELOPPE (EN MM)"
                   margin="normal"
                   onChange={handleChange}
+                  error={Boolean(formErrors.developee)}
+                  helperText={formErrors.type}
                 />
-              </div>
 
-              <div>
-                <TextField
-                  name="quantiteUnitaire"
-                  label="Quantité Unitaire"
-                  type="number"
+                <FormControl
+                  style={{ width: '50%', marginLeft: '10px' }}
                   margin="normal"
-                  width="100%"
+                  name="format"
                   onChange={handleChange}
-                />
+                  error={Boolean(formErrors.format)}
+                  helperText={formErrors.format}
+                >
+                  <InputLabel>Forme</InputLabel>
+
+                  <Select
+                    displayEmpty
+                    label={'Forme'}
+                    name="format"
+                    onChange={handleChange}
+                  >
+                    <MenuItem value="CARREE">CAR (CARREE)</MenuItem>
+                    <MenuItem value="RECTANGULAIRE">
+                      REC (RECTANGULAIRE)
+                    </MenuItem>
+                    <MenuItem value="OVALE">OV (OVALE)</MenuItem>
+                    <MenuItem value="SPECIALE">SP ( SPECIALE)</MenuItem>
+                    <MenuItem value="TRIANGULAIRE">
+                      TRIA ( (TRIANGULAIRE)
+                    </MenuItem>
+                    <MenuItem value="AUTRE">Autre</MenuItem>
+                  </Select>
+                  <FormHelperText
+                    style={{ minHeight: formErrors.format ? '4em' : undefined }}
+                  >
+                    {formErrors.format}
+                  </FormHelperText>
+                </FormControl>
               </div>
 
               <FormControl
@@ -271,6 +426,8 @@ const CreateAffaire = () => {
                 margin="normal"
                 name="supportPapier"
                 onChange={handleChange}
+                error={Boolean(formErrors.support)}
+                helperText={formErrors.support}
               >
                 <Typography
                   variant="subtitle2"
@@ -317,34 +474,21 @@ const CreateAffaire = () => {
                   </MenuItem>
                   <MenuItem value="AUTRE">autre</MenuItem>
                 </Select>
+
+                <FormHelperText>{formErrors.support}</FormHelperText>
               </FormControl>
 
-              <FormControl
-                style={{ width: '100%' }}
+              <TextField
+                name="quantiteUnitaire"
+                label="Quantité Unitaire"
+                type="number"
                 margin="normal"
-                name="format"
+                width="100%"
                 onChange={handleChange}
-              >
-                <Typography
-                  variant="subtitle2"
-                  marginBottom="0.5em"
-                  marginLeft="0.5em"
-                  opacity="0.6"
-                >
-                  Format
-                </Typography>
-
-                <Select displayEmpty name="format" onChange={handleChange}>
-                  <MenuItem value="CARREE">CAR (CARREE)</MenuItem>
-                  <MenuItem value="RECTANGULAIRE">REC (RECTANGULAIRE)</MenuItem>
-                  <MenuItem value="OVALE">OV (OVALE)</MenuItem>
-                  <MenuItem value="SPECIALE">SP ( SPECIALE)</MenuItem>
-                  <MenuItem value="TRIANGULAIRE">
-                    TRIA ( (TRIANGULAIRE)
-                  </MenuItem>
-                  <MenuItem value="AUTRE">Autre</MenuItem>
-                </Select>
-              </FormControl>
+                error={Boolean(formErrors.quantite)}
+                helperText={formErrors.quantite}
+                $
+              />
             </CardContent>
           </Card>
 
@@ -353,7 +497,7 @@ const CreateAffaire = () => {
           >
             <CardContent>
               <FormControl
-                component="fieldset"
+                error={Boolean(formErrors.avecImpression)}
                 margin="normal"
                 style={{
                   display: 'flex',
@@ -377,6 +521,7 @@ const CreateAffaire = () => {
                         value="oui"
                         control={<Radio />}
                         label="Oui"
+                        checked={affaireDetails.avecImpression === true}
                       />
                     </Grid>
                     <Grid item>
@@ -384,12 +529,13 @@ const CreateAffaire = () => {
                         value="non"
                         control={<Radio />}
                         label="Non"
+                        checked={affaireDetails.avecImpression === false}
                       />
                     </Grid>
                   </Grid>
                 </RadioGroup>
+                <FormHelperText>{formErrors.avecImpression}</FormHelperText>
               </FormControl>
-
               <div
                 style={{
                   display: 'flex',
@@ -397,33 +543,51 @@ const CreateAffaire = () => {
                   justifyContent: 'center',
                 }}
               >
-                {radioValues.avecImpression && (
-                  <RadioGroup
-                    value={radioValues.impressionSide}
-                    onChange={handleRadioChange('impressionSide')}
-                    row
+                {radioValues.avecImpression === 'oui' && (
+                  <FormControl
+                    component="fieldset"
+                    error={Boolean(formErrors.RectoVerso)}
                   >
-                    <Grid container spacing={1}>
-                      <Grid item>
-                        <FormControlLabel
-                          value="RECTO"
-                          control={<Radio />}
-                          label="Recto"
-                        />
+                    <RadioGroup
+                      value={radioValues.impressionSide}
+                      onChange={handleRadioChange('impressionSide')}
+                      row
+                    >
+                      <Grid container spacing={1}>
+                        <Grid item>
+                          <FormControlLabel
+                            value="RECTO"
+                            control={<Radio />}
+                            label="Recto"
+                          />
+                        </Grid>
+                        <Grid item>
+                          <FormControlLabel
+                            value="VERSO"
+                            control={<Radio />}
+                            label="Verso"
+                          />
+                        </Grid>
+
+                        <Grid item>
+                          <FormControlLabel
+                            value="RECTO_VERSO"
+                            control={<Radio />}
+                            label="Recto & Verso"
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid item>
-                        <FormControlLabel
-                          value="VERSO"
-                          control={<Radio />}
-                          label="Verso"
-                        />
-                      </Grid>
-                    </Grid>
-                  </RadioGroup>
+                    </RadioGroup>
+
+                    <FormHelperText
+                      sx={{ display: 'flex', justifyContent: 'center' }}
+                    >
+                      {formErrors.RectoVerso}
+                    </FormHelperText>
+                  </FormControl>
                 )}
               </div>
-
-              {radioValues.avecImpression && (
+              {radioValues.avecImpression === 'oui' && (
                 <FormControl fullWidth margin="normal">
                   <TextField
                     label="Nbr couleur"
@@ -433,9 +597,76 @@ const CreateAffaire = () => {
                     value={affaireDetails.colorNumber}
                     inputProps={{ min: '1', max: '8', step: '1' }}
                     margin="normal"
+                    error={Boolean(formErrors.NbColor)}
+                    helperText={formErrors.NbColor}
                   />
                 </FormControl>
               )}
+              <Card
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                }}
+              >
+                {(radioValues.avecImpression === 'non' ||
+                  !affaireDetails.avecImpression) && (
+                  <>
+                    <CardHeader
+                      avatar={
+                        <Icon>
+                          <WarningAmberIcon sx={{ color: 'red' }} />
+                        </Icon>
+                      }
+                      title="REMARQUE"
+                      sx={{
+                        backgroundColor: '#fffbe2',
+                        color: '#173753',
+                        fontSize: '0.6rem',
+                        textAlign: 'right',
+                        borderTopLeftRadius: '20px',
+                        borderTopRightRadius: '20px',
+                        height: '50px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        '.MuiCardHeader-title': {
+                          fontSize: '0.88rem',
+                        },
+                      }}
+                    />
+                    <CardContent sx={{ padding: '0' }}>
+                      <List
+                        sx={{
+                          width: '100%',
+                          color: '#173753',
+                          backgroundColor: '#fffbe2',
+                          borderRadius: '10px',
+                          padding: '20px',
+                        }}
+                      >
+                        {[
+                          'CETTE ETIQUETTE EST VIERGE NON IMPRIMEE',
+                          'ABSENCE DES CLICHES D’IMPRESSION (OUTIL D’IMPRESSION)',
+                          'ABSENCE DE BON A TIRER',
+                        ].map((text, index) => (
+                          <ListItem key={index}>
+                            <ListItemIcon>
+                              <FiberManualRecordIcon
+                                sx={{ fontSize: '10px', color: '#173753' }}
+                              />{' '}
+                            </ListItemIcon>
+                            <ListItemText primary={text} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </CardContent>
+                  </>
+                )}
+              </Card>
             </CardContent>
           </Card>
         </div>
@@ -451,58 +682,22 @@ const CreateAffaire = () => {
               }}
             >
               <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Sens de sortie :
-                </Typography>
-                <RadioGroup
-                  row
-                  value={radioValues.typeSortie}
-                  onChange={handleRadioChange('typeSortie')}
-                  name="sortieType"
-                >
-                  <FormControlLabel
-                    value="Externe"
-                    control={<Radio />}
-                    label="Externe"
-                  />
-                  <FormControlLabel
-                    value="Interne"
-                    control={<Radio />}
-                    label="Interne"
-                  />
-                </RadioGroup>
-
-                <FormControl margin="normal" fullWidth>
-                  {!selectedSortie && (
-                    <InputLabel shrink={false}>Position</InputLabel>
-                  )}
-                  <Select
-                    displayEmpty
-                    name="supportPapier"
-                    value={
-                      selectedSortie
-                        ? selectedSortie
+                <SortieSelectionCard
+                  sortieType={radioValues.typeSortie}
+                  onSortieTypeChange={handleRadioChange('typeSortie')}
+                  selectedPositions={
+                    selectedSortie
+                      ? [
+                          selectedSortie
                             .replace('EXT_', 'N_')
-                            .replace('INT_', 'N_')
-                        : ''
-                    }
-                    onChange={handleChange}
-                    placeholder="Sélectionner position"
-                  >
-                    {radioValues.typeSortie === 'Externe'
-                      ? ['N_1', 'N_2', 'N_3', 'N_4'].map((value) => (
-                          <MenuItem key={value} value={value}>
-                            N: {value.split('_')[1]}
-                          </MenuItem>
-                        ))
-                      : ['N_5', 'N_6', 'N_7', 'N_8'].map((value) => (
-                          <MenuItem key={value} value={value}>
-                            N: {value.split('_')[1]}
-                          </MenuItem>
-                        ))}
-                  </Select>
-                </FormControl>
-
+                            .replace('INT_', 'N_'),
+                        ]
+                      : []
+                  }
+                  onPositionChange={handleChange}
+                  positions={SortiePositions}
+                  formErrors={formErrors}
+                />
                 <Typography
                   ariant="h3"
                   style={{
@@ -514,23 +709,25 @@ const CreateAffaire = () => {
                 >
                   Poses d'etiquette :
                 </Typography>
-                <RadioGroup
-                  row
-                  value={radioValues.sortieDirection}
-                  onChange={handleRadioChange('sortieDirection')}
-                >
-                  <FormControlLabel
-                    value="Externe"
-                    control={<Radio />}
-                    label="Auto"
-                  />
-                  <FormControlLabel
-                    value="Interne"
-                    control={<Radio />}
-                    label="Manuelle"
-                  />
-                </RadioGroup>
-
+                <FormControl error={Boolean(formErrors.sortieDirection)}>
+                  <RadioGroup
+                    row
+                    value={radioValues.sortieDirection}
+                    onChange={handleRadioChange('sortieDirection')}
+                  >
+                    <FormControlLabel
+                      value="AUTO"
+                      control={<Radio />}
+                      label="Auto"
+                    />
+                    <FormControlLabel
+                      value="MANUELLE"
+                      control={<Radio />}
+                      label="Manuelle"
+                    />
+                  </RadioGroup>
+                  <FormHelperText>{formErrors.sortieDirection}</FormHelperText>
+                </FormControl>
                 <div style={{ display: 'flex', gap: 100, marginTop: 20 }}>
                   <div>
                     <Typography
@@ -543,28 +740,31 @@ const CreateAffaire = () => {
                     >
                       Repiquage
                     </Typography>
-                    <RadioGroup
-                      row
-                      value={radioValues.repiquage}
-                      onChange={handleRadioChange('repiquage')}
-                    >
-                      <Grid container spacing={1}>
-                        <Grid item>
-                          <FormControlLabel
-                            value="oui"
-                            control={<Radio />}
-                            label="Oui"
-                          />
+                    <FormControl error={Boolean(formErrors.repiquage)}>
+                      <RadioGroup
+                        row
+                        value={radioValues.repiquage}
+                        onChange={handleRadioChange('repiquage')}
+                      >
+                        <Grid container spacing={1}>
+                          <Grid item>
+                            <FormControlLabel
+                              value="oui"
+                              control={<Radio />}
+                              label="Oui"
+                            />
+                          </Grid>
+                          <Grid item>
+                            <FormControlLabel
+                              value="non"
+                              control={<Radio />}
+                              label="Non"
+                            />
+                          </Grid>
                         </Grid>
-                        <Grid item>
-                          <FormControlLabel
-                            value="non"
-                            control={<Radio />}
-                            label="Non"
-                          />
-                        </Grid>
-                      </Grid>
-                    </RadioGroup>
+                      </RadioGroup>
+                      <FormHelperText>{formErrors.repiquage}</FormHelperText>
+                    </FormControl>
                   </div>
                   <div>
                     <Typography
@@ -577,28 +777,31 @@ const CreateAffaire = () => {
                     >
                       Vernis
                     </Typography>
-                    <RadioGroup
-                      row
-                      value={radioValues.vernis}
-                      onChange={handleRadioChange('vernis')}
-                    >
-                      <Grid container spacing={1}>
-                        <Grid item>
-                          <FormControlLabel
-                            value="oui"
-                            control={<Radio />}
-                            label="Oui"
-                          />
+                    <FormControl error={Boolean(formErrors.vernis)}>
+                      <RadioGroup
+                        row
+                        value={radioValues.vernis}
+                        onChange={handleRadioChange('vernis')}
+                      >
+                        <Grid container spacing={1}>
+                          <Grid item>
+                            <FormControlLabel
+                              value="oui"
+                              control={<Radio />}
+                              label="Oui"
+                            />
+                          </Grid>
+                          <Grid item>
+                            <FormControlLabel
+                              value="non"
+                              control={<Radio />}
+                              label="Non"
+                            />
+                          </Grid>
                         </Grid>
-                        <Grid item>
-                          <FormControlLabel
-                            value="non"
-                            control={<Radio />}
-                            label="Non"
-                          />
-                        </Grid>
-                      </Grid>
-                    </RadioGroup>
+                      </RadioGroup>
+                      <FormHelperText>{formErrors.vernis}</FormHelperText>
+                    </FormControl>
                   </div>
                   <div>
                     <Typography
@@ -611,28 +814,31 @@ const CreateAffaire = () => {
                     >
                       Dorure
                     </Typography>
-                    <RadioGroup
-                      row
-                      value={radioValues.dorure}
-                      onChange={handleRadioChange('dorure')}
-                    >
-                      <Grid container spacing={1}>
-                        <Grid item>
-                          <FormControlLabel
-                            value="oui"
-                            control={<Radio />}
-                            label="Oui"
-                          />
+                    <FormControl error={Boolean(formErrors.dorure)}>
+                      <RadioGroup
+                        row
+                        value={radioValues.dorure}
+                        onChange={handleRadioChange('dorure')}
+                      >
+                        <Grid container spacing={1}>
+                          <Grid item>
+                            <FormControlLabel
+                              value="oui"
+                              control={<Radio />}
+                              label="Oui"
+                            />
+                          </Grid>
+                          <Grid item>
+                            <FormControlLabel
+                              value="non"
+                              control={<Radio />}
+                              label="Non"
+                            />
+                          </Grid>
                         </Grid>
-                        <Grid item>
-                          <FormControlLabel
-                            value="non"
-                            control={<Radio />}
-                            label="Non"
-                          />
-                        </Grid>
-                      </Grid>
-                    </RadioGroup>
+                      </RadioGroup>
+                      <FormHelperText>{formErrors.dorure}</FormHelperText>
+                    </FormControl>
                   </div>
                   <div>
                     <Typography
@@ -645,28 +851,33 @@ const CreateAffaire = () => {
                     >
                       Plastification
                     </Typography>
-                    <RadioGroup
-                      row
-                      value={radioValues.plasification}
-                      onChange={handleRadioChange('plasification')}
-                    >
-                      <Grid container spacing={1}>
-                        <Grid item>
-                          <FormControlLabel
-                            value="oui"
-                            control={<Radio />}
-                            label="Oui"
-                          />
+                    <FormControl error={Boolean(formErrors.Plastification)}>
+                      <RadioGroup
+                        row
+                        value={affaireDetails.plasification}
+                        onChange={handleRadioChange('plasification')}
+                      >
+                        <Grid container spacing={1}>
+                          <Grid item>
+                            <FormControlLabel
+                              value="oui"
+                              control={<Radio />}
+                              label="Oui"
+                            />
+                          </Grid>
+                          <Grid item>
+                            <FormControlLabel
+                              value="non"
+                              control={<Radio />}
+                              label="Non"
+                            />
+                          </Grid>
                         </Grid>
-                        <Grid item>
-                          <FormControlLabel
-                            value="non"
-                            control={<Radio />}
-                            label="Non"
-                          />
-                        </Grid>
-                      </Grid>
-                    </RadioGroup>
+                      </RadioGroup>
+                      <FormHelperText>
+                        {formErrors.Plastification}
+                      </FormHelperText>
+                    </FormControl>
                   </div>
 
                   <div>
@@ -680,37 +891,37 @@ const CreateAffaire = () => {
                     >
                       Existance de rayon de coin
                     </Typography>
-                    <RadioGroup
-                      row
-                      value={
-                        affaireDetails.format === 'OVALE' ||
-                        affaireDetails.format === 'RONDE'
-                          ? 'non'
-                          : radioValues.existanceDeRayonDeCoin
-                      }
-                      onChange={handleRadioChange('existanceDeRayonDeCoin')}
-                    >
-                      <Grid container spacing={1}>
-                        <Grid item>
-                          <FormControlLabel
-                            value="oui"
-                            control={<Radio />}
-                            label="Oui"
-                            disabled={
-                              affaireDetails.format === 'OVALE' ||
-                              affaireDetails.format === 'RONDE'
-                            }
-                          />
+                    <FormControl error={Boolean(formErrors.ExistanceRayon)}>
+                      <RadioGroup
+                        row
+                        value={affaireDetails.existanceDeRayonDeCoin}
+                        onChange={handleRadioChange('existanceDeRayonDeCoin')}
+                      >
+                        <Grid container spacing={1}>
+                          <Grid item>
+                            <FormControlLabel
+                              value="oui"
+                              control={<Radio />}
+                              label="Oui"
+                              disabled={
+                                affaireDetails.format === 'OVALE' ||
+                                affaireDetails.format === 'RONDE'
+                              }
+                            />
+                          </Grid>
+                          <Grid item>
+                            <FormControlLabel
+                              value="non"
+                              control={<Radio />}
+                              label="Non"
+                            />
+                          </Grid>
                         </Grid>
-                        <Grid item>
-                          <FormControlLabel
-                            value="non"
-                            control={<Radio />}
-                            label="Non"
-                          />
-                        </Grid>
-                      </Grid>
-                    </RadioGroup>
+                      </RadioGroup>
+                      <FormHelperText>
+                        {formErrors.ExistanceRayon}
+                      </FormHelperText>
+                    </FormControl>
                   </div>
                 </div>
 
@@ -721,6 +932,8 @@ const CreateAffaire = () => {
                     type="number"
                     margin="normal"
                     onChange={handleChange}
+                    error={Boolean(formErrors.NbBobine)}
+                    helperText={formErrors.NbBobine}
                   />
                   <TextField
                     label="Nbr Etq/ de front"
@@ -728,37 +941,43 @@ const CreateAffaire = () => {
                     type="number"
                     margin="normal"
                     onChange={handleChange}
+                    error={Boolean(formErrors.NbEtqFront)}
+                    helperText={formErrors.NbEtqFront}
                   />
                 </div>
 
                 <div>
-                  <FormControl margin="normal" fullWidth>
-                    {selectedMandarin && (
-                      <Typography
-                        variant="subtitle2"
-                        marginBottom="0.5em"
-                        marginLeft="0.5em"
-                        opacity="0.6"
-                      >
-                        Mandarin
-                      </Typography>
-                    )}
-                    {!selectedMandarin && (
-                      <InputLabel shrink={false}>Mandarin</InputLabel>
-                    )}
+                  <FormControl
+                    margin="normal"
+                    fullWidth
+                    error={Boolean(formErrors.mandrin)}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      marginBottom="0.5em"
+                      marginLeft="0.5em"
+                      opacity="0.6"
+                    >
+                      Mandarin
+                    </Typography>
+
                     <Select
                       displayEmpty
-                      value={selectedMandarin}
+                      value={affaireDetails.mandrin}
                       name="mandrin"
                       onChange={handleChange}
                       placeholder="Mandrin"
                     >
-                      <MenuItem value={40}>40</MenuItem>
-                      <MenuItem value={76}>76</MenuItem>
-                      <MenuItem value="Autre">Autre</MenuItem>
+                      <MenuItem value={'QUARANTE'}>40</MenuItem>
+                      <MenuItem value={'SOIXANTE'}>60</MenuItem>
+                      <MenuItem value={'AUTRE'}>Autre</MenuItem>
                     </Select>
+
+                    <FormHelperText>{formErrors.mandrin}</FormHelperText>
                   </FormControl>
                 </div>
+
+                {/*<AudioRecorder onRecordingComplete={onRecordingComplete} />*/}
               </CardContent>
             </Card>
           </Grid>

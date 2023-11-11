@@ -43,8 +43,6 @@ export const DataTable = ({
   const router = useRouter();
   const dispatch = useDispatch();
 
-  console.log('items', items);
-
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -185,8 +183,6 @@ export const DataTable = ({
                   onClick={() => isDialog && onRowClick && onRowClick(item)}
                 >
                   {columns.map((col) => {
-                    console.log('item[col.key]', item[col.key]);
-                    console.log('col.key ', col.key);
                     const isStatusColumn =
                       col.key === 'status' || col.key === 'active';
                     const cellStyle = isStatusColumn

@@ -71,8 +71,30 @@ export const updateClientlientValidationSchema = Yup.object().shape({
 
 export const affaireSelectionValidationSchema = Yup.object().shape({
   clientName: Yup.string().required('Le nom du client est requis'),
+  productType: Yup.string().required("Le type d'affaire est requis"),
+});
+
+export const creeateAffaireValidationSchema = Yup.object().shape({
   name: Yup.string()
     .required('Le nom de l’affaire est requis')
     .min(3, 'Le nom de l’affaire doit comporter au moins 3 caractères'),
-  productType: Yup.string().required("Le type d'affaire est requis"),
+  type: Yup.string().required(" Type d'etiquette est requis"),
+  developee: Yup.string().required('developee est requis'),
+  laize: Yup.string().required('laize est requis'),
+  support: Yup.string().required(' Support (PAPIER) est requis'),
+  quantite: Yup.string().required('quantite est requis'),
+  format: Yup.string().required('Forme est requis'),
+  avecImpression: Yup.string().required('avec Impression est requis'),
+  RectoVerso: Yup.string().required('Vous devez choisir une option'),
+  NbColor: Yup.string().required(
+    'La couleur est obligatoire et doit être comprise entre 1 et 8.',
+  ),
+  sortieType: Yup.string().required('Type sortie est requis'),
+  selectedPositions: Yup.string().required('Vous devez choisir une position'),
+  sortieDirection: Yup.string().required(
+    'Vous devez choisir une direction de sortie',
+  ),
+  NbBobine: Yup.string().required('Nombre de bobine est requis'),
+  NbEtqFront: Yup.string().required('Nombre de Etq Front est requis'),
+  mandrin: Yup.string().required('Mandrin est requis'),
 });
