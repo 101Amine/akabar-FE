@@ -78,22 +78,14 @@ const CreateClient = () => {
         .then(() => {
           // If validation is successful
           dispatch(addClient(clientDetails));
-
-          if (success) {
-            router.push('/ventes/clients');
-          }
-
-          if (success) {
-            handleSnackbarOpen('Client ajouté avec succès !', 'success');
-          } else if (error) {
-            handleSnackbarOpen(
-              "Échec de l'ajout d'un client. Veuillez réessayer.",
-              'error',
-            );
-          }
+          router.push('/ventes/clients');
+          handleSnackbarOpen('Client ajouté avec succès !', 'success');
         })
         .catch((err) => {
-          // If validation fails, set the errors to state
+          handleSnackbarOpen(
+            "Échec de l'ajout d'un client. Veuillez réessayer.",
+            'error',
+          );
           let errors = {};
           err.inner.forEach((error) => {
             errors[error.path] = error.message;

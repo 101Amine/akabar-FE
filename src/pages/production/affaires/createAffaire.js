@@ -22,6 +22,7 @@ import {
   FormHelperText,
   InputLabel,
   ListItemIcon,
+  IconButton,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
@@ -29,7 +30,7 @@ import dayjs from 'dayjs';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import BackButton from '../../../components/BackButton';
@@ -38,13 +39,15 @@ import {
   clearAffaireDetails,
   setAffaireDetails,
 } from '../../../redux/affaireSlice';
-import SortieSelectionCard from './senseSortieCheckBoxes';
 import { creeateAffaireValidationSchema } from '../../../utils/validationService';
-import { fetchWithHeaders } from '../../../utils/api';
-import AudioRecorder from '../../../components/AudioRecorder';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Loader from '../../../components/Loader';
+import ImpressionDetails from '../../../components/ImpressionDetails';
+import CustomCardComponent from '../../../components/CustomCardComponent';
+import MediaBloc from '../../../components/MediaBloc';
+import CloseIcon from '@mui/icons-material/Close';
+import PopupAffaire from '../../../components/PopupAffaire';
 
 const CreateAffaire = () => {
   const dispatch = useDispatch();
@@ -55,7 +58,6 @@ const CreateAffaire = () => {
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
   const booleanGroups = [
     'avecImpression',
-    // 'typeSortie',
     'repiquage',
     'vernis',
     'dorure',
@@ -65,12 +67,10 @@ const CreateAffaire = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [selectedValue, setSelectedValue] = useState('');
-  const [selectedMandarin, setSelecteMandarin] = useState('');
+  const [showNotification, setShowNotification] = useState(true);
   const [selectedSortie, setSelectedSortie] = useState('');
-  const [selectedImpression, setSelectedImpression] = useState('');
-  const [numberValue, setNumberValue] = useState('');
-  const [selectedOption, setSelectedOption] = useState('non');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
   const [radioValues, setRadioValues] = useState({
     type: '',
     avecImpression: '',
@@ -96,10 +96,7 @@ const CreateAffaire = () => {
     (event) => {
       const { name, value, checked, type } = event.target;
 
-      console.log('name', name);
-      console.log('value', value);
       if (type === 'checkbox') {
-        // Condition to check if the checkbox is checked
         if (checked) {
           const newSortieDirection = getSortieDirection(
             radioValues.typeSortie,
@@ -121,7 +118,6 @@ const CreateAffaire = () => {
           value,
         );
 
-        console.log('typeSortie : ', newSortieDirection);
         setSelectedSortie(newSortieDirection);
         dispatch(
           setAffaireDetails({
@@ -135,6 +131,30 @@ const CreateAffaire = () => {
     },
     [affaireDetails, radioValues, dispatch],
   );
+
+  const handleNotificationClose = () => {
+    setShowNotification(false);
+  };
+
+  const handleSubmitNotification = async () => {
+    // Your form submission logic here
+    // ...
+
+    // Check with the backend if there are suggested 'affaires'
+    const hasSuggestedAffaires = true; // Replace with actual backend call response
+    if (hasSuggestedAffaires) {
+      setShowNotification(true);
+    }
+  };
+
+  const handleNotificationClick = () => {
+    handleNotificationClose();
+    setIsPopupOpen(true); // Open the popup
+  };
+
+  const handlePopupClose = () => {
+    setIsPopupOpen(false);
+  };
 
   const handleRadioChange = (groupName) => (event) => {
     const value = event.target.value;
@@ -164,26 +184,6 @@ const CreateAffaire = () => {
       dispatch(
         setAffaireDetails({ ...affaireDetails, [groupName]: dispatchedValue }),
       );
-    }
-  };
-
-  const onRecordingComplete = async (audioBlob) => {
-    const formData = new FormData();
-    formData.append('file', audioBlob, 'recording.wav');
-
-    try {
-      const response = await fetchWithHeaders('/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        alert('File uploaded successfully');
-      } else {
-        alert('Error uploading file');
-      }
-    } catch (error) {
-      alert('Error uploading file');
     }
   };
 
@@ -359,61 +359,97 @@ const CreateAffaire = () => {
           >
             <CardContent>
               <div
-                style={{ display: 'flex', alignItems: 'center', flex: 0.35 }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
               >
-                <TextField
-                  name="laize"
-                  label="LAIZE (EN MM)"
-                  margin="normal"
-                  onChange={handleChange}
-                  error={Boolean(formErrors.laize)}
-                  helperText={formErrors.laize}
-                />
-                <Typography variant="h6" style={{ margin: '0 8px' }}>
-                  X
-                </Typography>
-                <TextField
-                  name="developee"
-                  label="DEVELOPPE (EN MM)"
-                  margin="normal"
-                  onChange={handleChange}
-                  error={Boolean(formErrors.developee)}
-                  helperText={formErrors.type}
-                />
+                <Box display={'flex'}>
+                  <TextField
+                    name="laize"
+                    label="LAIZE (EN MM)"
+                    margin="normal"
+                    onChange={handleChange}
+                    error={Boolean(formErrors.laize)}
+                    helperText={formErrors.laize}
+                  />
+                  <Typography
+                    variant="h6"
+                    style={{ margin: '0 8px', marginBlock: 'auto' }}
+                  >
+                    X
+                  </Typography>
+                  <TextField
+                    name="developpe"
+                    label="DEVELOPPE (EN MM)"
+                    margin="normal"
+                    onChange={handleChange}
+                    error={Boolean(formErrors.developpe)}
+                    helperText={formErrors.type}
+                  />
 
-                <FormControl
-                  style={{ width: '50%', marginLeft: '10px' }}
-                  margin="normal"
-                  name="format"
-                  onChange={handleChange}
-                  error={Boolean(formErrors.format)}
-                  helperText={formErrors.format}
-                >
-                  <InputLabel>Forme</InputLabel>
-
-                  <Select
-                    displayEmpty
-                    label={'Forme'}
+                  <FormControl
+                    style={{ width: '50%', marginLeft: '10px' }}
+                    margin="normal"
                     name="format"
                     onChange={handleChange}
+                    error={Boolean(formErrors.format)}
+                    helperText={formErrors.format}
                   >
-                    <MenuItem value="CARREE">CAR (CARREE)</MenuItem>
-                    <MenuItem value="RECTANGULAIRE">
-                      REC (RECTANGULAIRE)
-                    </MenuItem>
-                    <MenuItem value="OVALE">OV (OVALE)</MenuItem>
-                    <MenuItem value="SPECIALE">SP ( SPECIALE)</MenuItem>
-                    <MenuItem value="TRIANGULAIRE">
-                      TRIA ( (TRIANGULAIRE)
-                    </MenuItem>
-                    <MenuItem value="AUTRE">Autre</MenuItem>
-                  </Select>
-                  <FormHelperText
-                  // style={{ minHeight: formErrors.format ? '4em' : undefined }}
+                    <InputLabel>Forme</InputLabel>
+
+                    <Select
+                      displayEmpty
+                      label={'Forme'}
+                      name="format"
+                      onChange={handleChange}
+                    >
+                      <MenuItem value="CARREE">CAR (CARREE)</MenuItem>
+                      <MenuItem value="RECTANGULAIRE">
+                        REC (RECTANGULAIRE)
+                      </MenuItem>
+                      <MenuItem value="OVALE">OV (OVALE)</MenuItem>
+                      <MenuItem value="SPECIALE">SP ( SPECIALE)</MenuItem>
+                      <MenuItem value="TRIANGULAIRE">
+                        TRIA ( (TRIANGULAIRE)
+                      </MenuItem>
+                      <MenuItem value="AUTRE">Autre</MenuItem>
+                    </Select>
+                    <FormHelperText>{formErrors.format}</FormHelperText>
+                  </FormControl>
+                </Box>
+
+                {showNotification && (
+                  <Box
+                    sx={{
+                      marginTop: 2,
+                      padding: 2,
+                      backgroundColor: '#f5f5f5',
+                      borderRadius: '4px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
                   >
-                    {formErrors.format}
-                  </FormHelperText>
-                </FormControl>
+                    <Typography variant="body1">
+                      You have some suggested affaires, click here to see more.
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ cursor: 'pointer', color: '#6366F1' }}
+                      onClick={handleNotificationClick}
+                    >
+                      Open
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ cursor: 'pointer' }}
+                      onClick={handleNotificationClose}
+                    >
+                      X
+                    </Typography>
+                  </Box>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '20px' }}>
@@ -661,339 +697,20 @@ const CreateAffaire = () => {
 
         <Divider />
         {affaireDetails.avecImpression && (
-          <Grid>
-            <Card
-              style={{
-                marginBottom: '1em',
-                marginTop: '2em',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              }}
-            >
-              <CardContent>
-                <SortieSelectionCard
-                  sortieType={radioValues.typeSortie}
-                  onSortieTypeChange={handleRadioChange('typeSortie')}
-                  selectedPositions={
-                    selectedSortie
-                      ? [
-                          selectedSortie
-                            .replace('EXT_', 'N_')
-                            .replace('INT_', 'N_'),
-                        ]
-                      : []
-                  }
-                  onPositionChange={handleChange}
-                  positions={SortiePositions}
-                  formErrors={formErrors}
-                />
-                <Typography
-                  ariant="h3"
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 18,
-                    marginBottom: 10,
-                    marginTop: 30,
-                  }}
-                >
-                  Poses d'etiquette :
-                </Typography>
-                <FormControl error={Boolean(formErrors.poseEtiquette)}>
-                  <RadioGroup
-                    row
-                    value={radioValues.poseEtiquette}
-                    onChange={handleRadioChange('poseEtiquette')}
-                  >
-                    <FormControlLabel
-                      value="AUTO"
-                      control={<Radio />}
-                      label="Auto"
-                    />
-                    <FormControlLabel
-                      value="MANUELLE"
-                      control={<Radio />}
-                      label="Manuelle"
-                    />
-                  </RadioGroup>
-                  <FormHelperText>{formErrors.poseEtiquette}</FormHelperText>
-                </FormControl>
-                <div style={{ display: 'flex', gap: 100, marginTop: 20 }}>
-                  <div>
-                    <Typography
-                      ariant="h3"
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 18,
-                        marginBottom: 10,
-                      }}
-                    >
-                      Repiquage
-                    </Typography>
-                    <FormControl error={Boolean(formErrors.repiquage)}>
-                      <RadioGroup
-                        row
-                        value={radioValues.repiquage}
-                        onChange={handleRadioChange('repiquage')}
-                      >
-                        <Grid container spacing={1}>
-                          <Grid item>
-                            <FormControlLabel
-                              value="oui"
-                              control={<Radio />}
-                              label="Oui"
-                              checked={affaireDetails.repiquage === true}
-                            />
-                          </Grid>
-                          <Grid item>
-                            <FormControlLabel
-                              value="non"
-                              control={<Radio />}
-                              label="Non"
-                              checked={affaireDetails.repiquage === false}
-                            />
-                          </Grid>
-                        </Grid>
-                      </RadioGroup>
-                      <FormHelperText>{formErrors.repiquage}</FormHelperText>
-                    </FormControl>
-                  </div>
-                  <div>
-                    <Typography
-                      ariant="h3"
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 18,
-                        marginBottom: 10,
-                      }}
-                    >
-                      Vernis
-                    </Typography>
-                    <FormControl error={Boolean(formErrors.vernis)}>
-                      <RadioGroup
-                        row
-                        value={radioValues.vernis}
-                        onChange={handleRadioChange('vernis')}
-                      >
-                        <Grid container spacing={1}>
-                          <Grid item>
-                            <FormControlLabel
-                              value="oui"
-                              control={<Radio />}
-                              label="Oui"
-                              checked={affaireDetails.vernis === true}
-                            />
-                          </Grid>
-                          <Grid item>
-                            <FormControlLabel
-                              value="non"
-                              control={<Radio />}
-                              label="Non"
-                              checked={affaireDetails.vernis === false}
-                            />
-                          </Grid>
-                        </Grid>
-                      </RadioGroup>
-                      <FormHelperText>{formErrors.vernis}</FormHelperText>
-                    </FormControl>
-                  </div>
-                  <div>
-                    <Typography
-                      ariant="h3"
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 18,
-                        marginBottom: 10,
-                      }}
-                    >
-                      Dorure
-                    </Typography>
-                    <FormControl error={Boolean(formErrors.dorure)}>
-                      <RadioGroup
-                        row
-                        value={radioValues.dorure}
-                        onChange={handleRadioChange('dorure')}
-                      >
-                        <Grid container spacing={1}>
-                          <Grid item>
-                            <FormControlLabel
-                              value="oui"
-                              control={<Radio />}
-                              label="Oui"
-                              checked={affaireDetails.dorure === true}
-                            />
-                          </Grid>
-                          <Grid item>
-                            <FormControlLabel
-                              value="non"
-                              control={<Radio />}
-                              label="Non"
-                              checked={affaireDetails.dorure === false}
-                            />
-                          </Grid>
-                        </Grid>
-                      </RadioGroup>
-                      <FormHelperText>{formErrors.dorure}</FormHelperText>
-                    </FormControl>
-                  </div>
-                  <div>
-                    <Typography
-                      ariant="h3"
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 18,
-                        marginBottom: 10,
-                      }}
-                    >
-                      Plastification
-                    </Typography>
-                    <FormControl error={Boolean(formErrors.Plastification)}>
-                      <RadioGroup
-                        row
-                        value={affaireDetails.plasification}
-                        onChange={handleRadioChange('plasification')}
-                      >
-                        <Grid container spacing={1}>
-                          <Grid item>
-                            <FormControlLabel
-                              value="oui"
-                              control={<Radio />}
-                              label="Oui"
-                              checked={affaireDetails.plasification === true}
-                            />
-                          </Grid>
-                          <Grid item>
-                            <FormControlLabel
-                              value="non"
-                              control={<Radio />}
-                              label="Non"
-                              checked={affaireDetails.plasification === false}
-                            />
-                          </Grid>
-                        </Grid>
-                      </RadioGroup>
-                      <FormHelperText>
-                        {formErrors.Plastification}
-                      </FormHelperText>
-                    </FormControl>
-                  </div>
-
-                  <div>
-                    {affaireDetails.format !== 'OVALE' &&
-                      affaireDetails.format !== 'RONDE' && (
-                        <>
-                          <Typography
-                            variant="h3"
-                            style={{
-                              fontWeight: 600,
-                              fontSize: 18,
-                              marginBottom: 10,
-                            }}
-                          >
-                            Existance de rayon de coin
-                          </Typography>
-
-                          <FormControl
-                            error={Boolean(formErrors.ExistanceRayon)}
-                          >
-                            <RadioGroup
-                              row
-                              value={affaireDetails.existanceDeRayonDeCoin}
-                              onChange={handleRadioChange(
-                                'existanceDeRayonDeCoin',
-                              )}
-                            >
-                              <Grid container spacing={1}>
-                                <Grid item>
-                                  <FormControlLabel
-                                    value="oui"
-                                    control={<Radio />}
-                                    label="Oui"
-                                    checked={
-                                      affaireDetails.existanceDeRayonDeCoin ===
-                                      true
-                                    }
-                                  />
-                                </Grid>
-                                <Grid item>
-                                  <FormControlLabel
-                                    value="non"
-                                    control={<Radio />}
-                                    label="Non"
-                                    checked={
-                                      affaireDetails.existanceDeRayonDeCoin ===
-                                      false
-                                    }
-                                  />
-                                </Grid>
-                              </Grid>
-                            </RadioGroup>
-                            <FormHelperText>
-                              {formErrors.ExistanceRayon}
-                            </FormHelperText>
-                          </FormControl>
-                        </>
-                      )}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    width: '100%',
-                    gap: 20,
-                    marginTop: 20,
-                  }}
-                >
-                  <TextField
-                    label="Nbr Etq / bobine"
-                    name="nbrEtqParBobine"
-                    type="number"
-                    margin="normal"
-                    sx={{ width: '45%' }}
-                    onChange={handleChange}
-                    error={Boolean(formErrors.nbrEtqParBobine)}
-                    helperText={formErrors.nbrEtqParBobine}
-                  />
-                  <TextField
-                    label="Nbr Etq/ de front"
-                    name="nbrEtqDeFront"
-                    type="number"
-                    margin="normal"
-                    sx={{ width: '45%' }}
-                    onChange={handleChange}
-                    error={Boolean(formErrors.nbrEtqDeFront)}
-                    helperText={formErrors.nbrEtqDeFront}
-                  />
-
-                  <FormControl
-                    margin="normal"
-                    fullWidth
-                    error={Boolean(formErrors.mandrin)}
-                  >
-                    <InputLabel>Mandrin</InputLabel>
-
-                    <Select
-                      displayEmpty
-                      style={{ width: '100%' }}
-                      label={'Mandrin'}
-                      value={affaireDetails.mandrin}
-                      name="mandrin"
-                      onChange={handleChange}
-                      placeholder="Mandrin"
-                    >
-                      <MenuItem value={'QUARANTE'}>40</MenuItem>
-                      <MenuItem value={'SOIXANTE'}>60</MenuItem>
-                      <MenuItem value={'AUTRE'}>Autre</MenuItem>
-                    </Select>
-
-                    <FormHelperText>{formErrors.mandrin}</FormHelperText>
-                  </FormControl>
-                </div>
-
-                {/*<AudioRecorder onRecordingComplete={onRecordingComplete} />*/}
-              </CardContent>
-            </Card>
-          </Grid>
+          <>
+            <ImpressionDetails
+              affaireDetails={affaireDetails}
+              radioValues={radioValues}
+              handleRadioChange={handleRadioChange}
+              handleChange={handleChange}
+              formErrors={formErrors}
+              selectedSortie={selectedSortie}
+              SortiePositions={SortiePositions}
+            />
+            <CustomCardComponent />
+          </>
         )}
+        <MediaBloc handleChange={handleChange} />
         <Button
           variant="contained"
           color="primary"
@@ -1017,6 +734,35 @@ const CreateAffaire = () => {
             {snackbarMessage}
           </MuiAlert>
         </Snackbar>
+
+        <Snackbar
+          open={showNotification}
+          onClose={handleNotificationClose}
+          message="You have some suggested affaires, click here to see more"
+          action={
+            <>
+              <Button
+                color="secondary"
+                size="small"
+                onClick={handleNotificationClick}
+                style={{ color: '#6366F1' }} // Set the color of the button text
+              >
+                Open
+              </Button>
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={handleNotificationClose}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </>
+          }
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        />
+
+        <PopupAffaire open={isPopupOpen} onClose={handlePopupClose} />
       </Box>
     </Container>
   );

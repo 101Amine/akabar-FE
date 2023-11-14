@@ -5,14 +5,13 @@ import {
   outlinedInputClasses,
   paperClasses,
   tableCellClasses,
-  TextField,
 } from '@mui/material';
 
 const muiTheme = createTheme({
   transitions: {
     duration: {
-      enteringScreen: 1000,
-      leavingScreen: 1000,
+      enteringScreen: 0,
+      leavingScreen: 0,
     },
   },
 });

@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as authAPI from '../utils/authAPI';
 
+const isBrowser = typeof window !== 'undefined';
+
 export const initializeAuth = createAsyncThunk(
   'auth/initialize',
   async (_, { rejectWithValue }) => {
@@ -28,6 +30,10 @@ export const signIn = createAsyncThunk(
       console.log('response', response);
       if (response) {
         localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem(
+          'userName',
+          `${response.claims.firstName} ${response.claims.lastName}`,
+        );
         return response.claims;
       } else {
         throw new Error('Sign in failed');
@@ -47,6 +53,7 @@ export const signOut = createAsyncThunk(
       console.log('response in logout', response);
       if (response === 200) {
         localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('userName');
         return;
       } else {
         throw new Error('Sign out failed');
@@ -62,10 +69,12 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
-    name: '',
     status: 'idle',
     error: null,
-    isAuthenticated: false,
+    isAuthenticated: isBrowser
+      ? localStorage.getItem('isAuthenticated') === 'true'
+      : false,
+    name: isBrowser ? localStorage.getItem('userName') || '' : '',
   },
   reducers: {},
   extraReducers: (builder) => {

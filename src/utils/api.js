@@ -1,8 +1,17 @@
-const ROOT_URL = process.env.NEXT_PUBLIC_API_URL;
+export const ROOT_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const fetchWithHeaders = async (endpoint, options = {}) => {
+export const fetchWithHeaders = async (
+  endpoint,
+  options = {},
+  isUpload = false,
+) => {
   const headers = {
     'Content-Type': 'application/json',
+    ...options.headers,
+  };
+
+  const headersUpload = {
+    'Content-Type': 'multipart/form-data',
     ...options.headers,
   };
 
@@ -10,7 +19,7 @@ export const fetchWithHeaders = async (endpoint, options = {}) => {
     method: 'POST',
     ...options,
     credentials: 'include',
-    headers,
+    headers: isUpload ? headersUpload : headers,
   });
 
   return response.json();

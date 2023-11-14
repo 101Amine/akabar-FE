@@ -164,7 +164,9 @@ export const DataTable = ({
           </TableHead>
           <TableBody>
             {items.map((item) => {
-              const fullName = `${item.firstName} ${item.lastName}`;
+              const fullName = isAffaire
+                ? `${item.name}`
+                : `${item.firstName} ${item.lastName}`;
               return (
                 <TableRow
                   key={item.id}

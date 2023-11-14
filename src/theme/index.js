@@ -10,13 +10,6 @@ export function createTheme() {
   const shadows = createShadows();
   const typography = createTypography();
 
-  const transitions = {
-    duration: {
-      enteringScreen: 1000,
-      leavingScreen: 1000,
-    },
-  };
-
   return createMuiTheme({
     breakpoints: {
       values: {
@@ -34,6 +27,5 @@ export function createTheme() {
       borderRadius: 8,
     },
     typography,
-    transitions,
   });
 }
