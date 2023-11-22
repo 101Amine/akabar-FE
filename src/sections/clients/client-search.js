@@ -52,7 +52,7 @@ export const ClientFilters = ({ filters, onFilterChange, onFilterSubmit }) => {
         <OutlinedInput
           fullWidth
           placeholder="Rechercher par ICE"
-          value={filters.ICE}
+          value={filters.ice}
           onChange={(e) => handleInputChange('ice', e.target.value)}
           startAdornment={
             <InputAdornment position="start">

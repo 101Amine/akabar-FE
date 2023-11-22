@@ -4,6 +4,9 @@ import authReducer from './authSlice';
 import clientReducer from './clientSlice';
 import uiReducer from './uiSlice';
 import affaireReducer from './affaireSlice';
+import agentReducer from './agentSlice';
+import articleReducer from './articleSlice';
+import devisReducer from './devisSlice';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -11,6 +14,9 @@ const rootReducer = combineReducers({
   auth: authReducer,
   ui: uiReducer,
   affaire: affaireReducer,
+  agent: agentReducer,
+  article: articleReducer,
+  devis: devisReducer,
 });
 
 export default rootReducer;

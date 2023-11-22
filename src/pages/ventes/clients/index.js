@@ -12,45 +12,44 @@ import {
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
+import { ClientFilters } from 'src/sections/clients/client-search';
 import { useDispatch, useSelector } from 'react-redux';
-import { setPage, setRowsPerPage } from '../../../redux/userSlice';
+import { useClientFilters } from '../../../hooks/useClientFilters';
+import { fetchClients } from '../../../redux/clientSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
+import { setRowsPerPage } from '../../../redux/userSlice';
 import BackButton from '../../../components/BackButton';
-import { fetchAffaires } from '../../../redux/affaireSlice';
-import { AffairesFilters } from '../../../sections/affaires/affaires-search';
 
-const affaireColumns = [
-  { key: 'name', label: 'Nom' },
-  { key: 'clientName', label: 'Client' },
-  { key: 'type', label: 'Type affaire' },
-  { key: 'productType', label: 'Type produit' },
-  { key: 'date', label: 'Date' },
-  { key: 'status', label: 'Status' },
+const clientColumns = [
+  { key: 'nameClient', label: 'Nom' },
+  { key: 'codeClient', label: 'Code' },
+  { key: 'phone', label: 'Telephone' },
+  { key: 'fax', label: 'fax' },
+  { key: 'ice', label: 'Ice' },
+  { key: 'address', label: 'Addresse' },
+  { key: 'bankAccount', label: 'Compte bancaire' },
 ];
 
 const Page = () => {
-  const dispatch = useDispatch();
-  const router = useRouter();
+  const page = useSelector((state) => state.client.page);
+  const rowsPerPage = useSelector((state) => state.client.rowsPerPage);
+  const totalClients = useSelector((state) => state.client.totalClients);
+  const clients = useSelector((state) => state.client.clients);
 
-  const page = useSelector((state) => state.affaire.page);
-  const rowsPerPage = useSelector((state) => state.affaire.rowsPerPage);
-  const affaires = useSelector((state) => state.affaire.affaires);
-  const totalAffaires = useSelector((state) => state.affaire.totalAffaires);
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+  const { filters, setFilters, fetchFilteredClients } = useClientFilters();
 
-  const [filters, setFilters] = useState({
-    'client.nameClient': '',
-    name: '',
-  });
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAffaires({}));
+    dispatch(fetchClients({}));
   }, [dispatch]);
 
   const handlePageChange = useCallback(
     (event) => {
       dispatch(setPage(event));
-      dispatch(fetchAffaires({}));
+      dispatch(fetchClients({}));
     },
     [dispatch],
   );
@@ -58,43 +57,19 @@ const Page = () => {
   const handleRowsPerPageChange = useCallback(
     (value) => {
       dispatch(setRowsPerPage(value));
-      dispatch(fetchAffaires({}));
+      dispatch(fetchClients({}));
     },
     [dispatch],
   );
 
-  const fetchFilteredAffaires = useCallback(() => {
-    const searchCriteriaList = Object.entries(filters)
-      .map(([key, value]) => {
-        return {
-          filterKey: key,
-          operation: 'cn',
-          value: value,
-          dataOption: 'all',
-        };
-      })
-      .filter(Boolean);
-
-    console.log('searchCriteriaList', searchCriteriaList);
-
-    const searchFilter = {
-      searchCriteriaList: searchCriteriaList,
-      dataOption: 'all',
-    };
-
-    dispatch(fetchAffaires(searchFilter));
-  }, [dispatch, filters]);
-
   const proceedToForm = () => {
-    router
-      .push('/production/affaires/selectAffaire')
-      .then((r) => console.log(r));
+    router.push('/ventes/clients/createClient').then((r) => console.info(r));
   };
 
   return (
     <>
       <Head>
-        <title>Affaires | Akabar</title>
+        <title>Clients | Akabar</title>
       </Head>
       <Box
         component="main"
@@ -108,17 +83,17 @@ const Page = () => {
           style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
         >
           <Stack spacing={3}>
-            <Stack spacing={3}>
-              <BackButton />
-            </Stack>
+            <BackButton />
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4" marginTop={'70px'}>
-                  Liste des affaires
+                  Clients
                 </Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
+
               <Divider />
+
               <div>
                 <Button
                   onClick={proceedToForm}
@@ -129,11 +104,11 @@ const Page = () => {
                   }
                   variant="contained"
                 >
-                  Nouveau affaire
+                  Nouveau client
                 </Button>
               </div>
             </Stack>
-            <AffairesFilters
+            <ClientFilters
               filters={filters}
               onFilterChange={(filterKey, value) => {
                 setFilters((prevFilters) => ({
@@ -142,15 +117,14 @@ const Page = () => {
                 }));
               }}
               onFilterSubmit={() => {
-                fetchFilteredAffaires();
+                fetchFilteredClients();
               }}
-            />{' '}
+            />
             <DataTable
-              count={totalAffaires}
-              items={affaires}
-              isAffaire={true}
-              columns={affaireColumns}
-              entity="affaires"
+              count={totalClients}
+              items={clients}
+              columns={clientColumns}
+              entity="client"
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
               page={page}

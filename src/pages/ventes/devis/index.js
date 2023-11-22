@@ -12,76 +12,60 @@ import {
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
-import {
-  ClientFilters,
-  ClientsSearch,
-} from 'src/sections/clients/client-search';
-import { DataTable } from '../../sections/DataTable/data-table';
-import {
-  fetchClients,
-  setOffset,
-  setPage,
-  setRowsPerPage,
-} from '../../redux/clientSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useClientFilters } from '../../hooks/useClientFilters';
-import BackButton from '../../components/BackButton';
+import { DataTable } from '../../../sections/DataTable/data-table';
+import { setRowsPerPage, setPage } from '../../../redux/userSlice';
+import BackButton from '../../../components/BackButton';
+import { fetchDevis } from '../../../redux/devisSlice';
 
-const clientColumns = [
-  { key: 'nameClient', label: 'Nom' },
-  { key: 'codeClient', label: 'Code' },
-  { key: 'phone', label: 'Telephone' },
-  { key: 'fax', label: 'fax' },
-  { key: 'ice', label: 'Ice' },
-  { key: 'address', label: 'Addresse' },
-  { key: 'bankAccount', label: 'Compte bancaire' },
+const devisColumns = [
+  { key: 'numeroDevis', label: 'numero devis' },
+  { key: 'date', label: 'date' },
+  { key: 'nomClient', label: 'nom' },
+  { key: 'agent', label: 'agent' },
+  { key: 'netAPayer', label: 'Net A Payer' },
+  { key: 'status', label: 'Status' },
 ];
 
 const Page = () => {
-  const page = useSelector((state) => state.client.page);
-  const rowsPerPage = useSelector((state) => state.client.rowsPerPage);
-  const totalClients = useSelector((state) => state.client.totalClients);
-  const clients = useSelector((state) => state.client.clients);
+  const page = useSelector((state) => state.devis.page);
+  const rowsPerPage = useSelector((state) => state.devis.rowsPerPage);
+  const totalDevis = useSelector((state) => state.devis.totalDevis);
+  const devis = useSelector((state) => state.devis.devis);
 
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
-  const { filters, setFilters, fetchFilteredClients } = useClientFilters();
 
   const router = useRouter();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchClients({}));
+    dispatch(fetchDevis({}));
   }, [dispatch]);
 
   const handlePageChange = useCallback(
     (event) => {
       dispatch(setPage(event));
-      dispatch(fetchClients({}));
+      dispatch(fetchDevis({}));
     },
     [dispatch],
   );
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleRowsPerPageChange = useCallback(
     (value) => {
       dispatch(setRowsPerPage(value));
-      dispatch(fetchClients({}));
+      dispatch(fetchDevis({}));
     },
     [dispatch],
   );
 
   const proceedToForm = () => {
-    router.push('/ventes/clients/createClient').then((r) => console.info(r));
+    router.push('/ventes/devis/createDevis').then((r) => console.info(r));
   };
 
   return (
     <>
       <Head>
-        <title>Clients | Akabar</title>
+        <title>Devis | Akabar</title>
       </Head>
       <Box
         component="main"
@@ -99,7 +83,7 @@ const Page = () => {
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4" marginTop={'70px'}>
-                  Clients
+                  Devis
                 </Typography>
                 <Stack alignItems="center" direction="row" spacing={1}></Stack>
               </Stack>
@@ -116,27 +100,27 @@ const Page = () => {
                   }
                   variant="contained"
                 >
-                  Nouveau client
+                  Nouveau devis
                 </Button>
               </div>
             </Stack>
-            <ClientFilters
-              filters={filters}
-              onFilterChange={(filterKey, value) => {
-                setFilters((prevFilters) => ({
-                  ...prevFilters,
-                  [filterKey]: value,
-                }));
-              }}
-              onFilterSubmit={() => {
-                fetchFilteredClients();
-              }}
-            />
+            {/*<ClientFilters*/}
+            {/*  filters={filters}*/}
+            {/*  onFilterChange={(filterKey, value) => {*/}
+            {/*    setFilters((prevFilters) => ({*/}
+            {/*      ...prevFilters,*/}
+            {/*      [filterKey]: value,*/}
+            {/*    }));*/}
+            {/*  }}*/}
+            {/*  onFilterSubmit={() => {*/}
+            {/*    fetchFilteredClients();*/}
+            {/*  }}*/}
+            {/*/>*/}
             <DataTable
-              count={totalClients}
-              items={clients}
-              columns={clientColumns}
-              entity="client"
+              count={totalDevis}
+              items={devis}
+              columns={devisColumns}
+              entity="devis"
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
               page={page}

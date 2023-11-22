@@ -16,8 +16,6 @@ export const loginUser = async (credentials) => {
     body: JSON.stringify(credentials),
   });
 
-  console.log('user data', response);
-
   if (response.status !== 200) {
     throw new Error('Error logging in');
   }

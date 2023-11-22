@@ -8,7 +8,7 @@ export const useClientFilters = () => {
   const [filters, setFilters] = useState({
     nameClient: '',
     codeClient: '',
-    ICE: '',
+    ice: '',
   });
 
   const fetchFilteredClients = useCallback(() => {

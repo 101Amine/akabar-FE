@@ -39,6 +39,7 @@ export const DataTable = ({
   entity,
   showPagination = true,
   isAffaire = false,
+  isPopup = false,
 }) => {
   const router = useRouter();
   const dispatch = useDispatch();

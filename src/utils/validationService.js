@@ -19,6 +19,10 @@ export const createAffaireValidationSchema = Yup.object().shape({
   name: Yup.string().required("Nom de l'affaire est requis"),
 });
 
+export const createAgentValidationSchema = Yup.object().shape({
+  name: Yup.string().required("Nom de l'agent est requis"),
+});
+
 export const createClientValidationSchema = Yup.object().shape({
   nameClient: Yup.string().required('Nom du client est requis'),
 
@@ -38,6 +42,10 @@ export const createClientValidationSchema = Yup.object().shape({
   // ),
   //
   // address: Yup.string().required('Adresse est requise'),
+});
+
+export const createArticleValidationSchema = Yup.object().shape({
+  name: Yup.string().required("Nom d'article est requis"),
 });
 
 export const updateUserValidationSchema = Yup.object().shape({

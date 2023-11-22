@@ -37,6 +37,7 @@ import BackButton from '../../../components/BackButton';
 import {
   addAffaire,
   clearAffaireDetails,
+  fetchAffaires,
   setAffaireDetails,
 } from '../../../redux/affaireSlice';
 import { creeateAffaireValidationSchema } from '../../../utils/validationService';
@@ -46,8 +47,8 @@ import Loader from '../../../components/Loader';
 import ImpressionDetails from '../../../components/ImpressionDetails';
 import CustomCardComponent from '../../../components/CustomCardComponent';
 import MediaBloc from '../../../components/MediaBloc';
-import CloseIcon from '@mui/icons-material/Close';
 import PopupAffaire from '../../../components/PopupAffaire';
+import { debounce } from 'lodash';
 
 const CreateAffaire = () => {
   const dispatch = useDispatch();
@@ -67,9 +68,14 @@ const CreateAffaire = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [showNotification, setShowNotification] = useState(true);
+  const [showNotification, setShowNotification] = useState(false);
   const [selectedSortie, setSelectedSortie] = useState('');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [formValues, setFormValues] = useState({
+    laize: '',
+    developpe: '',
+    forme: '',
+  });
 
   const [radioValues, setRadioValues] = useState({
     type: '',
@@ -84,6 +90,19 @@ const CreateAffaire = () => {
   });
   const [formErrors, setFormErrors] = useState({});
 
+  useEffect(() => {
+    if (affaireDetails.clientId) {
+      sessionStorage.setItem('affaireDetails', JSON.stringify(affaireDetails));
+    }
+  }, [affaireDetails]);
+
+  useEffect(() => {
+    const storedAffaireDetails = sessionStorage.getItem('affaireDetails');
+    if (storedAffaireDetails) {
+      const affaireDetailsFromSession = JSON.parse(storedAffaireDetails);
+      dispatch(setAffaireDetails(affaireDetailsFromSession));
+    }
+  }, []);
   const getSortieDirection = (direction, position) => {
     const positionNumber = parseInt(position.replace('N_', ''), 10);
 
@@ -131,6 +150,102 @@ const CreateAffaire = () => {
     },
     [affaireDetails, radioValues, dispatch],
   );
+
+  const fetchSuggestedAffaires = () => {
+    console.log('formValues', formValues);
+    if (formValues.laize && formValues.developpe && formValues.forme) {
+      const filters = prepareFilters();
+      console.log('we inside');
+
+      const searchFilter = {
+        searchCriteriaList: filters,
+        dataOption: 'all',
+      };
+      dispatch(fetchAffaires(searchFilter))
+        .then((response) => {
+          // Check if response has data
+          console.log('response content data', response);
+          if (
+            response.payload.currentPageData &&
+            response.payload.currentPageData.length > 0
+          ) {
+            setShowNotification(true);
+          } else {
+            setShowNotification(false);
+          }
+        })
+        .catch((error) => {
+          // Handle the error
+          console.error('Error fetching affaires:', error);
+          setShowNotification(false);
+        });
+    }
+  };
+
+  const handleChangeForm = (event) => {
+    const { name, value } = event.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const prepareFilters = () => {
+    let searchCriteriaList = [];
+
+    if (formValues.laize && !isNaN(formValues.laize)) {
+      console.log('formValues.laize ', formValues.laize);
+      searchCriteriaList.push({
+        filterKey: 'laize',
+        operation: 'ge',
+        value: Number(formValues.laize) - 5,
+        dataOption: 'all',
+      });
+      searchCriteriaList.push({
+        filterKey: 'laize',
+        operation: 'le',
+        value: Number(formValues.laize) + 5,
+        dataOption: 'all',
+      });
+    }
+
+    if (formValues.developpe) {
+      searchCriteriaList.push({
+        filterKey: 'developpe',
+        operation: 'ge',
+        value: Number(formValues.developpe) - 5,
+        dataOption: 'all',
+      });
+      searchCriteriaList.push({
+        filterKey: 'developpe',
+        operation: 'le',
+        value: Number(formValues.developpe) + 5,
+        dataOption: 'all',
+      });
+
+      console.log('searchCriteriaList', searchCriteriaList);
+    }
+
+    if (formValues.forme) {
+      searchCriteriaList.push({
+        filterKey: 'type',
+        operation: 'eq',
+        value: formValues.forme,
+        dataOption: 'any',
+      });
+    }
+
+    if (affaireDetails.clientId) {
+      searchCriteriaList.push({
+        filterKey: 'client.id',
+        operation: 'eq',
+        value: affaireDetails.clientId,
+        dataOption: 'all',
+      });
+    }
+
+    return searchCriteriaList;
+  };
 
   const handleNotificationClose = () => {
     setShowNotification(false);
@@ -369,7 +484,10 @@ const CreateAffaire = () => {
                     name="laize"
                     label="LAIZE (EN MM)"
                     margin="normal"
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleChangeForm(e);
+                    }}
                     error={Boolean(formErrors.laize)}
                     helperText={formErrors.laize}
                   />
@@ -383,7 +501,10 @@ const CreateAffaire = () => {
                     name="developpe"
                     label="DEVELOPPE (EN MM)"
                     margin="normal"
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleChangeForm(e);
+                    }}
                     error={Boolean(formErrors.developpe)}
                     helperText={formErrors.type}
                   />
@@ -391,8 +512,11 @@ const CreateAffaire = () => {
                   <FormControl
                     style={{ width: '50%', marginLeft: '10px' }}
                     margin="normal"
-                    name="format"
-                    onChange={handleChange}
+                    name="forme"
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleChangeForm(e);
+                    }}
                     error={Boolean(formErrors.format)}
                     helperText={formErrors.format}
                   >
@@ -401,8 +525,11 @@ const CreateAffaire = () => {
                     <Select
                       displayEmpty
                       label={'Forme'}
-                      name="format"
-                      onChange={handleChange}
+                      name="forme"
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleChangeForm(e);
+                      }}
                     >
                       <MenuItem value="CARREE">CAR (CARREE)</MenuItem>
                       <MenuItem value="RECTANGULAIRE">
@@ -429,27 +556,45 @@ const CreateAffaire = () => {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
+                      marginBottom: '20px',
                     }}
                   >
                     <Typography variant="body1">
-                      You have some suggested affaires, click here to see more.
+                      Vous avez des propositions d'affaires, cliquez ici pour en
+                      voir plus.
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ cursor: 'pointer', color: '#6366F1' }}
-                      onClick={handleNotificationClick}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                      }}
                     >
-                      Open
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ cursor: 'pointer' }}
-                      onClick={handleNotificationClose}
-                    >
-                      X
-                    </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ cursor: 'pointer', color: '#6366F1' }}
+                        onClick={handleNotificationClick}
+                      >
+                        Open
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ cursor: 'pointer' }}
+                        onClick={handleNotificationClose}
+                      >
+                        X
+                      </Typography>
+                    </Box>
                   </Box>
                 )}
+
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={fetchSuggestedAffaires}
+                >
+                  Proposer une affaire similaire
+                </Button>
               </div>
 
               <div style={{ display: 'flex', gap: '20px' }}>
@@ -734,33 +879,6 @@ const CreateAffaire = () => {
             {snackbarMessage}
           </MuiAlert>
         </Snackbar>
-
-        <Snackbar
-          open={showNotification}
-          onClose={handleNotificationClose}
-          message="You have some suggested affaires, click here to see more"
-          action={
-            <>
-              <Button
-                color="secondary"
-                size="small"
-                onClick={handleNotificationClick}
-                style={{ color: '#6366F1' }} // Set the color of the button text
-              >
-                Open
-              </Button>
-              <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={handleNotificationClose}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </>
-          }
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        />
 
         <PopupAffaire open={isPopupOpen} onClose={handlePopupClose} />
       </Box>

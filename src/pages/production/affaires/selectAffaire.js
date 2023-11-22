@@ -177,7 +177,10 @@ const Page = () => {
     handleAffaireDetailsChange('clientName', client.nameClient);
   };
 
-  console.log('affaireDetails', affaireDetails);
+  useEffect(() => {
+    const today = dayjs().format('YYYY-MM-DDTHH:mm:ss');
+    handleAffaireDetailsChange('date', today);
+  }, []);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -306,6 +309,7 @@ const Page = () => {
                     );
 
                     setSelectedDate(newValue);
+                    console.log('formattedDateTime', formattedDateTime);
                     handleAffaireDetailsChange('date', formattedDateTime);
                   }}
                 />
