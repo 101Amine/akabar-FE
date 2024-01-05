@@ -67,7 +67,6 @@ export const fetchAffaires = createAsyncThunk(
       },
     );
 
-    console.log('response', response);
     return response.content;
   },
 );

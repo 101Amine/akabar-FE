@@ -15,37 +15,30 @@ export const createUserValidationSchema = Yup.object().shape({
     .required('Numéro de téléphone est requis'),
 });
 
+export const createDevisValidationSchema = Yup.object().shape({
+  codeDevis: Yup.string().required('Code de devis est requis'),
+  nameDevis: Yup.string().required('Nom de devis est requis'),
+});
+
 export const createAffaireValidationSchema = Yup.object().shape({
   name: Yup.string().required("Nom de l'affaire est requis"),
 });
 
-export const createAgentValidationSchema = Yup.object().shape({
-  name: Yup.string().required("Nom de l'agent est requis"),
-});
-
 export const createClientValidationSchema = Yup.object().shape({
   nameClient: Yup.string().required('Nom du client est requis'),
+});
 
-  // codeClient: Yup.string().required('Code du client est requis'),
-  //
-  // phone: Yup.string()
-  //   .matches(/^[0-9]+$/, 'Seuls les chiffres sont autorisés')
-  //   .length(10, 'Le numéro de téléphone doit comporter 10 chiffres'),
-  //
-  // fax: Yup.string().matches(/^[0-9]+$/, 'Seuls les chiffres sont autorisés'),
-  //
-  // ice: Yup.string().matches(/^[0-9]+$/, 'ICE du client est requis'),
-  //
-  // bankAccount: Yup.string().matches(
-  //   /^[0-9]+$/,
-  //   'Seuls les chiffres sont autorisés',
-  // ),
-  //
-  // address: Yup.string().required('Adresse est requise'),
+export const createAgentValidationSchema = Yup.object().shape({
+  code: Yup.string().required("Code d'agent est requis"),
+  name: Yup.string().required("Nom d'agent est requis"),
 });
 
 export const createArticleValidationSchema = Yup.object().shape({
   name: Yup.string().required("Nom d'article est requis"),
+  code: Yup.string().required("Code d'article est requis"),
+  family: Yup.string().required("Famille d'article est requis"),
+  priceHT: Yup.string().required("Prix hors taxe d'article est requis"),
+  unite: Yup.string().required("Unités d'article est requis"),
 });
 
 export const updateUserValidationSchema = Yup.object().shape({
@@ -91,6 +84,6 @@ export const creeateAffaireValidationSchema = Yup.object().shape({
   laize: Yup.string().required('laize est requis'),
   supportPapier: Yup.string().required(' Support (PAPIER) est requis'),
   quantiteUnitaire: Yup.string().required('quantite est requis'),
-  format: Yup.string().required('Forme est requis'),
+  forme: Yup.string().required('Forme est requis'),
   avecImpression: Yup.string().required('avec Impression est requis'),
 });

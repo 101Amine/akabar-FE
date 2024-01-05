@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { ComingSoonLogo } from './coming-soon-logo';
-import animationStyle from '../styles/animation.module.scss';
+import animationStyle from '../../styles/animation.module.scss';
 
 export const ComingSoon = () => {
   const [text, setText] = useState('');

@@ -13,12 +13,13 @@ import {
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchArticles } from '../../../redux/articleSlice';
-import { setRowsPerPage } from '../../../redux/userSlice';
-import { useClientFilters } from '../../../hooks/useClientFilters';
+import { setPage, setRowsPerPage } from '../../../redux/userSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/utils/BackButton';
 import { fetchAgents } from '../../../redux/agentSlice';
+import { useItemsFiltersV2 } from '../../../hooks/useItemsFiltersV2';
+import { fetchArticles } from '../../../redux/articleSlice';
+import { AgentsFilters } from '../../../sections/agents/article-filters';
 
 const agentsColumns = [
   { key: 'code', label: 'Code' },
@@ -32,18 +33,31 @@ const Page = () => {
   const agents = useSelector((state) => state.agent.agents);
 
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const [filters, setFilters] = useState({
+    name: '',
+    code: '',
+  });
+
+  const { fetchFilteredItems } = useItemsFiltersV2({
+    filters,
+    setFilters,
+    dispatch,
+    fetchAction: fetchAgents,
+  });
+
   useEffect(() => {
-    dispatch(fetchAgents({}));
+    dispatch(fetchAgents());
   }, [dispatch]);
 
   const handlePageChange = useCallback(
     (event) => {
       dispatch(setPage(event));
-      dispatch(fetchAgents({}));
+      dispatch(fetchAgents());
     },
     [dispatch],
   );
@@ -51,13 +65,13 @@ const Page = () => {
   const handleRowsPerPageChange = useCallback(
     (value) => {
       dispatch(setRowsPerPage(value));
-      dispatch(fetchAgents({}));
+      dispatch(fetchAgents());
     },
     [dispatch],
   );
 
   const proceedToForm = () => {
-    router.push('/ventes/agents/createAgent').then((r) => console.info(r));
+    router.push('/ventes/agents/agentForm');
   };
 
   return (
@@ -74,7 +88,9 @@ const Page = () => {
       >
         <Container
           maxWidth={isIconOnly ? 'false' : 'xl'}
-          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+          style={{
+            marginLeft: lgUp ? (isIconOnly ? '-100px' : '50px') : '0',
+          }}
         >
           <Stack spacing={3}>
             <BackButton />
@@ -102,18 +118,18 @@ const Page = () => {
                 </Button>
               </div>
             </Stack>
-            {/*<ClientFilters*/}
-            {/*  filters={filters}*/}
-            {/*  onFilterChange={(filterKey, value) => {*/}
-            {/*    setFilters((prevFilters) => ({*/}
-            {/*      ...prevFilters,*/}
-            {/*      [filterKey]: value,*/}
-            {/*    }));*/}
-            {/*  }}*/}
-            {/*  onFilterSubmit={() => {*/}
-            {/*    fetchFilteredClients();*/}
-            {/*  }}*/}
-            {/*/>*/}
+            <AgentsFilters
+              filters={filters}
+              onFilterChange={(filterKey, value) => {
+                setFilters((prevFilters) => ({
+                  ...prevFilters,
+                  [filterKey]: value,
+                }));
+              }}
+              onFilterSubmit={() => {
+                fetchFilteredItems();
+              }}
+            />
             <DataTable
               count={totalAgents}
               items={agents}

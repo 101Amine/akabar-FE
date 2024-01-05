@@ -1,11 +1,24 @@
 import { useTheme } from '@mui/material/styles';
+import { useMediaQuery } from '@mui/material';
 
 export const ComingSoonLogo = () => {
   const theme = useTheme();
   const fillColor = theme.palette.primary.main;
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+
+  const svgStyle = !lgUp
+    ? {
+        width: 'calc(100vw - 80px)',
+      }
+    : {};
 
   return (
-    <svg viewBox="0 0 834 690" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 834 690"
+      style={svgStyle}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <g id="undraw_dev_productivity_umsq 1" clip-path="url(#clip0)">
         <g id="man">
           <path

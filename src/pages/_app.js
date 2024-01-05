@@ -11,8 +11,13 @@ import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import 'simplebar-react/dist/simplebar.min.css';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
+import Appsignal from '@appsignal/javascript';
 
 const clientSideEmotionCache = createEmotionCache();
+
+const appsignal = new Appsignal({
+  key: 'fbfa7f6c-39c9-42cc-bc82-43c6d2bf757f',
+});
 
 const SplashScreen = () => null;
 
@@ -20,6 +25,8 @@ const App = (props) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
 
   useNProgress();
+
+  appsignal.demo();
 
   const getLayout = Component.getLayout ?? ((page) => page);
 

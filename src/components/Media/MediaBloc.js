@@ -3,7 +3,7 @@ import { Card, CardContent, TextField, Button, Grid } from '@mui/material';
 import AudioRecorder from './AudioRecorder';
 import ImageUploader from './ImageUploader';
 import PDFUPloader from './PDFUploader';
-import { fetchWithHeaders } from '../utils/api';
+import { fetchWithHeaders } from '../../utils/api';
 
 const onRecordingComplete = async (audioBlob) => {
   const formData = new FormData();
@@ -20,40 +20,32 @@ const onRecordingComplete = async (audioBlob) => {
     );
 
     if (response.ok) {
-      alert('File uploaded successfully');
-    } else {
-      alert('Error uploading file');
+      console.log('File uploaded successfully');
     }
   } catch (error) {
-    alert('Error uploading file');
+    console.error('Error uploading file');
   }
 };
-const MediaBloc = ({ onDescriptionChange, onPDFUpload, handleChange }) => {
+const MediaBloc = ({ handleChange }) => {
   return (
     <Card>
       <CardContent>
         <Grid container spacing={3}>
           {' '}
-          {/* Adjusted spacing to 3 (which is 24px) */}
-          {/* Audio Recorder */}
           <Grid item xs={12} md={6}>
             {' '}
-            {/* Adjusted to take half width on medium devices and up */}
             <Card variant="outlined">
               <AudioRecorder onRecordingComplete={onRecordingComplete} />
             </Card>
           </Grid>
-          {/* Image Upload */}
           <Grid item xs={12} md={6}>
             {' '}
-            {/* Adjusted to take half width on medium devices and up */}
             <Card variant="outlined">
               <ImageUploader />
             </Card>
           </Grid>
           <Grid item xs={12} md={6}>
             {' '}
-            {/* Adjusted to take half width on medium devices and up */}
             <TextField
               label="Informations Complémentaires"
               name={'texteInformatif'}
@@ -66,10 +58,8 @@ const MediaBloc = ({ onDescriptionChange, onPDFUpload, handleChange }) => {
               margin="normal"
             />
           </Grid>
-          {/* PDF Upload Section */}
           <Grid item xs={12} md={6}>
             {' '}
-            {/* Adjusted to take half width on medium devices and up */}
             <Card variant="outlined">
               <PDFUPloader />
             </Card>

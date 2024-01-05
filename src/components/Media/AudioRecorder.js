@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Button, Card, IconButton, Box } from '@mui/material';
 import axios from 'axios';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ROOT_URL } from '../utils/api';
+import { ROOT_URL } from '../../utils/api';
 
 function AudioRecorder({ onRecordingComplete }) {
   const [recording, setRecording] = useState(false);
@@ -22,16 +22,12 @@ function AudioRecorder({ onRecordingComplete }) {
         withCredentials: true,
       });
       if (response.status === 200) {
-        alert('Audio uploaded successfully');
         if (onRecordingComplete) {
           onRecordingComplete(audioBlob, response.data);
         }
-      } else {
-        alert('Error uploading audio');
       }
     } catch (error) {
       console.error('Error uploading audio:', error);
-      alert('Error uploading audio');
     }
   };
 
@@ -57,8 +53,7 @@ function AudioRecorder({ onRecordingComplete }) {
       mediaRecorderRef.current.start();
       setRecording(true);
     } catch (error) {
-      console.error('Error accessing audio device:', error);
-      alert('Error accessing audio device. Please check permissions.');
+      console.log('Error accessing audio device. Please check permissions.');
     }
   };
   const handleStopRecording = () => {

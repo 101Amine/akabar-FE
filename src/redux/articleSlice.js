@@ -1,16 +1,21 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchWithHeaders } from '../utils/api';
+import { findOneEntity } from './utils/findOneEntity';
+
+const API_PREFIX = '/stock/product';
 
 // Initial state
 const initialState = {
   articleDetails: {
     code: '',
-    name: '',
-    famille: '',
-    prixHT: '',
+    designation: '',
+    family: '',
+    priceHT: '',
     unite: '',
   },
   articles: [],
+  families: [],
+  units: [],
   page: 0,
   rowsPerPage: 5,
   totalPages: 1,
@@ -29,14 +34,23 @@ const initialState = {
  * @property {string} unite - the article's unite
  */
 export const addArticle = createAsyncThunk(
-  'client/addArticle',
+  'stock/addArticle',
   /**
    * @param {articleDetails} articleDetails
    */
   async (articleDetails) => {
-    return await fetchWithHeaders(`/users/client/add`, {
+    return await fetchWithHeaders(`${API_PREFIX}/add`, {
       method: 'POST',
       body: JSON.stringify(articleDetails),
+    });
+  },
+);
+
+export const getArticleFamilies = createAsyncThunk(
+  'stock/getArticleFamilies',
+  async () => {
+    return await fetchWithHeaders(`${API_PREFIX}/classifications`, {
+      method: 'GET',
     });
   },
 );
@@ -50,12 +64,12 @@ export const addArticle = createAsyncThunk(
  * @property {string} unite - the article's unite
  */
 export const updateArticle = createAsyncThunk(
-  'client/updateArticle',
+  'stock/updateArticle',
   /**
    * @param {articleUpdateDetails} articleUpdateDetails
    */
   async (articleUpdateDetails) => {
-    const response = await fetchWithHeaders(`/users/profile`, {
+    const response = await fetchWithHeaders(`${API_PREFIX}/update`, {
       method: 'POST',
       body: JSON.stringify(articleUpdateDetails),
     });
@@ -68,12 +82,12 @@ export const updateArticle = createAsyncThunk(
 );
 
 export const fetchArticles = createAsyncThunk(
-  'client/fetchArticles',
-  async (searchFilter = {}, { getState }) => {
+  'stock/fetchArticles',
+  async (searchFilter, { getState }) => {
     const { page, rowsPerPage } = getState().article;
 
     const response = await fetchWithHeaders(
-      `/users/client/list?offset=${rowsPerPage * page}&limit=${rowsPerPage}`,
+      `${API_PREFIX}/list?offset=${rowsPerPage * page}&limit=${rowsPerPage}`,
       {
         method: 'POST',
         body: JSON.stringify(searchFilter),
@@ -124,6 +138,8 @@ const articleSlice = createSlice({
       })
       .addCase(fetchArticles.fulfilled, (state, action) => {
         state.fetching = false;
+
+        console.log('action payload', action.payload);
         state.articles = action.payload.currentPageData || [];
         state.totalArticles = action.payload.totalElements;
         state.totalPages = action.payload.totalPages;
@@ -142,6 +158,20 @@ const articleSlice = createSlice({
       })
       .addCase(updateArticle.rejected, (state, action) => {
         state.submitting = false;
+        state.error = action.error.message;
+      })
+      .addCase(getArticleFamilies.fulfilled, (state, action) => {
+        const { families, units } = action.payload.content;
+        state.families = families;
+        state.units = units;
+      })
+      .addCase(getArticleFamilies.rejected, (state, action) => {
+        state.error = action.error.message;
+      })
+      .addCase(findOneEntity.fulfilled, (state, action) => {
+        state.articleDetails = action.payload;
+      })
+      .addCase(findOneEntity.rejected, (state, action) => {
         state.error = action.error.message;
       });
   },

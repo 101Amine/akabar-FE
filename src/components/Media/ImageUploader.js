@@ -11,7 +11,6 @@ function ImageUploader() {
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreviewUrl(e.target.result);
-        // You can also handle the image upload here
       };
       reader.readAsDataURL(file);
     }
@@ -19,14 +18,6 @@ function ImageUploader() {
 
   const handleDiscardImage = () => {
     setImagePreviewUrl(null);
-  };
-
-  const handleUploadImage = async () => {
-    // Implement the logic to handle the uploading of the image
-    alert('Image uploaded successfully!');
-    // Reset the state if necessary
-    setImagePreviewUrl(null);
-    // Additional logic for uploading the image
   };
 
   return (

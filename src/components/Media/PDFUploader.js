@@ -20,17 +20,6 @@ function PDFUploader({ onPDFUpload }) {
     setPdfPreviewUrl(null);
   };
 
-  const handleUploadPDF = async () => {
-    // Implement the logic to handle the uploading of the PDF
-    alert('PDF uploaded successfully!');
-    // Reset the state if necessary
-    setPdfPreviewUrl(null);
-    // Additional logic for uploading the PDF
-    if (onPDFUpload) {
-      onPDFUpload(pdfPreviewUrl);
-    }
-  };
-
   return (
     <Box
       sx={{

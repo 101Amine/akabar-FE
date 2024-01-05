@@ -20,8 +20,6 @@ export const loginUser = async (credentials) => {
     throw new Error('Error logging in');
   }
 
-  console.log('response', response);
-
   return response.content;
 };
 

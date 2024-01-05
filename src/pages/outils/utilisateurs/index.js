@@ -10,6 +10,7 @@ import {
   Stack,
   SvgIcon,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
@@ -18,7 +19,7 @@ import { fetchUsers, setPage, setRowsPerPage } from '../../../redux/userSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
 import { fetchClients } from '../../../redux/clientSlice';
 import { UsersFilters } from '../../../sections/users/users-search';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/utils/BackButton';
 
 const userColumns = [
   { key: 'name', label: 'Nom' },
@@ -36,6 +37,7 @@ const Page = () => {
   const users = useSelector((state) => state.user.users);
   const totalUsers = useSelector((state) => state.user.totalUsers);
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   const [filters, setFilters] = useState({
     firstName: '',
@@ -85,8 +87,6 @@ const Page = () => {
       dataOption: 'all',
     };
 
-    console.log('searchFilter', searchFilter);
-
     dispatch(fetchUsers(searchFilter));
   }, [dispatch, filters]);
 
@@ -95,7 +95,7 @@ const Page = () => {
   };
 
   const proceedToForm = () => {
-    router.push('/outils/utilisateurs/createUser').then((r) => console.log(r));
+    router.push('/outils/utilisateurs/userForm');
   };
 
   return (
@@ -112,7 +112,9 @@ const Page = () => {
       >
         <Container
           maxWidth={isIconOnly ? 'false' : 'xl'}
-          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+          style={{
+            marginLeft: lgUp ? (isIconOnly ? '-100px' : '50px') : '0',
+          }}
         >
           <Stack spacing={3}>
             <Stack spacing={3}>

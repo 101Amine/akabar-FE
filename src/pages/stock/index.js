@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { Box } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { ComingSoon } from 'src/components/coming-soon';
+import { ComingSoon } from 'src/components/ComingSoon/coming-soon';
 
 const Page = () => (
   <>

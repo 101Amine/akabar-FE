@@ -6,8 +6,10 @@ const initialState = {
   devisDetails: {
     numero: '',
     date: '',
-    name: '',
-    agent: '',
+    clientId: '',
+    affaireId: '',
+    articles: [],
+    agents: '',
     netAPayer: '',
     status: '',
   },

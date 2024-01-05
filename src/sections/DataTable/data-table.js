@@ -57,7 +57,11 @@ export const DataTable = ({
   };
 
   const renderColumnContent = (col, item, fullName) => {
-    if (col.key === 'name' && !isAffaire) {
+    if (
+      col.key === 'name' &&
+      !isAffaire &&
+      (entity === 'user' || entity === 'client')
+    ) {
       return (
         <Stack alignItems="center" direction="row" spacing={2}>
           <Avatar>{getInitials(fullName)}</Avatar>
@@ -82,7 +86,6 @@ export const DataTable = ({
   };
 
   const getStatusColor = (status) => {
-    console.log('status', status);
     switch (status) {
       case 'EN_PREPARATION':
         return '#ebcb0c';
@@ -102,19 +105,28 @@ export const DataTable = ({
 
     switch (entity) {
       case 'client':
-        route = '/ventes/clients/updateClient';
+        route = '/ventes/clients/clientForm';
         break;
-      case 'affaire':
-        route = '/ventes/affaires/updateAffaire';
+      case 'affaires':
+        route = '/production/affaires/updateAffaire';
+        break;
+      case 'article':
+        route = '/stock/articles/articleForm';
         break;
       case 'user':
-        route = '/outils/utilisateurs/updateUser';
+        route = '/outils/utilisateurs/userForm';
+        break;
+
+      case 'agent':
+        route = '/ventes/agents/agentForm';
         break;
     }
 
+    console.log('item', item);
+
     router.push({
       pathname: route,
-      query: { [entity]: JSON.stringify(item) },
+      query: { id: item.id },
     });
   };
 
@@ -148,7 +160,7 @@ export const DataTable = ({
 
   return (
     <Card>
-      <Box sx={{ minWidth: 800 }}>
+      <Box>
         <Table>
           <TableHead>
             <TableRow>
@@ -165,9 +177,10 @@ export const DataTable = ({
           </TableHead>
           <TableBody>
             {items.map((item) => {
-              const fullName = isAffaire
-                ? `${item.name}`
-                : `${item.firstName} ${item.lastName}`;
+              const fullName =
+                entity !== 'user' && entity !== 'client'
+                  ? `${item.name}`
+                  : `${item.firstName} ${item.lastName}`;
               return (
                 <TableRow
                   key={item.id}

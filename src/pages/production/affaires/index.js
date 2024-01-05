@@ -9,15 +9,17 @@ import {
   Stack,
   SvgIcon,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPage, setRowsPerPage } from '../../../redux/userSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/utils/BackButton';
 import { fetchAffaires } from '../../../redux/affaireSlice';
-import { AffairesFilters } from '../../../sections/affaires/affaires-search';
+import { AffairesFilters } from '../../../sections/affaires/affaires-filters';
+import { useItemsFilters } from '../../../hooks/useItemsFilters';
 
 const affaireColumns = [
   { key: 'name', label: 'Nom' },
@@ -37,10 +39,18 @@ const Page = () => {
   const affaires = useSelector((state) => state.affaire.affaires);
   const totalAffaires = useSelector((state) => state.affaire.totalAffaires);
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   const [filters, setFilters] = useState({
     'client.nameClient': '',
     name: '',
+  });
+
+  const { fetchFilteredItems } = useItemsFilters({
+    filters,
+    setFilters,
+    dispatch,
+    fetchAction: fetchAffaires,
   });
 
   useEffect(() => {
@@ -63,28 +73,6 @@ const Page = () => {
     [dispatch],
   );
 
-  const fetchFilteredAffaires = useCallback(() => {
-    const searchCriteriaList = Object.entries(filters)
-      .map(([key, value]) => {
-        return {
-          filterKey: key,
-          operation: 'cn',
-          value: value,
-          dataOption: 'all',
-        };
-      })
-      .filter(Boolean);
-
-    console.log('searchCriteriaList', searchCriteriaList);
-
-    const searchFilter = {
-      searchCriteriaList: searchCriteriaList,
-      dataOption: 'all',
-    };
-
-    dispatch(fetchAffaires(searchFilter));
-  }, [dispatch, filters]);
-
   const proceedToForm = () => {
     router
       .push('/production/affaires/selectAffaire')
@@ -105,7 +93,9 @@ const Page = () => {
       >
         <Container
           maxWidth={isIconOnly ? 'false' : 'xl'}
-          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+          style={{
+            marginLeft: lgUp ? (isIconOnly ? '-100px' : '50px') : '0',
+          }}
         >
           <Stack spacing={3}>
             <Stack spacing={3}>
@@ -142,7 +132,7 @@ const Page = () => {
                 }));
               }}
               onFilterSubmit={() => {
-                fetchFilteredAffaires();
+                fetchFilteredItems();
               }}
             />{' '}
             <DataTable

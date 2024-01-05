@@ -27,7 +27,6 @@ export const signIn = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await authAPI.loginUser(credentials);
-      console.log('response', response);
       if (response) {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem(
@@ -48,9 +47,7 @@ export const signOut = createAsyncThunk(
   'auth/signOut',
   async (_, { rejectWithValue }) => {
     try {
-      console.log('hitting it');
       const response = await authAPI.logoutUser();
-      console.log('response in logout', response);
       if (response === 200) {
         localStorage.removeItem('isAuthenticated');
         localStorage.removeItem('userName');
@@ -59,7 +56,6 @@ export const signOut = createAsyncThunk(
         throw new Error('Sign out failed');
       }
     } catch (error) {
-      console.log('error message', error);
       return rejectWithValue(error.message);
     }
   },
@@ -88,7 +84,6 @@ const authSlice = createSlice({
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.isAuthenticated = true;
-        console.log('action.payload', action);
         state.name = `${action.payload.firstName} ${action.payload.lastName}`;
       })
       .addCase(signIn.rejected, (state, action) => {

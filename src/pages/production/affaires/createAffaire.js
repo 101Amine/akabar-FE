@@ -22,7 +22,6 @@ import {
   FormHelperText,
   InputLabel,
   ListItemIcon,
-  IconButton,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
@@ -33,7 +32,7 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/utils/BackButton';
 import {
   addAffaire,
   clearAffaireDetails,
@@ -43,20 +42,25 @@ import {
 import { creeateAffaireValidationSchema } from '../../../utils/validationService';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import Loader from '../../../components/Loader';
-import ImpressionDetails from '../../../components/ImpressionDetails';
-import CustomCardComponent from '../../../components/CustomCardComponent';
-import MediaBloc from '../../../components/MediaBloc';
-import PopupAffaire from '../../../components/PopupAffaire';
-import { debounce } from 'lodash';
+import Loader from '../../../components/utils/Loader';
+import ImpressionDetails from '../../../components/Affaire/ImpressionDetails';
+import CustomCardComponent from '../../../components/Affaire/CustomCardComponent';
+import MediaBloc from '../../../components/Media/MediaBloc';
+import PopupAffaire from '../../../components/Affaire/PopupAffaire';
 
 const CreateAffaire = () => {
+  // Redux dispatch and router hooks
   const dispatch = useDispatch();
   const router = useRouter();
+  const { id } = router.query; // Extracting ID from the URL
+  const isUpdateMode = Boolean(id);
+
+  // Redux state selectors
   const { affaireDetails, submitting, error, success, loading } = useSelector(
     (state) => state.affaire,
   );
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+
   const booleanGroups = [
     'avecImpression',
     'repiquage',
@@ -152,10 +156,8 @@ const CreateAffaire = () => {
   );
 
   const fetchSuggestedAffaires = () => {
-    console.log('formValues', formValues);
     if (formValues.laize && formValues.developpe && formValues.forme) {
       const filters = prepareFilters();
-      console.log('we inside');
 
       const searchFilter = {
         searchCriteriaList: filters,
@@ -164,7 +166,6 @@ const CreateAffaire = () => {
       dispatch(fetchAffaires(searchFilter))
         .then((response) => {
           // Check if response has data
-          console.log('response content data', response);
           if (
             response.payload.currentPageData &&
             response.payload.currentPageData.length > 0
@@ -194,7 +195,6 @@ const CreateAffaire = () => {
     let searchCriteriaList = [];
 
     if (formValues.laize && !isNaN(formValues.laize)) {
-      console.log('formValues.laize ', formValues.laize);
       searchCriteriaList.push({
         filterKey: 'laize',
         operation: 'ge',
@@ -222,8 +222,6 @@ const CreateAffaire = () => {
         value: Number(formValues.developpe) + 5,
         dataOption: 'all',
       });
-
-      console.log('searchCriteriaList', searchCriteriaList);
     }
 
     if (formValues.forme) {
@@ -301,7 +299,6 @@ const CreateAffaire = () => {
       );
     }
   };
-
   const SortiePositions =
     radioValues?.typeSortie === 'Externe'
       ? ['N_1', 'N_2', 'N_3', 'N_4']

@@ -22,7 +22,6 @@ const PrintingOptions = ({
         error={formErrors.avecImpression}
         helperText={formErrors.avecImpression}
       />
-      {/* Additional fields based on 'avecImpression' value can be added here */}
     </div>
   );
 };

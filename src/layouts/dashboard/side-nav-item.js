@@ -13,6 +13,7 @@ export const SideNavItem = (props) => {
     path,
     title,
     onItemClicked,
+    lgUp,
   } = props;
 
   const handleItemClick = () => {
@@ -69,7 +70,7 @@ export const SideNavItem = (props) => {
                   color: 'neutral.400',
                   display: 'inline-flex',
                   justifyContent: 'center',
-                  mr: 2,
+                  mr: lgUp ? 2 : 0,
                   ...(active && {
                     color: '#164cc8',
                   }),
@@ -78,27 +79,29 @@ export const SideNavItem = (props) => {
                 {icon}
               </Box>
             )}
-            <Box
-              component="span"
-              className="childBox"
-              sx={{
-                color: 'white',
-                flexGrow: 1,
-                fontFamily: (theme) => theme.typography.fontFamily,
-                fontSize: 14,
-                fontWeight: 600,
-                lineHeight: '24px',
-                whiteSpace: 'nowrap',
-                ...(active && {
-                  color: '#164cc8',
-                }),
-                ...(disabled && {
-                  color: '#000',
-                }),
-              }}
-            >
-              {title}
-            </Box>
+            {lgUp && (
+              <Box
+                component="span"
+                className="childBox"
+                sx={{
+                  color: 'white',
+                  flexGrow: 1,
+                  fontFamily: (theme) => theme.typography.fontFamily,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  lineHeight: '24px',
+                  whiteSpace: 'nowrap',
+                  ...(active && {
+                    color: '#164cc8',
+                  }),
+                  ...(disabled && {
+                    color: '#000',
+                  }),
+                }}
+              >
+                {title}
+              </Box>
+            )}
           </LinkComponent>
         </NextLink>
       ) : (

@@ -20,9 +20,8 @@ import {
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { Layout as DashboardLayout } from '../../../layouts/dashboard/layout';
-import UpdateClient from '../../ventes/clients/updateClient';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/utils/BackButton';
+import { useSelector } from 'react-redux';
 
 const UpdateAffaire = () => {
   const router = useRouter();

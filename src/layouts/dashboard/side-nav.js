@@ -13,8 +13,8 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { Logo } from 'src/components/logo';
-import { Scrollbar } from 'src/components/scrollbar';
+import { Logo } from 'src/components/utils/logo';
+import { Scrollbar } from 'src/components/utils/scrollbar';
 import { styled, useTheme } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
 import { disableIconOnly, setIconOnly } from '../../redux/uiSlice';
@@ -106,17 +106,19 @@ export const SideNav = (props) => {
                 <div>
                   <Logo />
                 </div>
-                <Typography
-                  color="white"
-                  variant="subtitle1"
-                  fontFamily={'cursive'}
-                  letterSpacing={'5px'}
-                  fontWeight={'bold'}
-                  fontSize={'18px'}
-                  marginTop={'-2px'}
-                >
-                  Akabar
-                </Typography>
+                {lgUp && (
+                  <Typography
+                    color="white"
+                    variant="subtitle1"
+                    fontFamily={'cursive'}
+                    letterSpacing={'5px'}
+                    fontWeight={'bold'}
+                    fontSize={'18px'}
+                    marginTop={'-2px'}
+                  >
+                    Akabar
+                  </Typography>
+                )}
               </>
             )}
           </Box>
@@ -209,7 +211,7 @@ export const SideNav = (props) => {
         sx: {
           backgroundColor: 'neutral.800',
           color: 'common.white',
-          width: 280,
+          width: lgUp ? 280 : 80,
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,

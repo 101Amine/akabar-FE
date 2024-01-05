@@ -1,5 +1,5 @@
 import React from 'react';
-import FormTextField from './FormTextField';
+import FormTextField from '../Affaire/FormTextField';
 
 const AffaireDetails = ({ affaireDetails, handleChange, formErrors }) => {
   return (

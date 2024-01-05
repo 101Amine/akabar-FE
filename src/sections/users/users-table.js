@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { Scrollbar } from 'src/components/scrollbar';
+import { Scrollbar } from 'src/components/utils/scrollbar';
 import { getInitials } from 'src/utils/get-initials';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
@@ -39,7 +39,6 @@ export const UsersTable = (props) => {
   } = props;
 
   const handleEdit = (user) => {
-    console.log('user', user);
     router.push({
       pathname: '/users/updateUser',
       query: { user: JSON.stringify(user) },
@@ -47,8 +46,6 @@ export const UsersTable = (props) => {
   };
 
   const handleBlock = async (id) => {
-    console.log('Blocking user with ID:', id);
-
     const payload = {
       active: false,
     };
@@ -59,7 +56,6 @@ export const UsersTable = (props) => {
         body: JSON.stringify(payload),
       });
 
-      console.log('User blocked successfully', response);
       setSnackbarMessage('User blocked successfully!');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
@@ -117,7 +113,6 @@ export const UsersTable = (props) => {
                           aria-label="edit customer"
                           onClick={() => {
                             handleEdit(customer);
-                            console.log('curstomer :', customer);
                           }}
                         >
                           <EditIcon />

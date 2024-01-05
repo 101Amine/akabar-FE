@@ -9,16 +9,17 @@ import {
   Stack,
   SvgIcon,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
-import { ClientFilters } from 'src/sections/clients/client-search';
+import { ClientFilters } from 'src/sections/clients/client-filters';
 import { useDispatch, useSelector } from 'react-redux';
-import { useClientFilters } from '../../../hooks/useClientFilters';
 import { fetchClients } from '../../../redux/clientSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
 import { setRowsPerPage } from '../../../redux/userSlice';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/utils/BackButton';
+import { useItemsFilters } from '../../../hooks/useItemsFilters';
 
 const clientColumns = [
   { key: 'nameClient', label: 'Nom' },
@@ -36,11 +37,24 @@ const Page = () => {
   const totalClients = useSelector((state) => state.client.totalClients);
   const clients = useSelector((state) => state.client.clients);
 
-  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
-  const { filters, setFilters, fetchFilteredClients } = useClientFilters();
-
-  const router = useRouter();
   const dispatch = useDispatch();
+  const router = useRouter();
+
+  const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+
+  const [filters, setFilters] = useState({
+    nameClient: '',
+    codeClient: '',
+    ice: '',
+  });
+
+  const { fetchFilteredItems } = useItemsFilters({
+    filters,
+    setFilters,
+    dispatch,
+    fetchAction: fetchClients,
+  });
 
   useEffect(() => {
     dispatch(fetchClients({}));
@@ -63,7 +77,7 @@ const Page = () => {
   );
 
   const proceedToForm = () => {
-    router.push('/ventes/clients/createClient').then((r) => console.info(r));
+    router.push('/ventes/clients/clientForm').then((r) => console.info(r));
   };
 
   return (
@@ -80,7 +94,9 @@ const Page = () => {
       >
         <Container
           maxWidth={isIconOnly ? 'false' : 'xl'}
-          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+          style={{
+            marginLeft: lgUp ? (isIconOnly ? '-100px' : '50px') : '0',
+          }}
         >
           <Stack spacing={3}>
             <BackButton />
@@ -117,7 +133,7 @@ const Page = () => {
                 }));
               }}
               onFilterSubmit={() => {
-                fetchFilteredClients();
+                fetchFilteredItems();
               }}
             />
             <DataTable

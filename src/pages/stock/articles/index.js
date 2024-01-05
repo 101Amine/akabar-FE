@@ -9,24 +9,24 @@ import {
   Stack,
   SvgIcon,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchArticles } from '../../../redux/articleSlice';
-import { setRowsPerPage } from '../../../redux/userSlice';
-import { useClientFilters } from '../../../hooks/useClientFilters';
+import { setPage, setRowsPerPage } from '../../../redux/userSlice';
 import { DataTable } from '../../../sections/DataTable/data-table';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/utils/BackButton';
+import { ArticleFilters } from '../../../sections/articles/article-filters';
+import { useItemsFiltersV2 } from '../../../hooks/useItemsFiltersV2';
 
 const articleColumns = [
-  { key: 'nameClient', label: 'Nom' },
-  { key: 'codeClient', label: 'Code' },
-  { key: 'phone', label: 'Telephone' },
-  { key: 'fax', label: 'fax' },
-  { key: 'ice', label: 'Ice' },
-  { key: 'address', label: 'Addresse' },
-  { key: 'bankAccount', label: 'Compte bancaire' },
+  { key: 'code', label: 'Code' },
+  { key: 'name', label: 'Nom' },
+  { key: 'family', label: 'Famille' },
+  { key: 'unite', label: 'unité' },
+  { key: 'priceHT', label: 'prix HT' },
 ];
 
 const Page = () => {
@@ -34,20 +34,33 @@ const Page = () => {
   const rowsPerPage = useSelector((state) => state.article.rowsPerPage);
   const totalArticles = useSelector((state) => state.article.totalArticles);
   const articles = useSelector((state) => state.article.articles);
-
   const isIconOnly = useSelector((state) => state.ui.isIconOnly);
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const [filters, setFilters] = useState({
+    designation: '',
+    code: '',
+    family: '',
+  });
+
+  const { fetchFilteredItems } = useItemsFiltersV2({
+    filters,
+    setFilters,
+    dispatch,
+    fetchAction: fetchArticles,
+  });
+
   useEffect(() => {
-    dispatch(fetchArticles({}));
+    dispatch(fetchArticles());
   }, [dispatch]);
 
   const handlePageChange = useCallback(
     (event) => {
       dispatch(setPage(event));
-      dispatch(fetchArticles({}));
+      dispatch(fetchArticles());
     },
     [dispatch],
   );
@@ -55,13 +68,13 @@ const Page = () => {
   const handleRowsPerPageChange = useCallback(
     (value) => {
       dispatch(setRowsPerPage(value));
-      dispatch(fetchArticles({}));
+      dispatch(fetchArticles());
     },
     [dispatch],
   );
 
   const proceedToForm = () => {
-    router.push('/stock/articles/createArticle').then((r) => console.info(r));
+    router.push('/stock/articles/articleForm').then((r) => console.info(r));
   };
 
   return (
@@ -78,7 +91,9 @@ const Page = () => {
       >
         <Container
           maxWidth={isIconOnly ? 'false' : 'xl'}
-          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+          style={{
+            marginLeft: lgUp ? (isIconOnly ? '-100px' : '50px') : '0',
+          }}
         >
           <Stack spacing={3}>
             <BackButton />
@@ -106,23 +121,23 @@ const Page = () => {
                 </Button>
               </div>
             </Stack>
-            {/*<ClientFilters*/}
-            {/*  filters={filters}*/}
-            {/*  onFilterChange={(filterKey, value) => {*/}
-            {/*    setFilters((prevFilters) => ({*/}
-            {/*      ...prevFilters,*/}
-            {/*      [filterKey]: value,*/}
-            {/*    }));*/}
-            {/*  }}*/}
-            {/*  onFilterSubmit={() => {*/}
-            {/*    fetchFilteredClients();*/}
-            {/*  }}*/}
-            {/*/>*/}
+            <ArticleFilters
+              filters={filters}
+              onFilterChange={(filterKey, value) => {
+                setFilters((prevFilters) => ({
+                  ...prevFilters,
+                  [filterKey]: value,
+                }));
+              }}
+              onFilterSubmit={() => {
+                fetchFilteredItems();
+              }}
+            />
             <DataTable
               count={totalArticles}
               items={articles}
               columns={articleColumns}
-              entity="client"
+              entity="article"
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
               page={page}

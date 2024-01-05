@@ -1,11 +1,14 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchWithHeaders } from '../utils/api';
+import { findOneEntity } from './utils/findOneEntity';
+
+const API_PREFIX = '/agent';
 
 // Initial state for agents
 const initialState = {
   agentDetails: {
     code: '',
-    nomAgent: '',
+    name: '',
   },
   agents: [],
   page: 0,
@@ -28,10 +31,21 @@ export const addAgent = createAsyncThunk(
    * @param {AgentDetails} agentDetails
    */
   async (agentDetails) => {
-    return await fetchWithHeaders(`/agents/add`, {
+    return await fetchWithHeaders(`${API_PREFIX}/add`, {
       method: 'POST',
       body: JSON.stringify(agentDetails),
     });
+  },
+);
+
+export const getAgentDetails = createAsyncThunk(
+  'agent/addAgent',
+  async (id) => {
+    const response = await fetchWithHeaders(`${API_PREFIX}/findOne/${id}`, {
+      method: 'POST',
+    });
+
+    return response.json();
   },
 );
 
@@ -41,7 +55,7 @@ export const updateAgent = createAsyncThunk(
    * @param {AgentDetails} agentDetails
    */
   async (agentDetails) => {
-    const response = await fetchWithHeaders(`/agents/update`, {
+    const response = await fetchWithHeaders(`${API_PREFIX}/update`, {
       method: 'POST',
       body: JSON.stringify(agentDetails),
     });
@@ -55,13 +69,17 @@ export const updateAgent = createAsyncThunk(
 
 export const fetchAgents = createAsyncThunk(
   'agent/fetchAgents',
-  async (searchFilter = {}, { getState }) => {
+  async (searchFilter, { getState }) => {
     const { page, rowsPerPage } = getState().agent;
 
+    console.log('searchFilter', searchFilter);
     const response = await fetchWithHeaders(
-      `/agents/list?offset=${rowsPerPage * page}&limit=${rowsPerPage}`,
+      `${API_PREFIX}/list?offset=${rowsPerPage * page}&limit=${rowsPerPage}`,
       {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Ensure the content type is set for JSON
+        },
         body: JSON.stringify(searchFilter),
       },
     );
@@ -125,6 +143,12 @@ const agentSlice = createSlice({
       })
       .addCase(updateAgent.rejected, (state, action) => {
         state.submitting = false;
+        state.error = action.error.message;
+      })
+      .addCase(findOneEntity.fulfilled, (state, action) => {
+        state.agentDetails = action.payload;
+      })
+      .addCase(findOneEntity.rejected, (state, action) => {
         state.error = action.error.message;
       });
   },

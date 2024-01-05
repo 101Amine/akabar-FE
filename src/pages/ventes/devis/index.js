@@ -9,13 +9,14 @@ import {
   Stack,
   SvgIcon,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { DataTable } from '../../../sections/DataTable/data-table';
 import { setRowsPerPage, setPage } from '../../../redux/userSlice';
-import BackButton from '../../../components/BackButton';
+import BackButton from '../../../components/utils/BackButton';
 import { fetchDevis } from '../../../redux/devisSlice';
 
 const devisColumns = [
@@ -37,6 +38,8 @@ const Page = () => {
 
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   useEffect(() => {
     dispatch(fetchDevis({}));
@@ -76,7 +79,7 @@ const Page = () => {
       >
         <Container
           maxWidth={isIconOnly ? 'false' : 'xl'}
-          style={{ marginLeft: isIconOnly ? '-100px' : '50px' }}
+          style={{ marginLeft: !lgUp ? '0px' : isIconOnly ? '-100px' : '50px' }}
         >
           <Stack spacing={3}>
             <BackButton />

@@ -14,8 +14,8 @@ import {
   MenuItem,
   InputLabel,
 } from '@mui/material';
-import SortieSelectionCard from '../pages/production/affaires/senseSortieCheckBoxes';
-import MediaBloc from './MediaBloc';
+import SortieSelectionCard from '../../pages/production/affaires/senseSortieCheckBoxes';
+import MediaBloc from '../Media/MediaBloc';
 const ImpressionDetails = ({
   affaireDetails,
   radioValues,

@@ -48,7 +48,8 @@ export const TopNav = (props) => {
             lg: paddingLeftValue,
           },
           top: 0,
-          marginLeft: '15px',
+          width: lgUp ? 'calc(100% - 15px)' : '100vw',
+          marginLeft: lgUp ? '15px' : '0px',
           zIndex: (theme) => theme.zIndex.appBar,
         }}
       >
@@ -75,7 +76,11 @@ export const TopNav = (props) => {
               style={{
                 display: 'flex',
                 gap: '15px',
-                paddingLeft: isIconOnly ? '80px' : `${SIDE_NAV_WIDTH - 5}px`,
+                paddingLeft: !lgUp
+                  ? '0px'
+                  : isIconOnly
+                  ? '80px'
+                  : `${SIDE_NAV_WIDTH - 5}px`, // Updated paddingLeft
                 listStyle: 'none',
               }}
             >
@@ -97,6 +102,7 @@ export const TopNav = (props) => {
                     key={item.title}
                     path={item.path}
                     title={item.title}
+                    lgUp={lgUp}
                     onItemClicked={handleTopNavClick}
                   />
                 );

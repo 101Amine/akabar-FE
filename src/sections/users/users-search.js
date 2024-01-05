@@ -22,8 +22,6 @@ export const UsersFilters = ({
   setHasInteractedWithStatus,
 }) => {
   const handleInputChange = (filterKey, value) => {
-    console.log('filterKey', filterKey);
-    console.log('value', value);
     onFilterChange(filterKey, value);
   };
 

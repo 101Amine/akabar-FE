@@ -27,7 +27,6 @@ export const addUser = createAsyncThunk(
 export const blockUser = createAsyncThunk(
   'user/blockUser',
   async (idOrEmail) => {
-    console.log('idOrEmail', idOrEmail);
     const payload = {
       active: false,
       ...(typeof idOrEmail === 'string' && { email: idOrEmail }),
@@ -146,7 +145,6 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.fetching = false;
-        console.log('new action.payload', action.payload.currentPageData);
         state.users = action.payload.currentPageData || [];
         state.totalUsers = action.payload.totalElements;
         state.totalPages = action.payload.totalPages;

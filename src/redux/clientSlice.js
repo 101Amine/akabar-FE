@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchWithHeaders } from '../utils/api';
+import { findOneEntity } from './utils/findOneEntity';
 
 // Initial state
 const initialState = {
@@ -148,6 +149,12 @@ const clientSlice = createSlice({
       })
       .addCase(updateClient.rejected, (state, action) => {
         state.submitting = false;
+        state.error = action.error.message;
+      })
+      .addCase(findOneEntity.fulfilled, (state, action) => {
+        state.clientDetails = action.payload;
+      })
+      .addCase(findOneEntity.rejected, (state, action) => {
         state.error = action.error.message;
       });
   },

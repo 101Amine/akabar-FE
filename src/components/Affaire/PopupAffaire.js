@@ -1,13 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
-import { ClientFilters } from '../sections/clients/client-search';
-import { DataTable } from '../sections/DataTable/data-table';
+import { DataTable } from '../../sections/DataTable/data-table';
 import { useDispatch, useSelector } from 'react-redux';
-import { setPage, setRowsPerPage } from '../redux/userSlice';
-import { fetchAffaires, setAffaireDetails } from '../redux/affaireSlice';
-import { AffairesFilters } from '../sections/affaires/affaires-search';
-import { useRouter } from 'next/router';
-import affaireDetails from './AffaireDetails';
+import { setPage, setRowsPerPage } from '../../redux/userSlice';
+import { fetchAffaires } from '../../redux/affaireSlice';
+import { AffairesFilters } from '../../sections/affaires/affaires-filters';
+import { useAffaireDetailsHandler } from '../../utils/handlers';
 
 const affaireColumns = [
   { key: 'name', label: 'Nom' },
@@ -19,42 +17,29 @@ const affaireColumns = [
 ];
 
 const PopupAffaire = ({ open, onClose, setOpenDialog }) => {
-  const router = useRouter();
   const dispatch = useDispatch();
 
   const page = useSelector((state) => state.affaire.page);
   const rowsPerPage = useSelector((state) => state.affaire.rowsPerPage);
   const affaires = useSelector((state) => state.affaire.affaires);
   const totalAffaires = useSelector((state) => state.affaire.totalAffaires);
-
+  const { affaireDetails } = useSelector((state) => state.affaire);
   const [setSelectedAffaire, selectedAffaire] = useState();
   const [filters, setFilters] = useState({
     'client.nameClient': '',
     name: '',
   });
 
+  const handleAffaireDetailsChange = useAffaireDetailsHandler(
+    affaireDetails,
+    dispatch,
+  );
+
   const handleRowClick = (affaire) => {
     setSelectedAffaire(affaire);
     onClose();
-    handleAffaireDetailsChange('clientName', affaire.name);
+    handleAffaireDetailsChange('clientName', affaire.name, dispatch);
   };
-
-  const handleAffaireDetailsChange = useCallback(
-    (nameOrEvent, value) => {
-      let newName, newValue;
-
-      if (nameOrEvent && nameOrEvent.target) {
-        newName = nameOrEvent.target.name;
-        newValue = nameOrEvent.target.value;
-      } else {
-        newName = nameOrEvent;
-        newValue = value;
-      }
-
-      dispatch(setAffaireDetails({ ...affaireDetails, [newName]: newValue }));
-    },
-    [affaireDetails, dispatch],
-  );
 
   const handlePageChange = useCallback(
     (event) => {
@@ -83,8 +68,6 @@ const PopupAffaire = ({ open, onClose, setOpenDialog }) => {
         };
       })
       .filter(Boolean);
-
-    console.log('searchCriteriaList', searchCriteriaList);
 
     const searchFilter = {
       searchCriteriaList: searchCriteriaList,
